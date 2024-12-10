@@ -1,7 +1,7 @@
 import CardImage from "@components/Cards/CardImage";
 import CardVideo from "@components/Cards/CardVideo";
 import DataContext from "@context/datacontext";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 export default function Cards() {
   const [data, setData] = useContext(DataContext);
   return (

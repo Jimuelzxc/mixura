@@ -6,6 +6,7 @@ import Videospage from "./pages/Videospages";
 import Navbar from "@layout/Navbar";
 import Header from "@layout/Header";
 import ParentContainer from "@layout/others/ParentContainer";
+import Save from "./pages/grabber/Save";
 
 import { addDataLocalStorage, showDataLocalStorage } from "./database/localstorage";
 import { useEffect, useState } from "react";
@@ -21,9 +22,11 @@ function App() {
         <Navbar />
         <Header>Moodboard</Header>
         <Routes>
+
           <Route path="/" element={<Mainpage />} />
           <Route path="/images" element={<Imagespage />} />
           <Route path="/videos" element={<Videospage />} />
+          <Route path="/save" element={<Save />} />
         </Routes>
       </DataContext.Provider>
     </ParentContainer>

@@ -1,0 +1,14 @@
+{
+    "manifest_version": 2,
+    "name": "Mixura",
+    "version": "1.0",
+    "permissions": ["contextMenus"],
+    "background": {
+        "scripts": ["background.js"]
+    },
+    "applications": {
+        "gecko": {
+            "id": "mixura-grabber@mixura.com"
+        }
+    }
+}

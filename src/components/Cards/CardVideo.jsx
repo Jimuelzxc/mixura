@@ -6,7 +6,7 @@ export default function CardVideo({value}) {
   return (
     <div id="card" className="flex flex-col gap-2 break-inside-avoid mb-10">
       <div className="rounded-md overflow-hidden">
-        <iframe height="289" width="100%" src={`https://www.youtube.com/embed/${getParams}?autoplay=1&mute=1`} allow="autoplay" allowFullScreen></iframe>
+        <iframe height="289" width="100%" src={`https://www.youtube.com/embed/${getParams}?autoplay=1&mute=1&loop=1&playlist=${getParams}&controls=0`} allow="autoplay; loop" allowFullScreen></iframe>
       </div>
       {/*<div id="card-details" className="">
         <h1 className="text-[1.4em]">Motion #1</h1>
