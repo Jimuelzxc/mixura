@@ -1,22 +1,22 @@
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect} from "react";
 import Wrapper from "@layout/others/Wrapper";
 import SaveBarInput from "@components/Navbar/SaveBarInput";
 import Settings from "@components/Navbar/Settings";
 
 import { useInput } from "@hooks/useInput";
-import { addDataFromLocalStorage } from "@database/localstorage";
+import { addDataLocalStorage, showDataLocalStorage} from "@database/localstorage";
 import { addCard } from "@utils/addCard";
+import DataContext from "@context/DataContext";
 
 
 const Navbar = () => {
-  const [data, setData] = useState([]);
+  const [data, setData] = useContext(DataContext)
   const savebarInput = useInput();
   useEffect(() => {
     savebarInput.ref.current.focus();
     savebarInput.setValue("")
-    addDataFromLocalStorage(data);
+    addDataLocalStorage(data);
   }, [data]);
-
 
   return (
     <div className=" py-4 border-b fixed top-0 w-full bg-white">
