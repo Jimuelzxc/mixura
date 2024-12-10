@@ -1,10 +1,10 @@
 import Hashtag from "@components/Hashtag";
-export default function CardImage() {
+export default function CardImage({value}) {
   return (
     <div id="card" className="flex flex-col gap-2 break-inside-avoid mb-10">
       <div className="rounded-md overflow-hidden">
         <img
-          src="https://i.pinimg.com/originals/1c/93/22/1c9322cb0c2b18c52c9ac4fcb7a9fdbd.gif"
+          src={value.url}
           alt=""
         />
       </div>

@@ -1,9 +1,12 @@
 import Hashtag from "@components/Hashtag";
-export default function CardVideo() {
+export default function CardVideo({value}) {
+  const urlOBJ = new URL(value.url)
+  const getParams = urlOBJ.searchParams.get("v")
+  console.log(getParams)
   return (
     <div id="card" className="flex flex-col gap-2 break-inside-avoid mb-10">
       <div className="rounded-md overflow-hidden">
-        <iframe height="300" width="100%" src="https://www.youtube.com/embed/2KhL-fwkx8s?si=lEJhWhJ-2CCARJ7C" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        <iframe height="289" width="100%" src={`https://www.youtube.com/embed/${getParams}?autoplay=1&mute=1`} allow="autoplay" allowFullScreen></iframe>
       </div>
       {/*<div id="card-details" className="">
         <h1 className="text-[1.4em]">Motion #1</h1>

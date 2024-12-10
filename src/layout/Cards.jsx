@@ -1,13 +1,18 @@
 import CardImage from "@components/Cards/CardImage";
 import CardVideo from "@components/Cards/CardVideo";
+import DataContext from "@context/datacontext";
+import { useContext } from "react";
 export default function Cards() {
+  const [data, setData] = useContext(DataContext);
   return (
     <div id="cards" className="columns-1 lg:columns-3 md:columns-2">
-      <CardImage />
-      <CardVideo />      
-      <CardImage />
-
+      {data.map((value, index) => {
+        if (value.type === "image") {
+          return <CardImage value={value} />;
+        } else {
+          return <CardVideo value={value} />;
+        }
+      })}
     </div>
   );
 }
-
