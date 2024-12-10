@@ -12,6 +12,7 @@ export default defineConfig({
       '@layout': path.resolve(__dirname, './src/layout'),
       '@hooks': path.resolve(__dirname, './src/hooks'),
       '@database': path.resolve(__dirname, './src/database'),
+      '@utils': path.resolve(__dirname, './src/utils'),
     },
   },
 });

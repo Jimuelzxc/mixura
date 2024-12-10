@@ -5,26 +5,18 @@ import Settings from "@components/Navbar/Settings";
 
 import { useInput } from "@hooks/useInput";
 import { addDataFromLocalStorage } from "@database/localstorage";
+import { addCard } from "@utils/addCard";
+
 
 const Navbar = () => {
   const [data, setData] = useState([]);
   const savebarInput = useInput();
   useEffect(() => {
     savebarInput.ref.current.focus();
-  }, [savebarInput.value]);
-  useEffect(() => {
+    savebarInput.setValue("")
     addDataFromLocalStorage(data);
   }, [data]);
 
-  const addImageCard = () => {
-    const imgext = [".jpg", ".jpeg", ".png", ".webp", ".gif"];
-    const getimgext = savebarInput.value.split(".").pop()  
-    imgext.some((ext) => savebarInput.value.endsWith(ext)) ? setData([...data, { url: savebarInput.value, type:"image", ext: getimgext}]): alert(false)
-  }
-
-  const addVideoCard = () => {
-    
-  }
 
   return (
     <div className=" py-4 border-b fixed top-0 w-full bg-white">
@@ -34,7 +26,7 @@ const Navbar = () => {
           inputRef={savebarInput.ref}
           value={savebarInput.value}
           onChange={savebarInput.handleOnChange}
-          onKeyDown={(e) => (e.key === "Enter" ? addImageCard() : null)}
+          onKeyDown={(e) => (e.key === "Enter" ? addCard(savebarInput, data, setData) : null)}
         />
         <Settings />
       </Wrapper>
