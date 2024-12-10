@@ -3,20 +3,29 @@ import Wrapper from "@layout/others/Wrapper";
 import SaveBarInput from "@components/Navbar/SaveBarInput";
 import Settings from "@components/Navbar/Settings";
 
-
-import { useInput } from "../hooks/useInput";
-import { addDataFromLocalStorage } from "../database/localstorage";
-
+import { useInput } from "@hooks/useInput";
+import { addDataFromLocalStorage } from "@database/localstorage";
 
 const Navbar = () => {
   const [data, setData] = useState([]);
   const savebarInput = useInput();
-  useEffect(() => {savebarInput.ref.current.focus();}, [savebarInput.value]);
-  useEffect(()=>{addDataFromLocalStorage(data)},[data])
-  function addCard() {
-    setData([...data, {url: savebarInput.value}])
-    console.log(data)
+  useEffect(() => {
+    savebarInput.ref.current.focus();
+  }, [savebarInput.value]);
+  useEffect(() => {
+    addDataFromLocalStorage(data);
+  }, [data]);
+
+  const addImageCard = () => {
+    const imgext = [".jpg", ".jpeg", ".png", ".webp", ".gif"];
+    const getimgext = savebarInput.value.split(".").pop()  
+    imgext.some((ext) => savebarInput.value.endsWith(ext)) ? setData([...data, { url: savebarInput.value, type:"image", ext: getimgext}]): alert(false)
   }
+
+  const addVideoCard = () => {
+    
+  }
+
   return (
     <div className=" py-4 border-b fixed top-0 w-full bg-white">
       <Wrapper className="flex flex-row justify-between items-center w-full">
@@ -25,7 +34,7 @@ const Navbar = () => {
           inputRef={savebarInput.ref}
           value={savebarInput.value}
           onChange={savebarInput.handleOnChange}
-          onKeyDown={(e) => e.key === "Enter" ? addCard(): null}
+          onKeyDown={(e) => (e.key === "Enter" ? addImageCard() : null)}
         />
         <Settings />
       </Wrapper>

@@ -1,12 +1,9 @@
 import Hashtag from "@components/Hashtag";
-export default function Card() {
+export default function CardVideo() {
   return (
     <div id="card" className="flex flex-col gap-2 break-inside-avoid mb-10">
       <div className="rounded-md overflow-hidden">
-        <img
-          src="https://i.pinimg.com/originals/1c/93/22/1c9322cb0c2b18c52c9ac4fcb7a9fdbd.gif"
-          alt=""
-        />
+        <iframe width="auto" height="100%" src="https://www.youtube.com/embed/2KhL-fwkx8s?si=lEJhWhJ-2CCARJ7C" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
       </div>
       {/*<div id="card-details" className="">
         <h1 className="text-[1.4em]">Motion #1</h1>
