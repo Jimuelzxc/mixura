@@ -1,0 +1,19 @@
+@import url("https://fonts.googleapis.com/css2?family=Gabarito:wght@400..900&family=League+Spartan:wght@100..900&display=swap");
+
+* {
+  font-family: "Gabarito", sans-serif;
+  color: rgb(61, 61, 61);
+  font-weight: medium;
+}
+svg {
+  color: white;
+}
+
+h1 {
+  font-family: "Gabarito", sans-serif;
+
+}
+p{
+  color: rgb(133, 133, 133);
+  font-weight: 100;
+}
