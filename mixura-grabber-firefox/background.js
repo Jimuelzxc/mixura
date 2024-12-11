@@ -1,23 +1,23 @@
 browser.contextMenus.create({
-  id: "save",
-  title: "Mixura | Save",
-  contexts: ["all"],
+  id: "saveImage",
+  title: "Save image",
+  contexts: ["image"],
+});
+browser.contextMenus.create({
+  id: "saveVideo",
+  title: "Create new card",
+  contexts: ["page"],
 });
 
+
 browser.contextMenus.onClicked.addListener((info) => {
-  if (info.menuItemId === "save") {
-    let popupUrl;
-
-    if (info.pageUrl) {
-      popupUrl = `http://localhost:5173/save?image=${encodeURIComponent(
-        info.pageUrl
-      )}`;
-    } else if (info.srcUrl) {
-      popupUrl = `http://localhost:5173/save?image=${encodeURIComponent(
-        info.srcUrl
-      )}`;
+  if (info.menuItemId === "saveImage" || info.menuItemId === "saveVideo") {
+    if (info.srcUrl) {
+      popupUrl = `http://localhost:5173/save?url=${encodeURIComponent(info.srcUrl)}`;
+    }else if(info.pageUrl){
+      popupUrl = `http://localhost:5173/save?url=${encodeURIComponent(info.pageUrl)}`;
     }
-
+  }
     // Get the screen dimensions
     let screenWidth = screen.width;
     let screenHeight = screen.height;
@@ -39,5 +39,5 @@ browser.contextMenus.onClicked.addListener((info) => {
       left: left,
       top: top,
     });
-  }
+
 });
