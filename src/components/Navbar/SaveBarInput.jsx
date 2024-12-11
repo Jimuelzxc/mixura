@@ -1,6 +1,6 @@
 import { BsArrowRightShort } from "react-icons/bs";
 const SaveBarInput = (props) => {
-  const { inputRef, value, onChange, onKeyDown } = props;
+  const { inputRef, value, onChange, onKeyDown, onClick } = props;
   return (
     <div className="flex justify-center grow">
       <div className="flex flex-row w-[60%] border-2 rounded-full px-3 py-[5px] text-[1.1em]">
@@ -14,7 +14,7 @@ const SaveBarInput = (props) => {
           onChange={onChange}
           onKeyDown={onKeyDown}
         />
-        <div className="flex items-center bg-slate-900 text-white px-1 rounded-full cursor-pointer">
+        <div className="flex items-center bg-slate-900 text-white px-1 rounded-full cursor-pointer" onClick={onClick}>
           <BsArrowRightShort className="text-[1.5em]" fill="white" />
         </div>
       </div>

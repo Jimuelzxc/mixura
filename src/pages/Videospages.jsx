@@ -1,6 +1,38 @@
+import { useContext, useEffect } from "react";
+
+import Wrapper from "@layout/others/Wrapper";
+import Cards from "@layout/Cards";
+import CardVideo from "@components/Cards/CardVideo";
+import DataContext from "@context/datacontext";
+import { deleteData } from "@utils/deleteCard";
+
+import { Link } from "react-router-dom";
+
 const Videospage = () => {
-    return(
-        <h1>VIDEOS PAGE</h1>
-    )
-}
-export default Videospage
+  const [data, setData] = useContext(DataContext);
+  return (
+    <>
+      <Wrapper className="flex flex-col gap-6">
+        <div className="flex flex-row gap-2">
+          <Link to="/" className="px-4 py-1 text-slate-950 bg-white rounded-full">
+            All
+          </Link>
+          <Link to="/images" className="px-4 py-1 text-slate-950 bg-white rounded-full">Images</Link>
+          <Link to="/videos" className="px-4 py-1 bg-slate-950 text-white rounded-full">Videos</Link>
+        </div>
+        <Cards>
+          {data.map((value, index) => {
+            return value.type === "video" ? (
+              <CardVideo
+                key={index}
+                value={value}
+                onClick={() => deleteData(index, data, setData)}
+              />
+            ) : null;
+          })}
+        </Cards>
+      </Wrapper>
+    </>
+  );
+};
+export default Videospage;

@@ -5,18 +5,27 @@ import Imagespage from "./pages/Imagespage";
 import Videospage from "./pages/Videospages";
 import ParentContainer from "@layout/others/ParentContainer";
 import Save from "./pages/grabber/Save";
+import Navbar from "@layout/Navbar";
+import Header from "@layout/Header";
 
 import { useEffect, useState } from "react";
 
 import DataContext from "@context/DataContext";
-import { addDataLocalStorage, showDataLocalStorage } from "@database/localstorage";
+import {
+  addDataLocalStorage,
+  showDataLocalStorage,
+} from "@database/localstorage";
 
 function App() {
   const [data, setData] = useState(showDataLocalStorage());
-  useEffect(()=>{addDataLocalStorage(data)},[data])
+  useEffect(() => {
+    addDataLocalStorage(data);
+  }, [data]);
   return (
     <ParentContainer>
       <DataContext.Provider value={[data, setData]}>
+        {location.pathname !== "/save" && <Navbar />}
+        {location.pathname !== "/save" && <Header>Moodboard</Header>}
         <Routes>
           <Route path="/" element={<Mainpage />} />
           <Route path="/images" element={<Imagespage />} />

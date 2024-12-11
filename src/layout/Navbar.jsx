@@ -27,6 +27,7 @@ const Navbar = () => {
           value={savebarInput.value}
           onChange={savebarInput.handleOnChange}
           onKeyDown={(e) => (e.key === "Enter" ? addCard(savebarInput, data, setData) : null)}
+          onClick={() => addCard(savebarInput, data, setData)}
         />
         <Settings state={[data,setData]}/>
       </Wrapper>
