@@ -19,7 +19,7 @@ const Navbar = () => {
   }, [data]);
 
   return (
-    <div className=" py-4 border-b fixed top-0 w-full bg-white">
+    <div className=" py-4 border-b fixed top-0 w-full bg-white z-[99]">
       <Wrapper className="flex flex-row justify-between items-center w-full">
         <h1 className="text-[1.5em]">Mixura.</h1>
         <SaveBarInput
@@ -28,7 +28,7 @@ const Navbar = () => {
           onChange={savebarInput.handleOnChange}
           onKeyDown={(e) => (e.key === "Enter" ? addCard(savebarInput, data, setData) : null)}
         />
-        <Settings />
+        <Settings state={[data,setData]}/>
       </Wrapper>
     </div>
   );
