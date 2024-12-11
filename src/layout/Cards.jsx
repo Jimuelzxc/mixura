@@ -1,5 +1,3 @@
-import DataContext from "@context/datacontext";
-import { useContext, useEffect } from "react";
 
 export default function Cards({children}) {
   return (
