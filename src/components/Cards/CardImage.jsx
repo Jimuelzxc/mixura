@@ -1,12 +1,12 @@
 import Hashtag from "@components/Hashtag";
 import { useState } from "react";
 import CardMenu from "./CardMenu";
-export default function CardImage({ value }) {
+export default function CardImage({ value, onClick }) {
   return (
     <div id="card" className="flex flex-col gap-2 break-inside-avoid mb-10">
       <div className="group rounded-md overflow-hidden relative cursor-pointer">
         <div className="bg-white absolute px-3 py-1 rounded-full left-0 m-5 border shadow-sm z-20">Image</div>
-        <CardMenu /> 
+        <CardMenu onClick={onClick}/> 
         <img src={value.url} alt=""/>
       </div>
       {/*<div id="card-details" className="">

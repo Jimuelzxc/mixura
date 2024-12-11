@@ -1,6 +1,6 @@
 import { BsThreeDots } from "react-icons/bs";
 import { useState } from "react";
-export default function CardMenu() {
+export default function CardMenu({onClick}) {
   const [isToggle, setIsToggle] = useState(false);
   return (
     <div className="hidden group-hover:block">
@@ -11,7 +11,7 @@ export default function CardMenu() {
         <BsThreeDots className="text-[1.4em]" />
       </div>
       {isToggle && (
-        <div className="bg-white absolute right-0  translate-y-[65px] translate-x-[-22px] rounded-md p-4 w-[120px] border shadow-sm cursor-pointer">
+        <div className="bg-white absolute right-0  translate-y-[65px] translate-x-[-22px] rounded-md p-4 w-[120px] border shadow-sm cursor-pointer" onClick={onClick}>
           Delete Card
         </div>
       )}
