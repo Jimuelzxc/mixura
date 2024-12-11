@@ -25,9 +25,9 @@ function App() {
     <ParentContainer>
       <DataContext.Provider value={[data, setData]}>
         {location.pathname !== "/save" && <Navbar />}
-        {location.pathname !== "/save" && <Header>Moodboard</Header>}
+        {/*location.pathname !== "/save" && <Header>Moodboard</Header>*/}
         <Routes>
-          <Route path="/" element={<Mainpage />} />
+          <Route path="/" index element={<Mainpage />} />
           <Route path="/images" element={<Imagespage />} />
           <Route path="/videos" element={<Videospage />} />
           <Route path="/save" element={<Save />} />

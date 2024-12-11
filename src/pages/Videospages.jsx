@@ -12,13 +12,32 @@ const Videospage = () => {
   const [data, setData] = useContext(DataContext);
   return (
     <>
-      <Wrapper className="flex flex-col gap-6">
-        <div className="flex flex-row gap-2">
-          <Link to="/" className="px-4 py-1 text-slate-950 bg-white rounded-full">
-            All
-          </Link>
-          <Link to="/images" className="px-4 py-1 text-slate-950 bg-white rounded-full">Images</Link>
-          <Link to="/videos" className="px-4 py-1 bg-slate-950 text-white rounded-full">Videos</Link>
+      <Wrapper className="flex flex-col gap-6 mt-[150px]">
+        <div id="tabcards" className="flex flew-row justify-between">
+          <div className="flex flex-row gap-2">
+            <Link
+              to="/"
+              className="px-4 py-1 text-slate-950 bg-white rounded-full"
+            >
+              All
+            </Link>
+            <Link
+              to="/images"
+              className="px-4 py-1 text-slate-950 bg-white rounded-full"
+            >
+              Images
+            </Link>
+            <Link
+              to="/videos"
+              className="px-4 py-1 bg-slate-950 text-white rounded-full"
+            >
+              Videos
+            </Link>
+          </div>
+          <div className="flex flex-row gap-7">
+            <div>Filter</div>
+            <div>Cards</div>
+          </div>
         </div>
         <Cards>
           {data.map((value, index) => {
