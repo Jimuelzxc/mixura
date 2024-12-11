@@ -1,3 +1,5 @@
+// ADD DATA BOTH IN REACT AND DATABASE
+
 export const addCard = (savebarInput, data, setData) => {
   if (!savebarInput.value.trim()) return;
   const imgext = [".jpg", ".jpeg", ".png", ".webp", ".gif"];

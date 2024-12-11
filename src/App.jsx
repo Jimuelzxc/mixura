@@ -6,10 +6,10 @@ import Videospage from "./pages/Videospages";
 import ParentContainer from "@layout/others/ParentContainer";
 import Save from "./pages/grabber/Save";
 
-import { addDataLocalStorage, showDataLocalStorage } from "./database/localstorage";
 import { useEffect, useState } from "react";
 
 import DataContext from "@context/DataContext";
+import { addDataLocalStorage, showDataLocalStorage } from "@database/localstorage";
 
 function App() {
   const [data, setData] = useState(showDataLocalStorage());

@@ -1,11 +1,19 @@
 import Hashtag from "@components/Hashtag";
+import { BsThreeDots } from "react-icons/bs";
+import { useState } from "react";
+import CardMenu from "./CardMenu";
 export default function CardVideo({value}) {
+
   const urlOBJ = new URL(value.url)
   const getParams = urlOBJ.searchParams.get("v")
   console.log(getParams)
   return (
     <div id="card" className="flex flex-col gap-2 break-inside-avoid mb-10">
-      <div className="rounded-md overflow-hidden">
+      <div className="rounded-md overflow-hidden relative group">
+        <div className="bg-white absolute px-3 py-1 rounded-full left-0 m-5 border shadow-sm z-20">
+          video
+        </div>
+        <CardMenu />
         <iframe height="289" width="100%" src={`https://www.youtube.com/embed/${getParams}?autoplay=1&mute=1&loop=1&playlist=${getParams}&controls=0`} allow="autoplay; loop" allowFullScreen></iframe>
       </div>
       {/*<div id="card-details" className="">

@@ -1,37 +1,7 @@
 import { useSearchParams } from "react-router-dom";
-import {
-  addDataLocalStorage,
-  showDataLocalStorage,
-} from "@database/localstorage";
-import { useEffect, useState } from "react";
 
+import { addData } from "@utils/addData";
 import Button from "@components/Button";
-
-function addData(getUrl) {
-  let currentData = showDataLocalStorage();
-  const imgext = [".jpg", ".jpeg", ".png", ".webp", ".gif"];
-  let inputUrl = new URL(getUrl);
-
-  if (imgext.some((ext) => getUrl.endsWith(ext))) {
-    const getext = getUrl.split(".").pop();
-    addDataLocalStorage([
-      ...currentData,
-      { url: getUrl, type: "image", ext: getext },
-    ]);
-
-    alert(getext);
-  } else if (
-    inputUrl.hostname.includes("youtube") &&
-    inputUrl.searchParams.has("v")
-  ) {
-    addDataLocalStorage([
-      ...currentData,
-      { url: getUrl, type: "video", ext: "youtube" },
-    ]);
-  }else {
-    alert(false)
-  }
-}
 
 export default function Save() {
   const [searchParams] = useSearchParams();
@@ -39,9 +9,12 @@ export default function Save() {
   return (
     <>
       <p>{getUrl}</p>
-      <Button className="px-4 mx-auto" onClick={() => addData(getUrl)}>
-        Add
-      </Button>
+      <div className="flex flex-row gap-2 justify-end px-5">
+        <Button className="px-4" onClick={() => addData(getUrl)}>
+          Add
+        </Button>
+        <Button className="px-4" onClick={() => window.close()}>Cancel</Button>
+      </div>
     </>
   );
 }
