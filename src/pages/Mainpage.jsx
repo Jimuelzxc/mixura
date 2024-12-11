@@ -4,7 +4,7 @@ import Wrapper from "@layout/others/Wrapper";
 import Cards from "@layout/Cards";
 import CardImage from "@components/Cards/CardImage";
 import CardVideo from "@components/Cards/CardVideo";
-import DataContext from "@context/datacontext";
+import DataContext from "@context/DataContext";
 import { deleteData } from "@utils/deleteCard";
 
 import { Link } from "react-router-dom";
