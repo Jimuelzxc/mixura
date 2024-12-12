@@ -15,7 +15,7 @@ const Mainpage = () => {
   const [data, setData] = useContext(DataContext);
   return (
     <>
-      <Wrapper className="flex flex-col gap-6 ">
+      <Wrapper className="flex flex-col gap-6 py-5 pb-10">
         <div id="tabcards" className="flex flew-row justify-between">
           <div className="flex flex-row gap-2">
             <Link

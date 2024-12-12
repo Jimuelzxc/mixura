@@ -8,7 +8,7 @@ export default function Modal(props) {
         <p className="text-center text-slate-950/70">{message}</p>
         <div className="flex gap-2 mt-3">
           <Button
-            className="bg-white/0 text-slate-900 border border-slate-950"
+            className="bg-white/0 text-slate-800 border border-slate-950"
             onClick={confirm}
           >
             {confirmText}

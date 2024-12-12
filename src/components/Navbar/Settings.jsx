@@ -54,7 +54,7 @@ export default function Settings({ state, settings }) {
         onClick={() => setSettingsIsOpen(!settingsIsOpen)}
       />
       {settingsIsOpen && (
-        <div className="absolute bg-white border flex flex-col gap-4 translate-x-[-230px] mt-5 p-5 px-8 w-[250px] rounded-md">
+        <div className="absolute bg-white/95 backdrop-blur-sm  border border-slate-950 flex flex-col gap-4 translate-x-[-230px] mt-5 p-5 px-8 w-[250px] rounded-md shadow-md">
           <Button>+ Create Card</Button>
           <hr />
           <div className="flex flex-col gap-2">

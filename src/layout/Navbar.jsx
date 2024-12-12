@@ -10,12 +10,10 @@ import {
 } from "@database/localstorage";
 import { addCard } from "@utils/addCard";
 import DataContext from "@context/DataContext";
-import Modal from "@components/modal/Modal";
 
 const Navbar = () => {
   const [data, setData] = useContext(DataContext);
   const [settingsIsOpen, setSettingsIsOpen] = useState(false);
-  const [newIsOpen, setNewIsOpen] = useState(false);
   const savebarInput = useInput();
 
   useEffect(() => {
@@ -25,9 +23,10 @@ const Navbar = () => {
   }, [data]);
 
   return (
-    <div className=" py-4 border-b fixed top-0 w-full bg-white z-[99]">
+    <>
+    <div className=" py-5 border-b border-slate-950 fixed top-0 w-full bg-white/90 backdrop-blur-sm z-[99] shadow-md ">
       <Wrapper className="flex flex-row justify-between items-center w-full">
-        <h1 className="text-[1.5em] text-slate-900">Mixura.</h1>
+        <h1 className="text-[1.5em] text-slate-900">Mixura <span className="text-[0.5em] absolute translate-y-[5px] ml-1 text-blue-700">beta</span></h1>
         <SaveBarInput
           inputRef={savebarInput.ref}
           value={savebarInput.value}
@@ -43,6 +42,7 @@ const Navbar = () => {
         />
       </Wrapper>
     </div>
+    </>
   );
 };
 

@@ -5,6 +5,13 @@
   color: rgb(61, 61, 61);
   font-weight: medium;
   color: rgb(15 23 42 / var(--tw-text-opacity, 1));
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
   
 }
 svg {
@@ -18,5 +25,3 @@ p {
   color: rgb(133, 133, 133);
   font-weight: 100;
 }
-
-
