@@ -22,7 +22,7 @@ function App() {
     addDataLocalStorage(data);
   }, [data]);
   return (
-    <ParentContainer>
+    <ParentContainer> 
       <DataContext.Provider value={[data, setData]}>
         {location.pathname !== "/save" && <Navbar />}
         {location.pathname !== "/save" && <Header>Motion Design Board</Header>}

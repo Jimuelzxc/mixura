@@ -3,7 +3,7 @@ import { addDataLocalStorage, showDataLocalStorage } from "@database/localstorag
 export const settingsNewData = (setData) => {
     setData([])
 };
-export const settingsOpenData = (e,setData, setSettingsIsOpen) => {
+export const settingsOpenData = (e,setData) => {
     const file = e.target.files[0]
     const reader = new FileReader() 
     reader.onload =()=>{
@@ -12,12 +12,11 @@ export const settingsOpenData = (e,setData, setSettingsIsOpen) => {
     }
     reader.readAsText(file)// para siyang "cat" cmd or ico-convert niya into text.
 };
-export const settingsExportData = (setSettingsIsOpen) => {
+export const settingsSaveData = () => {
     let data = showDataLocalStorage()
     const blob = new Blob([JSON.stringify(data)],{type:"application/json"})
     const link = document.createElement("a")
     link.href = URL.createObjectURL(blob)
     link.download = "test.json"
     link.click()
-    setSettingsIsOpen(false)
 };
