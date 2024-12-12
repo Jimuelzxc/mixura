@@ -5,7 +5,7 @@ export default function CardMenu({onClick}) {
   return (
     <div className="hidden group-hover:block">
       <div
-        className="absolute right-0 m-5 p-2 rounded-full bg-white border shadow-sm z-10 cursor-pointer"
+        className="absolute right-0 m-5 p-2 rounded-full bg-white border border-slate-200 shadow-md z-10 cursor-pointer"
         onClick={() => setIsToggle(!isToggle)}
       >
         <BsThreeDots className="text-[1.4em]" />

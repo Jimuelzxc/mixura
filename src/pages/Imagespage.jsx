@@ -13,7 +13,7 @@ const Imagespage = () => {
   const [data, setData] = useContext(DataContext);
   return (
     <>
-      <Wrapper className="flex flex-col gap-6 mt-[150px]">
+      <Wrapper className="flex flex-col gap-6">
         <div id="tabcards" className="flex flew-row justify-between">
           <div className="flex flex-row gap-2">
             <Link

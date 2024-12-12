@@ -3,7 +3,7 @@ const SaveBarInput = (props) => {
   const { inputRef, value, onChange, onKeyDown, onClick } = props;
   return (
     <div className="flex justify-center grow">
-      <div className="flex flex-row w-[60%] border-2 rounded-full px-3 py-[5px] text-[1.1em]">
+      <div className="flex flex-row w-[60%] border-2 border-slate-900 text-slate-900 rounded-full px-3 py-[5px] text-[1.1em]">
         <input
           type="text"
           id="savebar"

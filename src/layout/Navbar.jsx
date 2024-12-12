@@ -21,7 +21,7 @@ const Navbar = () => {
   return (
     <div className=" py-4 border-b fixed top-0 w-full bg-white z-[99]">
       <Wrapper className="flex flex-row justify-between items-center w-full">
-        <h1 className="text-[1.5em]">Mixura.</h1>
+        <h1 className="text-[1.5em] text-slate-900">Mixura.</h1>
         <SaveBarInput
           inputRef={savebarInput.ref}
           value={savebarInput.value}

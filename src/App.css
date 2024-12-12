@@ -4,6 +4,8 @@
   font-family: "Gabarito", sans-serif;
   color: rgb(61, 61, 61);
   font-weight: medium;
+  color: rgb(15 23 42 / var(--tw-text-opacity, 1));
+  
 }
 svg {
   color: white;
@@ -16,4 +18,5 @@ p {
   color: rgb(133, 133, 133);
   font-weight: 100;
 }
+
 
