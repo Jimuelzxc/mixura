@@ -9,8 +9,6 @@ import { deleteData } from "@utils/deleteCard";
 
 import { Link } from "react-router-dom";
 
-import Modal from "@components/modal/Modal";
-
 const Mainpage = () => {
   const [data, setData] = useContext(DataContext);
   return (
@@ -42,7 +40,6 @@ const Mainpage = () => {
             <div>Cards</div>
           </div>
         </div>
-
         <Cards>
           {data.map((value, index) => {
             if (value.type === "image") {

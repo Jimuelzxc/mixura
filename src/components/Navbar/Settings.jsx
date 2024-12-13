@@ -31,6 +31,7 @@ export default function Settings({ state, settings }) {
           confirm={() => {
             settingsNewData(setData);
             setNewIsOpen(false);
+            window.location.reload()
           }}
           cancel={() => setNewIsOpen(false)}
         />
@@ -44,6 +45,7 @@ export default function Settings({ state, settings }) {
           confirm={() => {
             file.current.click();
             setOpenShow(false);
+
           }}
           cancel={() => setOpenShow(false)}
         />

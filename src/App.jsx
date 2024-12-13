@@ -26,12 +26,16 @@ function App() {
       <DataContext.Provider value={[data, setData]}>
         {location.pathname !== "/save" && <Navbar />}
         {location.pathname !== "/save" && <Header>Motion Design Board </Header>}
+
         <Routes>
+
           <Route path="/" index element={<Mainpage />} />
           <Route path="/images" element={<Imagespage />} />
           <Route path="/videos" element={<Videospage />} />
           <Route path="/save" element={<Save />} />
         </Routes>
+        {!data.length ? <h1 className="text-center text-[1em] opacity-50 py-[200px] ">NO IDEAS</h1> : null}
+
       </DataContext.Provider>
     </ParentContainer>
   );
