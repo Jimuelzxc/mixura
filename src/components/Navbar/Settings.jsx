@@ -1,8 +1,5 @@
 import { useEffect, useState } from "react";
 import { BsGear } from "react-icons/bs";
-import Button from "../Button";
-import SettingsItem from "./SettingsItem";
-import HyperLink from "../HyperLink";
 import { useRef } from "react";
 import Modal from "../modal/Modal";
 
@@ -61,15 +58,15 @@ export default function Settings({ state, settings, title }) {
       />
       {settingsIsOpen && (
         <SettingsMenu
-          newIsOpen={newIsOpen}
-          setNewIsOpen={setNewIsOpen}
-          file={file}
-          settingsOpenData={settingsOpenData}
-          setData={setData}
-          openShow={openShow}
-          setOpenShow={setOpenShow}
-          settingsSaveData={settingsSaveData}
-          setNameboard={setNameboard}
+          newIsOpen={newIsOpen} //TOGGLE MODAL
+          setNewIsOpen={setNewIsOpen} //CHANGING TOGGLE
+          file={file} // FILE FOR SAVE and EXPORT
+          settingsOpenData={settingsOpenData} //TOGGLE MODAL
+          setData={setData} //Set DATA
+          openShow={openShow}// TOGGLE MODAL
+          setOpenShow={setOpenShow} // CHANGING TOGGLE
+          settingsSaveData={settingsSaveData}//SAVE DATA
+          setNameboard={setNameboard}// SET TITLE
         />
       )}
     </div>
