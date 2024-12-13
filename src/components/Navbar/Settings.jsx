@@ -13,15 +13,12 @@ export default function Settings({ state, settings, title }) {
   const [data, setData] = state;
   const [nameboard, setNameboard] = title;
   const [settingsIsOpen, setSettingsIsOpen] = settings;
-  const [newIsOpen, setNewIsOpen] = useState(false); // NEW ITEM
-  const [openShow, setOpenShow] = useState(false); //OPEN ITEM
+  const [newIsOpen, setNewIsOpen] = useState(false);
+  const [openShow, setOpenShow] = useState(false);
   const file = useRef();
   useEffect(() => {
     setSettingsIsOpen(false);
   }, [data]);
-  useEffect(() => {
-    console.log(nameboard);
-  }, [nameboard]);
   return (
     <div>
       {newIsOpen && (
