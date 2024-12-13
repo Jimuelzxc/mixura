@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Routes, Route } from "react-router-dom";
 import "./App.css";
 import Mainpage from "./pages/Mainpage";
@@ -8,20 +9,17 @@ import Save from "./pages/grabber/Save";
 import Navbar from "@layout/Navbar";
 import Header from "@layout/Header";
 
-import { useEffect, useState } from "react";
-
 import DataContext from "@context/DataContext";
-import { showTitleLocalStorage } from "@database/localstorage";
-
 import {
   addDataLocalStorage,
   showDataLocalStorage,
+  addTitleLocalStorage,
+  showTitleLocalStorage,
 } from "@database/localstorage";
-import { addTitleLocalStorage } from "./database/localstorage";
+
 function App() {
   const [data, setData] = useState(showDataLocalStorage());
   const [nameboard, setNameboard] = useState(showTitleLocalStorage());
-
   useEffect(() => {
     addDataLocalStorage(data);
   }, [data]);
@@ -30,10 +28,10 @@ function App() {
   }, [nameboard]);
   return (
     <ParentContainer>
-      <DataContext.Provider value={[data, setData, nameboard, setNameboard]}>
+      <DataContext.Provider
+        value={{ title: [nameboard, setNameboard], data: [data, setData] }}>
         {location.pathname !== "/save" && <Navbar />}
         {location.pathname !== "/save" && <Header />}
-
         <Routes>
           <Route path="/" index element={<Mainpage />} />
           <Route path="/images" element={<Imagespage />} />

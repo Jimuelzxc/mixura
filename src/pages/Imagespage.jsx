@@ -1,7 +1,6 @@
 import { useContext, useEffect } from "react";
 
 import Wrapper from "@layout/others/Wrapper";
-import TabCards from "@layout/TabCards";
 import Cards from "@layout/Cards";
 import CardImage from "@components/Cards/CardImage";
 import DataContext from "@context/DataContext";
@@ -10,7 +9,7 @@ import { deleteData } from "@utils/deleteCard";
 import { Link } from "react-router-dom";
 
 const Imagespage = () => {
-  const [data, setData] = useContext(DataContext);
+  const [data, setData] = useContext(DataContext).data
   return (
     <>
       <Wrapper className="flex flex-col gap-6 py-5 pb-10">

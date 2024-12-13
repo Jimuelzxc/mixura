@@ -4,7 +4,7 @@ import { useContext } from "react";
 import DataContext from "@context/DataContext";
 
 export default function CardMenu({onClick}) {
-  const [data, setData] = useContext(DataContext);
+  const [data] = useContext(DataContext).data;
   const [isToggle, setIsToggle] = useState(false);
   useEffect(() => {
     setIsToggle(false)

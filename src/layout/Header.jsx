@@ -9,7 +9,7 @@ import DataContext from "@context/DataContext"
 
 export default function Title() {
   
-  const [data, setData, nameboard, setNameboard] = useContext(DataContext)
+  const [nameboard, setNameboard] = useContext(DataContext).title
   const [nameModalShow, setNameModalShow] = useState(false);
   const inputName = useInput();
   useEffect(() => {nameModalShow && inputName.ref.current.focus()}, [nameModalShow]);

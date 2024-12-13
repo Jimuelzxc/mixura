@@ -10,7 +10,7 @@ import { deleteData } from "@utils/deleteCard";
 import { Link } from "react-router-dom";
 
 const Mainpage = () => {
-  const [data, setData] = useContext(DataContext);
+  const [data, setData] = useContext(DataContext).data;
   return (
     <>
       <Wrapper className="flex flex-col gap-6 py-5 pb-10">
