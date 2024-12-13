@@ -3,14 +3,14 @@ import { useState } from "react";
 import CardMenu from "./CardMenu";
 export default function CardImage({ value, onClick }) {
   return (
-    <div id="card" className="flex flex-col  break-inside-avoid mb-5 border-[1px] border-slate-950/50 rounded-md overflow-hidden shadow-lg hover:scale-[1.02]  p-2 bg-white ease-in-out duration-75" >
-      <div className="group rounded-t-md overflow-hidden relative cursor-pointer hover:border-2 hover:border-blue-700 hover:rounded-md bg-slate-950">
+    <div id="card" className="flex flex-col  break-inside-avoid mb-5 border-[1px] border-slate-950/50 rounded-md overflow-hidden shadow-lg hover:scale-[1.02] hover:p-2 bg-white ease-in-out duration-75 hover:border-2 hover:border-slate-950" >
+      <div className="group rounded-t-md overflow-hidden relative cursor-pointer hover:border-2  hover:rounded-md bg-slate-950">
         <div className="bg-white absolute px-2 opacity-90 rounded-full left-0 m-3 border shadow-sm z-20 text-[0.8em]">
           {value.ext === "gif" ? "GIF" : "image"}
         </div>
         <CardMenu onClick={onClick} />
         <a href={value.url}>
-          <img src={value.url} alt="" className="w-full hover:opacity-55 "/>
+          <img src={value.url} alt="" className="w-full"/>
         </a>
       </div>
       {/*<div id="card-details" className="p-6 bg-white">

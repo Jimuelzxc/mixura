@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import DataContext from "@context/DataContext";
 import { BsGear } from "react-icons/bs";
 import Button from "../Button";
 import SettingsItem from "./SettingsItem";
@@ -11,8 +12,9 @@ import {
   settingsOpenData,
   settingsSaveData,
 } from "@utils/settings";
-export default function Settings({ state, settings }) {
+export default function Settings({ state, settings, title }) {
   const [data, setData] = state;
+  const [nameboard, setNameboard] = title;
   const [settingsIsOpen, setSettingsIsOpen] = settings;
   const [newIsOpen, setNewIsOpen] = useState(false); // NEW ITEM
   const [openShow, setOpenShow] = useState(false); //OPEN ITEM
@@ -20,6 +22,7 @@ export default function Settings({ state, settings }) {
   useEffect(() => {
     setSettingsIsOpen(false);
   }, [data]);
+  useEffect(()=>{console.log(nameboard)},[nameboard])
   return (
     <div>
       {newIsOpen && (
@@ -29,9 +32,9 @@ export default function Settings({ state, settings }) {
           confirmText="Confirm"
           cancelText="Cancel"
           confirm={() => {
-            settingsNewData(setData);
+            settingsNewData(setData, setNameboard);
             setNewIsOpen(false);
-            window.location.reload()
+            window.location.reload();
           }}
           cancel={() => setNewIsOpen(false)}
         />
@@ -45,7 +48,6 @@ export default function Settings({ state, settings }) {
           confirm={() => {
             file.current.click();
             setOpenShow(false);
-
           }}
           cancel={() => setOpenShow(false)}
         />
@@ -70,9 +72,7 @@ export default function Settings({ state, settings }) {
                 ref={file}
                 accept=".json"
                 className="hidden"
-                onChange={(e) =>
-                  settingsOpenData(e, setData, setSettingsIsOpen)
-                }
+                onChange={(e) => settingsOpenData(e, setData, setNameboard)}
               />
               <SettingsItem onClick={() => setOpenShow(!openShow)}>
                 Open
