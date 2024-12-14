@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { Routes, Route } from "react-router-dom";
 import "./App.css";
-import Mainpage from "./pages/Mainpage";
-import Imagespage from "./pages/Imagespage";
-import Videospage from "./pages/Videospages";
+import Mainpage from "@pages/Mainpage";
+import Imagespage from "@pages/Imagespage";
+import Videospage from "@pages/Videospages";
+import Testing from "@pages/Testing";
 import ParentContainer from "@layout/others/ParentContainer";
 import Save from "./pages/grabber/Save";
 import Navbar from "@layout/Navbar";
@@ -20,6 +21,8 @@ import {
 function App() {
   const [data, setData] = useState(showDataLocalStorage());
   const [nameboard, setNameboard] = useState(showTitleLocalStorage());
+  const [selectedCardOptions, setSelectedCardOptions] = useState(["Frame", "Title"]);
+  const [inputRange, setInputRange] = useState(3)
   useEffect(() => {
     addDataLocalStorage(data);
   }, [data]);
@@ -29,7 +32,13 @@ function App() {
   return (
     <ParentContainer>
       <DataContext.Provider
-        value={{ title: [nameboard, setNameboard], data: [data, setData] }}>
+        value={{
+          title: [nameboard, setNameboard],
+          data: [data, setData],
+          selectedCardOptions: [selectedCardOptions, setSelectedCardOptions],
+          inputRange: [inputRange, setInputRange]
+        }}
+      >
         {location.pathname !== "/save" && <Navbar />}
         {location.pathname !== "/save" && <Header />}
         <Routes>
@@ -37,6 +46,7 @@ function App() {
           <Route path="/images" element={<Imagespage />} />
           <Route path="/videos" element={<Videospage />} />
           <Route path="/save" element={<Save />} />
+          <Route path="/Testing" element={<Testing />} />
         </Routes>
         {!data.length ? (
           <h1 className="text-center text-[1em] opacity-50 py-[200px] ">
