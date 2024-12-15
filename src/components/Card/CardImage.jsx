@@ -10,11 +10,11 @@ export default function CardImage({ value, onClick }) {
   }, []);
   return (
     <CardWrapper>
-      <div className="rounded-t-md overflow-hidden relative cursor-pointer bg-slate-700">
+      <div className="rounded-t-md overflow-hidden relative cursor-pointer bg-slate-700 group">
         <div className="bg-white absolute px-2 opacity-90 rounded-full left-0 m-3 shadow-sm z-20 text-[0.8em]">
           {value.ext === "gif" ? "GIF" : "image"}
         </div>
-        <CardMenu onClick={onClick} />
+        <CardMenu onClick={onClick}/>
         {selectedCardOptions.includes("Frame") && (
           <a href={value.url}>
             <img src={value.url} alt="" className="w-full" />

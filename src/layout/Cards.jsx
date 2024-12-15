@@ -1,9 +1,10 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import DataContext from "@context/DataContext";
 export default function Cards({ children }) {
   const [inputRange] = useContext(DataContext).inputRange;
+  useEffect(() => {console.log(inputRange)},[inputRange])
   return (
-    <div id="cards" className={`columns-${inputRange} gap-4`}>
+    <div id="cards" className={`gap-4`} style={{columnCount:inputRange}}>
       {children}
     </div>
   );
