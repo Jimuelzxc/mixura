@@ -1,34 +1,52 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { showDataLocalStorage } from "@database/localstorage";
+import { BsX } from "react-icons/bs";
+import Button from "@components/Button";
 
 function Testing() {
-  const [activeTab, setActiveTab] = useState("")
-  useEffect(() => {console.log(activeTab)},[activeTab])
+  const [data, setData] = useState(showDataLocalStorage());
+  const [showModal, setShowModal] = useState(false);
+  const [selected, setSelectedData] = useState([])
+  useEffect(() => {console.log(selected)},[selected])
   return (
-    <div className="h-screen w-full fixed bg-white top-0 z-[99999] flex justify-center items-center flex-col gap-4">
-    <h1 className="text-[1.3em]">THIS PAGE FOR TESTING PURPOSES</h1>
+    <div
+      className="h-screen w-full fixed top-0 bg-white z-[9999] flex items-center justify-center"
+      onKeyDown={(e) => console.log(true)}
+    >
+      {showModal && <ModalPreview selected={selected} setShowModal={setShowModal} />}
 
-      <div className="flex flex-row gap-4">
-        <Tab name="All" activeState={[activeTab, setActiveTab]}/>
-        <Tab name="Images" activeState={[activeTab, setActiveTab]}/>
-        <Tab name="Videos" activeState={[activeTab, setActiveTab]}/>
-      </div>
-      <div>
-        {activeTab== "All" && <span>{activeTab} Page</span>}
-        {activeTab== "Images" && <span>{activeTab} Page</span>}
-        {activeTab== "Videos" && <span>{activeTab} Page</span>}
-        <iframe src="https://player.vimeo.com/video/962272663?h=9182db1297?autoplay=1&loop=1" width="640" height="360" frameborder="0" allow="autoplay;" ></iframe>
+      <div className="w-full columns-3 px-12 py-12">
+        {data.map((item) => {
+          return (
+            <img
+              src={item.url}
+              className="mb-3 cursor-pointer"
+              onClick={() => {
+                setSelectedData(item)
+                setShowModal(true)
+              }}
+            />
+          );
+        })}
       </div>
     </div>
   );
 }
 
-
-function Tab({name, activeState}){
-  const [activeTab, setActiveTab] = activeState;
-  const unactiveStyle = "px-2 border-2 border-white rounded-full" 
-  const activeStyle = "px-2 border-2 border-slate-900 rounded-full"
-  return <span className={`cursor-pointer ${activeTab === name ? activeStyle: unactiveStyle}`} onClick={() => setActiveTab(name)}>{name}</span>
-}
-
+const ModalPreview = ({ selected, setShowModal }) => {
+  return (
+    <div className="h-full w-full absolute bg-white/95 backdrop-blur-sm flex justify-center items-center flex-col gap-3">
+      <div className="fixed right-0 top-0 m-12 text-[2em] cursor-pointer border border-slate-950 p-4 rounded-full opacity-55 hover:opacity-90 ease-in-out duration-150" onClick={() => setShowModal(false)}>
+        <BsX className="text-[1.5em]" />
+      </div>
+      <div className="columns-3 px-5">
+        <div className="border border-slate-950 shadow-2xl hover:scale-[1.1] ease-[cubic-bezier(.93,-0.13,0,1.17)] duration-150">
+          <img alt={selected.url} srcset="" />
+        </div>
+      </div>
+      <div></div>
+    </div>
+  );
+};
 
 export default Testing;

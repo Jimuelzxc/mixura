@@ -18,21 +18,27 @@ import {
   addTitleLocalStorage,
   showTitleLocalStorage,
 } from "@database/localstorage";
+import ModalPreview from "@components/modal/ModalPreview";
+
 
 function App() {
   const [data, setData] = useState(showDataLocalStorage());
   const [nameboard, setNameboard] = useState(showTitleLocalStorage());
-  const [selectedCardOptions, setSelectedCardOptions] = useState([
-    "Frame",
-    "Title",
-  ]);
+  const [selectedCardOptions, setSelectedCardOptions] = useState(["Frame"]);
   const [inputRange, setInputRange] = useState(3);
+  const [selectedData, setSelectedData] = useState([]);
+  const [modalPreviewShow, setModalPreviewShow] = useState(false);
   useEffect(() => {
     addDataLocalStorage(data);
-  }, [data]);
-  useEffect(() => {
     addTitleLocalStorage(nameboard);
-  }, [nameboard]);
+  }, [data, nameboard]);
+  useEffect(() => {
+    if (selectedData.length !== 0) {
+      setModalPreviewShow(true);
+    } else {
+      setModalPreviewShow(false);
+    }
+  }, [selectedData]);
   return (
     <ParentContainer>
       <DataContext.Provider
@@ -41,11 +47,18 @@ function App() {
           data: [data, setData],
           selectedCardOptions: [selectedCardOptions, setSelectedCardOptions],
           inputRange: [inputRange, setInputRange],
+          selectedData: [selectedData, setSelectedData],
         }}
       >
+        {modalPreviewShow && (
+          <ModalPreview
+            selectedData={selectedData}
+            setModalPreviewShow={setModalPreviewShow}
+          />
+        )}
         {location.pathname !== "/save" && <Navbar />}
         {location.pathname !== "/save" && <Header />}
-        <TabCards /> 
+        <TabCards />
         <Routes>
           <Route path="/" index element={<Mainpage />} />
           <Route path="/images" element={<Imagespage />} />
@@ -62,5 +75,6 @@ function App() {
     </ParentContainer>
   );
 }
+
 
 export default App;
