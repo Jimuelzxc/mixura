@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 
 function Testing() {
-  //TASK: Create tabs
   const [activeTab, setActiveTab] = useState("")
   useEffect(() => {console.log(activeTab)},[activeTab])
   return (
