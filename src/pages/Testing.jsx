@@ -1,57 +1,35 @@
 import React, { useEffect, useState } from "react";
-import InputRadio from "@components/InputRadio";
-import { useInputRadio } from "@hooks/useInputRadio";
 
 function Testing() {
-  const [selectedOptions, setSelectedOptions] = useState(["Frame","Title"]);
-  useEffect(() => {console.log(selectedOptions)},[selectedOptions])
-  const frame = useInputRadio("Frame", selectedOptions, setSelectedOptions);
-  const title = useInputRadio("Title", selectedOptions, setSelectedOptions);
-  const description = useInputRadio("Description", selectedOptions, setSelectedOptions);
-  const hashtags = useInputRadio("Hashtags", selectedOptions, setSelectedOptions);
-
+  //TASK: Create tabs
+  const [activeTab, setActiveTab] = useState("")
+  useEffect(() => {console.log(activeTab)},[activeTab])
   return (
-    <div className="h-screen w-full bg-white top-0 fixed z-[999999] flex justify-center items-center flex-col">
-      <h3 className="text-[2em]">Card</h3>
-      <div className="flex flex-row gap-3">
-        <InputRadio
-          placeholder="Frame"
-          value="Frame"
-          checked={frame.isCheck}
-          onChange={frame.handleCheckboxChange}
-        />
-        <InputRadio
-          placeholder="Title"
-          value="Title"
-          checked={title.isCheck}
-          onChange={title.handleCheckboxChange}
-        />
-        <InputRadio
-          placeholder="Description"
-          value="Description"
-          checked={description.isCheck}
-          onChange={description.handleCheckboxChange}
-        />
-        <InputRadio
-          placeholder="Hashtags"
-          value="Hashtags"
-          checked={hashtags.isCheck}
-          onChange={hashtags.handleCheckboxChange}
-        />
+    <div className="h-screen w-full fixed bg-white top-0 z-[99999] flex justify-center items-center flex-col gap-4">
+    <h1 className="text-[1.3em]">THIS PAGE FOR TESTING PURPOSES</h1>
+
+      <div className="flex flex-row gap-4">
+        <Tab name="All" activeState={[activeTab, setActiveTab]}/>
+        <Tab name="Images" activeState={[activeTab, setActiveTab]}/>
+        <Tab name="Videos" activeState={[activeTab, setActiveTab]}/>
       </div>
-      {/* CARDDDDDDDDDDDDDDDDDDDD */}
-      <div className="">
-        {selectedOptions.includes("Frame") && (
-          <div className="h-[200px] w-[200px] bg-slate-200"></div>
-        )}
-        {selectedOptions.includes("Title") && <h1>Title</h1>}
-        {selectedOptions.includes("Description") && <p>lorem ipsum</p>}
-        {selectedOptions.includes("Hashtags") && (
-          <div className="flex flex-row gap-1">#blabla</div>
-        )}
+      <div>
+        {activeTab== "All" && <span>{activeTab} Page</span>}
+        {activeTab== "Images" && <span>{activeTab} Page</span>}
+        {activeTab== "Videos" && <span>{activeTab} Page</span>}
+        <iframe src="https://player.vimeo.com/video/962272663?h=9182db1297?autoplay=1&loop=1" width="640" height="360" frameborder="0" allow="autoplay;" ></iframe>
       </div>
     </div>
   );
 }
+
+
+function Tab({name, activeState}){
+  const [activeTab, setActiveTab] = activeState;
+  const unactiveStyle = "px-2 border-2 border-white rounded-full" 
+  const activeStyle = "px-2 border-2 border-slate-900 rounded-full"
+  return <span className={`cursor-pointer ${activeTab === name ? activeStyle: unactiveStyle}`} onClick={() => setActiveTab(name)}>{name}</span>
+}
+
 
 export default Testing;

@@ -5,10 +5,11 @@ import Mainpage from "@pages/Mainpage";
 import Imagespage from "@pages/Imagespage";
 import Videospage from "@pages/Videospages";
 import Testing from "@pages/Testing";
+import Save from "@pages/grabber/Save";
 import ParentContainer from "@layout/others/ParentContainer";
-import Save from "./pages/grabber/Save";
 import Navbar from "@layout/Navbar";
 import Header from "@layout/Header";
+import TabCards from "@layout/TabCards";
 
 import DataContext from "@context/DataContext";
 import {
@@ -21,8 +22,11 @@ import {
 function App() {
   const [data, setData] = useState(showDataLocalStorage());
   const [nameboard, setNameboard] = useState(showTitleLocalStorage());
-  const [selectedCardOptions, setSelectedCardOptions] = useState(["Frame", "Title"]);
-  const [inputRange, setInputRange] = useState(3)
+  const [selectedCardOptions, setSelectedCardOptions] = useState([
+    "Frame",
+    "Title",
+  ]);
+  const [inputRange, setInputRange] = useState(3);
   useEffect(() => {
     addDataLocalStorage(data);
   }, [data]);
@@ -36,11 +40,12 @@ function App() {
           title: [nameboard, setNameboard],
           data: [data, setData],
           selectedCardOptions: [selectedCardOptions, setSelectedCardOptions],
-          inputRange: [inputRange, setInputRange]
+          inputRange: [inputRange, setInputRange],
         }}
       >
         {location.pathname !== "/save" && <Navbar />}
         {location.pathname !== "/save" && <Header />}
+        <TabCards /> 
         <Routes>
           <Route path="/" index element={<Mainpage />} />
           <Route path="/images" element={<Imagespage />} />

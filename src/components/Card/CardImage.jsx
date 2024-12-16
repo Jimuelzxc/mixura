@@ -5,9 +5,6 @@ import CardWrapper from "./CardWrapper";
 import DataContext from "@context/DataContext";
 export default function CardImage({ value, onClick }) {
   const [selectedCardOptions] = useContext(DataContext).selectedCardOptions;
-  useEffect(() => {
-    console.log(selectedCardOptions);
-  }, []);
   return (
     <CardWrapper>
       <div className="rounded-t-md overflow-hidden relative cursor-pointer bg-slate-700 group">

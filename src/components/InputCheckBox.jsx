@@ -1,4 +1,4 @@
-export default function InputRadio(props) {
+export default function InputCheckBox(props) {
   const { placeholder, value, checked, onChange } = props;
   return (
     <label className="flex flex-row gap-4">

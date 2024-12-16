@@ -1,4 +1,4 @@
-import InputRadio from "@components/InputRadio";
+import InputCheckBox from "@components/InputCheckBox";
 export default function CardsMenu(props) {
   const { inputRange, setInputRange, selectedCardOptions, handleInputRadio } = props;
   return (
@@ -13,25 +13,25 @@ export default function CardsMenu(props) {
       />
       <hr />
       <span className="opacity-40">Card Display:</span>
-      <InputRadio
+      <InputCheckBox
         placeholder="Frame"
         value="Frame"
         checked={selectedCardOptions.includes("Frame")}
         onChange={handleInputRadio}
       />
-      <InputRadio
+      <InputCheckBox
         placeholder="Title"
         value="Title"
         checked={selectedCardOptions.includes("Title")}
         onChange={handleInputRadio}
       />
-      <InputRadio
+      <InputCheckBox
         placeholder="Description"
         value="Description"
         checked={selectedCardOptions.includes("Description")}
         onChange={handleInputRadio}
       />
-      <InputRadio
+      <InputCheckBox
         placeholder="Hashtags"
         value="Hashtags"
         checked={selectedCardOptions.includes("Hashtags")}

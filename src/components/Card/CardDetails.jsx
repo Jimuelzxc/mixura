@@ -1,12 +1,11 @@
 import Hashtag from "../Hashtag";
-import { useContext, useEffect } from "react";
+import { useContext} from "react";
 import DataContext from "@context/DataContext";
 
 export default function CardDetails() {
-  const [selectedCardOptions, setSelectedCardOptions] =
-    useContext(DataContext).selectedCardOptions;
+  const [selectedCardOptions] = useContext(DataContext).selectedCardOptions;
   return (
-    <div id="card-details" className={`bg-white flex flex-col ${selectedCardOptions.includes("Frame") && selectedCardOptions.length === 1 || !selectedCardOptions.length ? null : "m-4"}`}>
+    <div id="card-details" className={`bg-white flex flex-col overflow-hidden ${selectedCardOptions.includes("Frame") && selectedCardOptions.length === 1 || !selectedCardOptions.length ? null : "m-4"}`}>
       {selectedCardOptions.includes("Title") && (
         <h1 className="text-[1.4em]">Motion #1</h1>
       )}
