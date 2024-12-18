@@ -8,6 +8,7 @@ export default function CardVideo({ value, onClick }) {
   const getParams = urlOBJ.searchParams.get("v");
   const [selectedCardOptions, setSelectedCardOptions] =
     useContext(DataContext).selectedCardOptions;
+    console.log(value)
   return (
     <CardWrapper>
       <div className="rounded-t-md overflow-hidden relative">
@@ -26,7 +27,7 @@ export default function CardVideo({ value, onClick }) {
           ></iframe>
         )}
       </div>
-      <CardDetails />
+      <CardDetails value={value}/>
     </CardWrapper>
   );
 }

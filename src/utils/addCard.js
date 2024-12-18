@@ -9,7 +9,14 @@ export const addCard = (savebarInput, data, setData) => {
     const getimgext = savebarInput.value.split(".").pop();
     setData([
       ...data,
-      { url: savebarInput.value, type: "image", ext: getimgext },
+      {
+        url: savebarInput.value,
+        title: "",
+        notes: "",
+        tags: ["notags"],
+        type: "image",
+        ext: getimgext,
+      },
     ]);
   } else if (
     inputURL.hostname.includes("youtube") &&
@@ -18,7 +25,14 @@ export const addCard = (savebarInput, data, setData) => {
     // VIDEO - YOUTUBE
     setData([
       ...data,
-      { url: savebarInput.value, type: "video", ext: "youtube" },
+      {
+        url: savebarInput.value,
+        title: "",
+        notes: "",
+        tags: ["notags"],
+        type: "video",
+        ext: "youtube",
+      },
     ]);
   }
 };

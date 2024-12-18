@@ -36,6 +36,7 @@ function App() {
   useEffect(() => {
     addDataLocalStorage(data);
     addTitleLocalStorage(nameboard);
+    console.log(data)
   }, [data, nameboard]);
   useEffect(() => {
     if (selectedData.length !== 0) {
@@ -74,7 +75,7 @@ function App() {
           <Route path="/testing" element={<Testing />} />
           <Route path="/create" element={<Create />} />
         </Routes>
-        {!data.length ? (
+        {!data.length && !uniqueLocation.includes(location) ? (
           <h1 className="text-center text-[1em] opacity-50 py-[200px] ">
             NO IDEAS
           </h1>

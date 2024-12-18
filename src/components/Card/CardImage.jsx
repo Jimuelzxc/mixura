@@ -17,7 +17,7 @@ export default function CardImage({ value, onClick }) {
           <img src={value.url} alt="" className="w-full" onClick={() => setSelectedData(value)}/>
         )}
       </div>
-      <CardDetails />
+      <CardDetails value={value}/>
     </CardWrapper>
   );
 }
