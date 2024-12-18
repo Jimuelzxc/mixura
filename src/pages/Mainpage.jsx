@@ -6,9 +6,15 @@ import CardVideo from "@components/Card/CardVideo";
 import DataContext from "@context/DataContext";
 import { deleteData } from "@utils/deleteCard";
 
+import ParentContainer from "@layout/others/ParentContainer";
+
+
 const Mainpage = () => {
   const [data, setData] = useContext(DataContext).data;
   return (
+    <ParentContainer>
+
+
     <Wrapper className="flex flex-col gap-6 py-5 pb-10">
       <Cards>
         {data.map((value, index) => {
@@ -32,6 +38,8 @@ const Mainpage = () => {
         })}
       </Cards>
     </Wrapper>
+    </ParentContainer>
+
   );
 };
 export default Mainpage;

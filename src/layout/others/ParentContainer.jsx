@@ -1,5 +1,5 @@
 export default function ParentContainer({children, className}){
     return(
-        <div className={`w-full ${className}`}>{children}</div>
+        <div id="parent" className={`w-full ${className}`}>{children}</div>
     )
 }

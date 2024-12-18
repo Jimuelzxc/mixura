@@ -4,10 +4,11 @@ import { BsPencilSquare } from "react-icons/bs";
 import ModalInput from "@components/modal/ModalInput";
 import { useInput } from "@hooks/useInput";
 import DataContext from "@context/DataContext"
+import Title from "@components/Title";
 
 
 
-export default function Title() {
+export default function Header() {
   
   const [nameboard, setNameboard] = useContext(DataContext).title
   const [nameModalShow, setNameModalShow] = useState(false);
@@ -34,9 +35,7 @@ export default function Title() {
           cancel={() => setNameModalShow(false)}
         />
       )}
-      <h1 className=" text-[2em] text-center z-[2] flex flex-row">
-        {nameboard}
-      </h1>
+      <Title text={nameboard} />
       <BsPencilSquare
         className="text-[0.8em] cursor-pointer opacity-40 hover:opacity-100 translate-y-1"
         onClick={() => {

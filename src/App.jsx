@@ -1,16 +1,21 @@
 import { useEffect, useState } from "react";
 import { Routes, Route } from "react-router-dom";
 import "./App.css";
+
+// PAGES import
 import Mainpage from "@pages/Mainpage";
 import Imagespage from "@pages/Imagespage";
 import Videospage from "@pages/Videospages";
+import Create from "@pages/Create";
 import Testing from "@pages/Testing";
 import Save from "@pages/grabber/Save";
-import ParentContainer from "@layout/others/ParentContainer";
+
+// LAYOUT import
 import Navbar from "@layout/Navbar";
 import Header from "@layout/Header";
 import TabCards from "@layout/TabCards";
 
+// OTHERS import
 import DataContext from "@context/DataContext";
 import {
   addDataLocalStorage,
@@ -19,7 +24,7 @@ import {
   showTitleLocalStorage,
 } from "@database/localstorage";
 import ModalPreview from "@components/modal/ModalPreview";
-
+import { useLocation } from "react-router-dom";
 
 function App() {
   const [data, setData] = useState(showDataLocalStorage());
@@ -39,8 +44,10 @@ function App() {
       setModalPreviewShow(false);
     }
   }, [selectedData]);
+  let uniqueLocation = ["/save", "/create"];
+  let location = useLocation().pathname;
   return (
-    <ParentContainer>
+    <>
       <DataContext.Provider
         value={{
           title: [nameboard, setNameboard],
@@ -56,15 +63,16 @@ function App() {
             setModalPreviewShow={setModalPreviewShow}
           />
         )}
-        {location.pathname !== "/save" && <Navbar />}
-        {location.pathname !== "/save" && <Header />}
-        <TabCards />
+        {!uniqueLocation.includes(location) && <Navbar />}
+        {!uniqueLocation.includes(location) && <Header />}
+        {!uniqueLocation.includes(location) && <TabCards />}
         <Routes>
           <Route path="/" index element={<Mainpage />} />
           <Route path="/images" element={<Imagespage />} />
           <Route path="/videos" element={<Videospage />} />
           <Route path="/save" element={<Save />} />
-          <Route path="/Testing" element={<Testing />} />
+          <Route path="/testing" element={<Testing />} />
+          <Route path="/create" element={<Create />} />
         </Routes>
         {!data.length ? (
           <h1 className="text-center text-[1em] opacity-50 py-[200px] ">
@@ -72,9 +80,8 @@ function App() {
           </h1>
         ) : null}
       </DataContext.Provider>
-    </ParentContainer>
+    </>
   );
 }
-
 
 export default App;
