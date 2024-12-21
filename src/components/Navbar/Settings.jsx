@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { BsGear } from "react-icons/bs";
-import { useRef } from "react";
 import Modal from "../modal/Modal";
+
+import { useClickOutside } from "@hooks/useClickOutside";
 
 import {
   settingsNewData,
@@ -19,6 +20,9 @@ export default function Settings({ state, settings, title }) {
   useEffect(() => {
     setSettingsIsOpen(false);
   }, [data]);
+  const menuRef = useRef(null);
+  useClickOutside(menuRef, () => setSettingsIsOpen(false));
+
   return (
     <div>
       {newIsOpen && (
@@ -48,24 +52,25 @@ export default function Settings({ state, settings, title }) {
           cancel={() => setOpenShow(false)}
         />
       )}
-
-      <BsGear
-        className="text-[1.2em] cursor-pointer"
-        onClick={() => setSettingsIsOpen(!settingsIsOpen)}
-      />
-      {settingsIsOpen && (
-        <SettingsMenu
-          newIsOpen={newIsOpen} //TOGGLE MODAL
-          setNewIsOpen={setNewIsOpen} //CHANGING TOGGLE
-          file={file} // FILE FOR SAVE and EXPORT
-          settingsOpenData={settingsOpenData} //TOGGLE MODAL
-          setData={setData} //Set DATA
-          openShow={openShow}// TOGGLE MODAL
-          setOpenShow={setOpenShow} // CHANGING TOGGLE
-          settingsSaveData={settingsSaveData}//SAVE DATA
-          setNameboard={setNameboard}// SET TITLE
+      <div ref={menuRef}>
+        <BsGear
+          className="text-[1.2em] cursor-pointer"
+          onClick={() => setSettingsIsOpen(!settingsIsOpen)}
         />
-      )}
+        {settingsIsOpen && (
+          <SettingsMenu
+            newIsOpen={newIsOpen} //TOGGLE MODAL
+            setNewIsOpen={setNewIsOpen} //CHANGING TOGGLE
+            file={file} // FILE FOR SAVE and EXPORT
+            settingsOpenData={settingsOpenData} //TOGGLE MODAL
+            setData={setData} //Set DATA
+            openShow={openShow} // TOGGLE MODAL
+            setOpenShow={setOpenShow} // CHANGING TOGGLE
+            settingsSaveData={settingsSaveData} //SAVE DATA
+            setNameboard={setNameboard} // SET TITLE
+          />
+        )}
+      </div>
     </div>
   );
 }
