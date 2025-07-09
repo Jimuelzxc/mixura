@@ -219,7 +219,7 @@ export default function Home() {
                       The Visual Cortex for <span className="text-primary">Your</span> Ideas
                   </h1>
                   <p className="mt-4 max-w-xl text-lg text-muted-foreground">
-                      Save, organize, and rediscover your visual inspirations with AI-powered tagging and search.
+                      Your visual library is waiting. Click "Add Image" to save your first inspiration.
                   </p>
               </div>
             ) : filteredImages.length > 0 ? (
@@ -249,11 +249,6 @@ export default function Home() {
           onUpdate={handleUpdateImage}
         />
       )}
-      <div className="fixed bottom-4 left-4 z-50">
-        <div className="h-10 w-10 bg-foreground text-background rounded-full flex items-center justify-center text-lg font-bold">
-            M
-        </div>
-      </div>
     </div>
   );
 }
