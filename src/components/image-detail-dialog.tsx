@@ -37,13 +37,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Popover, PopoverContent, PopoverAnchor } from '@/components/ui/popover';
 import { useToast } from '@/hooks/use-toast';
 import { suggestDetails } from '@/ai/flows/suggest-details';
+import { basicColorMap } from '@/lib/utils';
 
 
 const imageEditSchema = z.object({
   title: z.string().optional(),
   notes: z.string().optional(),
   tags: z.array(z.string()).optional(),
-  colors: z.array(z.string().regex(/^#([0-9a-f]{3}){1,2}$/i, "Must be a valid hex color code")).optional(),
+  colors: z.array(z.string()).optional(),
   boardId: z.string().optional(),
 });
 
@@ -63,7 +64,6 @@ interface ImageDetailDialogProps {
 export default function ImageDetailDialog({ image, board, boards, allTags, isOpen, onOpenChange, onDelete, onUpdate }: ImageDetailDialogProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [tagInput, setTagInput] = useState('');
-  const [colorInput, setColorInput] = useState('');
   const [isSuggestionsOpen, setSuggestionsOpen] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const { toast } = useToast();
@@ -120,7 +120,6 @@ export default function ImageDetailDialog({ image, board, boards, allTags, isOpe
         boardId: image.boardId,
       });
       setTagInput('');
-      setColorInput('');
     }
     setIsEditing(!isEditing);
   }
@@ -161,34 +160,6 @@ export default function ImageDetailDialog({ image, board, boards, allTags, isOpe
     form.setValue('tags', newTags);
   };
 
-  const handleAddColor = (color: string, field: any) => {
-    const trimmedColor = color.trim().toUpperCase();
-    if (trimmedColor && !field.value.includes(trimmedColor)) {
-      if (/^#([0-9A-F]{3}){1,2}$/i.test(trimmedColor)) {
-        form.setValue('colors', [...field.value, trimmedColor]);
-        setColorInput('');
-      } else {
-        toast({
-          title: 'Invalid Color',
-          description: 'Please enter a valid hex color code (e.g., #RRGGBB).',
-          variant: 'destructive',
-        });
-      }
-    }
-  };
-
-  const handleColorKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, field: any) => {
-    if (e.key === 'Enter' && colorInput.trim()) {
-      e.preventDefault();
-      handleAddColor(colorInput, field);
-    }
-  };
-
-  const removeColor = (colorToRemove: string, field: any) => {
-    const newColors = field.value.filter((color: string) => color !== colorToRemove);
-    form.setValue('colors', newColors);
-  };
-  
   const handleAiFill = async () => {
       if (!image.url) return;
 
@@ -215,7 +186,7 @@ export default function ImageDetailDialog({ image, board, boards, allTags, isOpe
         if (suggestions.title) form.setValue('title', suggestions.title);
         if (suggestions.notes) form.setValue('notes', suggestions.notes);
         if (suggestions.tags) form.setValue('tags', suggestions.tags);
-        if (suggestions.colors) form.setValue('colors', suggestions.colors.map(c => c.toUpperCase()));
+        if (suggestions.colors) form.setValue('colors', suggestions.colors);
 
         if (suggestions.suggestedBoardId) {
           form.setValue('boardId', suggestions.suggestedBoardId);
@@ -364,50 +335,6 @@ export default function ImageDetailDialog({ image, board, boards, allTags, isOpe
                 />
                 <FormField
                   control={form.control}
-                  name="colors"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Colors</FormLabel>
-                      <div className="flex flex-wrap gap-2 items-center rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
-                        <div className="flex flex-wrap gap-2">
-                          {field.value?.map((color: string) => (
-                            <Badge key={color} variant="secondary" className="pl-2">
-                              <span className="w-3 h-3 rounded-full mr-2 border" style={{ backgroundColor: color }} />
-                              {color}
-                              <button
-                                type="button"
-                                className="ml-1 rounded-full outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                                onClick={() => removeColor(color, field)}
-                              >
-                                <X className="h-3 w-3" />
-                              </button>
-                            </Badge>
-                          ))}
-                        </div>
-                        <div className="flex items-center gap-2 flex-1 min-w-[160px]">
-                          <Input
-                              placeholder="Add #RRGGBB..."
-                              value={colorInput}
-                              onChange={(e) => setColorInput(e.target.value)}
-                              onKeyDown={(e) => handleColorKeyDown(e, field)}
-                              className="h-auto flex-1 bg-transparent p-0 border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
-                          />
-                          <input
-                              type="color"
-                              value={colorInput || '#000000'}
-                              className="p-0 border-none rounded-sm cursor-pointer w-6 h-6 appearance-none bg-transparent"
-                              onChange={(e) => setColorInput(e.target.value.toUpperCase())}
-                              title="Pick a color"
-                              aria-label="Color picker"
-                          />
-                        </div>
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
                   name="notes"
                   render={({ field }) => (
                     <FormItem>
@@ -464,7 +391,7 @@ export default function ImageDetailDialog({ image, board, boards, allTags, isOpe
                       <div className="flex flex-wrap gap-2 mt-1">
                         {image.colors.map(color => 
                           <Badge key={color} variant="secondary" className="pl-2">
-                            <span className="w-3 h-3 rounded-full mr-2 border" style={{ backgroundColor: color }} />
+                            <span className="w-3 h-3 rounded-full mr-2 border" style={{ backgroundColor: basicColorMap[color] || '#000000' }} />
                             {color}
                           </Badge>
                         )}

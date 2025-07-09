@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import type { ImageItem, ViewSettings } from '@/lib/types';
 import { Badge } from '@/components/ui/badge';
-import { cn } from '@/lib/utils';
+import { cn, basicColorMap } from '@/lib/utils';
 import { Notebook, Tag, Palette } from 'lucide-react';
 
 interface ImageListItemProps {
@@ -76,8 +76,8 @@ export default function ImageListItem({ image, settings, onSelect, onTagClick }:
             <div className="flex flex-wrap items-center gap-4">
                 {image.colors.map((color) => (
                 <div key={color} className="flex items-center gap-2">
-                    <div className="w-4 h-4 rounded-full border" style={{backgroundColor: color}} />
-                    <span className="text-sm font-mono">{color}</span>
+                    <div className="w-4 h-4 rounded-full border" style={{backgroundColor: basicColorMap[color] || '#000000'}} />
+                    <span className="text-sm">{color}</span>
                 </div>
                 ))}
             </div>

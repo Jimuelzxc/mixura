@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import type { ImageItem } from '@/lib/types';
 import { Badge } from '@/components/ui/badge';
-import { cn } from '@/lib/utils';
+import { cn, basicColorMap } from '@/lib/utils';
 
 interface ImageCardProps {
   image: ImageItem;
@@ -62,7 +62,7 @@ export default function ImageCard({ image, onSelect, onTagClick, viewMode }: Ima
                 </Badge>
               ))}
               {image.colors && image.colors.map((color) => (
-                  <div key={color} className="w-3 h-3 rounded-full border border-white/50" style={{ backgroundColor: color }} title={color} />
+                  <div key={color} className="w-3 h-3 rounded-full border border-white/50" style={{ backgroundColor: basicColorMap[color] || '#000000' }} title={color} />
               ))}
             </div>
         )}

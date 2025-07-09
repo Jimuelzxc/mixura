@@ -1,6 +1,7 @@
 "use client";
 
-import { Tag, Hash, Search } from 'lucide-react';
+import { Tag, Hash, Search, Palette } from 'lucide-react';
+import React from 'react';
 import type { Board, ViewSettings, ImageItem } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { ViewOptions } from './view-options';
@@ -13,7 +14,7 @@ import { Separator } from './ui/separator';
 import { Badge } from './ui/badge';
 import { Input } from '@/components/ui/input';
 import AddLinkDialog from './add-link-dialog';
-import { cn } from '@/lib/utils';
+import { cn, basicColorMap } from '@/lib/utils';
 
 interface FilterToolbarProps {
   boards: Board[];
@@ -55,6 +56,11 @@ export default function FilterToolbar({
   itemCount,
 }: FilterToolbarProps) {
   const activeFilterCount = selectedTags.length + selectedColors.length;
+
+  const sortedColors = React.useMemo(() => {
+    const colorOrder = Object.keys(basicColorMap);
+    return allColors.sort((a, b) => colorOrder.indexOf(a) - colorOrder.indexOf(b));
+  }, [allColors]);
 
   return (
     <div className="mb-6 flex flex-col gap-4">
@@ -130,7 +136,7 @@ export default function FilterToolbar({
                 <Separator />
                 
                 <div>
-                  <h5 className="mb-2 text-xs font-medium text-muted-foreground">Tags</h5>
+                  <h5 className="mb-2 text-xs font-medium text-muted-foreground flex items-center"><Hash className="w-3 h-3 mr-1.5"/> Tags</h5>
                   {tags.length > 0 ? (
                     <div className="flex flex-wrap gap-1">
                       {tags.map(tag => (
@@ -139,9 +145,8 @@ export default function FilterToolbar({
                           variant={selectedTags.includes(tag) ? 'default' : 'outline'}
                           size="sm"
                           onClick={() => onTagSelect(tag)}
-                          className="rounded-full"
+                          className="rounded-full px-2 h-7"
                         >
-                          <Hash className="w-3 h-3 mr-1"/>
                           {tag}
                         </Button>
                       ))}
@@ -151,13 +156,13 @@ export default function FilterToolbar({
                   )}
                 </div>
 
-                {allColors.length > 0 && (
+                {sortedColors.length > 0 && (
                   <>
                   <Separator />
                   <div>
-                    <h5 className="mb-2 text-xs font-medium text-muted-foreground">Colors</h5>
+                    <h5 className="mb-2 text-xs font-medium text-muted-foreground flex items-center"><Palette className="w-3 h-3 mr-1.5"/> Colors</h5>
                     <div className="flex flex-wrap gap-2">
-                        {allColors.map(color => (
+                        {sortedColors.map(color => (
                             <button
                                 key={color}
                                 onClick={() => onColorSelect(color)}
@@ -166,7 +171,7 @@ export default function FilterToolbar({
                                     selectedColors.includes(color) ? 'border-primary ring-2 ring-primary ring-offset-2' : 'border-card hover:border-muted-foreground',
                                     'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2'
                                 )}
-                                style={{ backgroundColor: color }}
+                                style={{ backgroundColor: basicColorMap[color] || '#000000' }}
                                 title={color}
                                 aria-label={`Filter by color ${color}`}
                             />
