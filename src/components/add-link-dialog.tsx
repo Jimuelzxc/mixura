@@ -163,10 +163,10 @@ export default function AddLinkDialog({ onAddImage, boards, allTags }: AddLinkDi
   };
 
   const handleAddColor = (color: string, field: any) => {
-    const trimmedColor = color.trim();
+    const trimmedColor = color.trim().toUpperCase();
     if (trimmedColor && !field.value.includes(trimmedColor)) {
-      if (/^#([0-9a-f]{3}){1,2}$/i.test(trimmedColor)) {
-        form.setValue('colors', [...field.value, trimmedColor.toUpperCase()]);
+      if (/^#([0-9A-F]{3}){1,2}$/i.test(trimmedColor)) {
+        form.setValue('colors', [...field.value, trimmedColor]);
         setColorInput('');
       } else {
         toast({
@@ -182,10 +182,6 @@ export default function AddLinkDialog({ onAddImage, boards, allTags }: AddLinkDi
     if (e.key === 'Enter' && colorInput.trim()) {
       e.preventDefault();
       handleAddColor(colorInput, field);
-    } else if (e.key === 'Backspace' && !colorInput && field.value?.length > 0) {
-      e.preventDefault();
-      const newColors = field.value.slice(0, -1);
-      form.setValue('colors', newColors);
     }
   };
 
@@ -482,8 +478,8 @@ export default function AddLinkDialog({ onAddImage, boards, allTags }: AddLinkDi
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Colors</FormLabel>
-                    <FormControl>
-                      <div className="flex flex-wrap gap-2 items-center rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
+                    <div className="flex flex-wrap gap-2 items-center rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
+                      <div className="flex flex-wrap gap-2">
                         {field.value?.map((color: string) => (
                           <Badge key={color} variant="secondary" className="pl-2">
                             <span className="w-3 h-3 rounded-full mr-2 border" style={{ backgroundColor: color }} />
@@ -497,24 +493,25 @@ export default function AddLinkDialog({ onAddImage, boards, allTags }: AddLinkDi
                             </button>
                           </Badge>
                         ))}
-                        <div className="flex items-center gap-2 flex-1 min-w-[160px]">
-                            <Input
-                                placeholder="Add #RRGGBB..."
-                                value={colorInput}
-                                onChange={(e) => setColorInput(e.target.value)}
-                                onKeyDown={(e) => handleColorKeyDown(e, field)}
-                                className="h-auto flex-1 bg-transparent p-0 border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
-                            />
-                            <input
-                                type="color"
-                                className="p-0 border-none rounded-sm cursor-pointer w-6 h-6 appearance-none bg-transparent"
-                                onChange={(e) => handleAddColor(e.target.value.toUpperCase(), field)}
-                                title="Pick a color"
-                                aria-label="Color picker"
-                            />
-                        </div>
                       </div>
-                    </FormControl>
+                      <div className="flex items-center gap-2 flex-1 min-w-[160px]">
+                          <Input
+                              placeholder="Add #RRGGBB..."
+                              value={colorInput}
+                              onChange={(e) => setColorInput(e.target.value)}
+                              onKeyDown={(e) => handleColorKeyDown(e, field)}
+                              className="h-auto flex-1 bg-transparent p-0 border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
+                          />
+                          <input
+                              type="color"
+                              value={colorInput || '#000000'}
+                              className="p-0 border-none rounded-sm cursor-pointer w-6 h-6 appearance-none bg-transparent"
+                              onChange={(e) => setColorInput(e.target.value.toUpperCase())}
+                              title="Pick a color"
+                              aria-label="Color picker"
+                          />
+                      </div>
+                    </div>
                     <FormMessage />
                   </FormItem>
                 )}
