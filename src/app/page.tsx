@@ -209,20 +209,7 @@ export default function Home() {
                 viewSettings={viewSettings}
                 onViewSettingsChange={handleUpdateViewSettings}
             />
-            {images.length === 0 && !searchTerm ? (
-                <div className="flex flex-col items-center justify-center text-center py-24 px-4 sm:px-6 lg:px-8">
-                  <div className="relative mb-8 text-primary">
-                      <div className="absolute -inset-2 bg-primary/20 rounded-full blur-3xl" />
-                      <Triangle className="h-24 w-24 relative" fill="currentColor" strokeWidth={1} />
-                  </div>
-                  <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tighter text-foreground">
-                      The Visual Cortex for <span className="text-primary">Your</span> Ideas
-                  </h1>
-                  <p className="mt-4 max-w-xl text-lg text-muted-foreground">
-                      Your visual library is waiting. Click "Add Image" to save your first inspiration.
-                  </p>
-              </div>
-            ) : filteredImages.length > 0 ? (
+            {images.length === 0 && !searchTerm ? null : filteredImages.length > 0 ? (
               <ImageGrid 
                 images={filteredImages} 
                 onImageSelect={setSelectedImage} 
