@@ -1,6 +1,6 @@
 "use client";
 
-import { LayoutGrid, Tag } from 'lucide-react';
+import { LayoutGrid, Tag, Hash } from 'lucide-react';
 import type { Board } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 
@@ -57,7 +57,7 @@ export default function FilterToolbar({
                 onClick={() => onTagSelect(tag)}
                 className="rounded-full"
                 >
-                  <Tag />
+                  <Hash />
                   {tag}
                 </Button>
             ))}
