@@ -338,7 +338,9 @@ export default function AddLinkDialog({ onAddImage, boards, allTags }: AddLinkDi
                           </PopoverAnchor>
                         </div>
                       </FormControl>
-                       <PopoverContent className="w-[var(--radix-popover-anchor-width)] p-1">
+                       <PopoverContent
+                          onOpenAutoFocus={(e) => e.preventDefault()}
+                          className="w-[var(--radix-popover-anchor-width)] p-1">
                           <div className="max-h-40 overflow-y-auto">
                             {suggestedTags.map((tag) => (
                               <button
