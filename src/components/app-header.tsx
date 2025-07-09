@@ -11,9 +11,10 @@ interface AppHeaderProps {
   onSearchChange: (term: string) => void;
   onAddImage: (image: Omit<ImageItem, 'id'>, newBoardName?: string) => void;
   boards: Board[];
+  allTags: string[];
 }
 
-export default function AppHeader({ searchTerm, onSearchChange, onAddImage, boards }: AppHeaderProps) {
+export default function AppHeader({ searchTerm, onSearchChange, onAddImage, boards, allTags }: AppHeaderProps) {
   return (
     <header className="sticky top-0 z-10 w-full bg-background/80 backdrop-blur-sm border-b border-white/10">
       <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
@@ -34,7 +35,7 @@ export default function AppHeader({ searchTerm, onSearchChange, onAddImage, boar
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <AddLinkDialog onAddImage={onAddImage} boards={boards} />
+          <AddLinkDialog onAddImage={onAddImage} boards={boards} allTags={allTags} />
           <ThemeToggle />
         </div>
       </div>

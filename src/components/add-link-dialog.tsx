@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { PlusCircle, X } from 'lucide-react';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -32,6 +32,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import type { Board, ImageItem } from '@/lib/types';
 import { Badge } from './ui/badge';
+import { Popover, PopoverContent, PopoverAnchor } from '@/components/ui/popover';
+
 
 const imageSchema = z.object({
   url: z.string().url({ message: "Please enter a valid image URL." }),
@@ -60,11 +62,13 @@ type ImageFormValues = z.infer<typeof imageSchema>;
 interface AddLinkDialogProps {
   onAddImage: (image: Omit<ImageItem, 'id'>, newBoardName?: string) => void;
   boards: Board[];
+  allTags: string[];
 }
 
-export default function AddLinkDialog({ onAddImage, boards }: AddLinkDialogProps) {
+export default function AddLinkDialog({ onAddImage, boards, allTags }: AddLinkDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [tagInput, setTagInput] = useState('');
+  const [isSuggestionsOpen, setSuggestionsOpen] = useState(false);
   const [isPreviewLarge, setIsPreviewLarge] = useState(false);
   const hasBoards = boards.length > 0;
   
@@ -93,9 +97,22 @@ export default function AddLinkDialog({ onAddImage, boards }: AddLinkDialogProps
         newBoardName: '',
       });
       setTagInput('');
+    } else {
+      setSuggestionsOpen(false);
     }
   }, [isOpen, boards, form]);
 
+  const suggestedTags = useMemo(() => {
+    if (!tagInput) return [];
+    const currentTags = form.getValues('tags') || [];
+    return allTags
+        .filter(
+            (tag) =>
+                tag.toLowerCase().includes(tagInput.toLowerCase()) &&
+                !currentTags.includes(tag)
+        )
+        .slice(0, 5); // Limit suggestions
+  }, [tagInput, allTags, form]);
 
   const onSubmit = (data: ImageFormValues) => {
     const imagePartial = {
@@ -113,14 +130,18 @@ export default function AddLinkDialog({ onAddImage, boards }: AddLinkDialogProps
     setIsOpen(false);
   };
 
+  const handleAddTag = (tag: string, field: any) => {
+    const trimmedTag = tag.trim();
+    if (trimmedTag && !field.value.includes(trimmedTag)) {
+        form.setValue('tags', [...field.value, trimmedTag]);
+    }
+    setTagInput('');
+  }
+
   const handleTagKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, field: any) => {
     if (e.key === 'Enter' && tagInput.trim()) {
       e.preventDefault();
-      const newTag = tagInput.trim();
-      if (!field.value.includes(newTag)) {
-        form.setValue('tags', [...field.value, newTag]);
-      }
-      setTagInput('');
+      handleAddTag(tagInput, field)
     } else if (e.key === 'Backspace' && !tagInput && field.value?.length > 0) {
       e.preventDefault();
       const newTags = field.value.slice(0, -1);
@@ -287,29 +308,54 @@ export default function AddLinkDialog({ onAddImage, boards }: AddLinkDialogProps
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Tags</FormLabel>
-                    <FormControl>
-                      <div className="flex flex-wrap gap-2 items-center rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
-                        {field.value?.map((tag: string) => (
-                          <Badge key={tag} variant="secondary">
-                            {tag}
-                            <button
-                              type="button"
-                              className="ml-1 rounded-full outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                              onClick={() => removeTag(tag, field)}
-                            >
-                              <X className="h-3 w-3" />
-                            </button>
-                          </Badge>
-                        ))}
-                        <Input
-                          placeholder="Add a tag and press Enter"
-                          value={tagInput}
-                          onChange={(e) => setTagInput(e.target.value)}
-                          onKeyDown={(e) => handleTagKeyDown(e, field)}
-                          className="h-auto flex-1 bg-transparent p-0 border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 min-w-[120px]"
-                        />
-                      </div>
-                    </FormControl>
+                    <Popover open={isSuggestionsOpen && suggestedTags.length > 0} onOpenChange={setSuggestionsOpen}>
+                      <FormControl>
+                        <div className="flex flex-wrap gap-2 items-center rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
+                          {field.value?.map((tag: string) => (
+                            <Badge key={tag} variant="secondary">
+                              {tag}
+                              <button
+                                type="button"
+                                className="ml-1 rounded-full outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                                onClick={() => removeTag(tag, field)}
+                              >
+                                <X className="h-3 w-3" />
+                              </button>
+                            </Badge>
+                          ))}
+                          <PopoverAnchor asChild>
+                            <Input
+                              placeholder="Add a tag..."
+                              value={tagInput}
+                              onChange={(e) => {
+                                setTagInput(e.target.value);
+                                if (!isSuggestionsOpen) setSuggestionsOpen(true);
+                              }}
+                              onKeyDown={(e) => handleTagKeyDown(e, field)}
+                              onFocus={() => setSuggestionsOpen(true)}
+                              className="h-auto flex-1 bg-transparent p-0 border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 min-w-[120px]"
+                            />
+                          </PopoverAnchor>
+                        </div>
+                      </FormControl>
+                       <PopoverContent className="w-[var(--radix-popover-anchor-width)] p-1">
+                          <div className="max-h-40 overflow-y-auto">
+                            {suggestedTags.map((tag) => (
+                              <button
+                                type="button"
+                                key={tag}
+                                className="w-full text-left text-sm p-2 rounded-sm hover:bg-accent"
+                                onMouseDown={(e) => {
+                                    e.preventDefault();
+                                    handleAddTag(tag, field);
+                                }}
+                              >
+                                {tag}
+                              </button>
+                            ))}
+                          </div>
+                       </PopoverContent>
+                    </Popover>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -342,7 +388,7 @@ export default function AddLinkDialog({ onAddImage, boards }: AddLinkDialogProps
       {isUrlValid && (
         <Dialog open={isPreviewLarge} onOpenChange={setIsPreviewLarge}>
           <DialogContent className="max-w-4xl h-auto p-0 bg-transparent border-0 shadow-none">
-            <DialogHeader>
+             <DialogHeader>
               <DialogTitle className="sr-only">Large image preview</DialogTitle>
             </DialogHeader>
             <Image

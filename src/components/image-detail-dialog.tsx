@@ -1,7 +1,7 @@
 "use client";
 
 import Image from 'next/image';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -33,6 +33,8 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Popover, PopoverContent, PopoverAnchor } from '@/components/ui/popover';
+
 
 const imageEditSchema = z.object({
   title: z.string().min(2, { message: "Title must be at least 2 characters." }),
@@ -47,15 +49,17 @@ interface ImageDetailDialogProps {
   image: ImageItem;
   board?: Board;
   boards: Board[];
+  allTags: string[];
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   onDelete: (id: string) => void;
   onUpdate: (image: ImageItem) => void;
 }
 
-export default function ImageDetailDialog({ image, board, boards, isOpen, onOpenChange, onDelete, onUpdate }: ImageDetailDialogProps) {
+export default function ImageDetailDialog({ image, board, boards, allTags, isOpen, onOpenChange, onDelete, onUpdate }: ImageDetailDialogProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [tagInput, setTagInput] = useState('');
+  const [isSuggestionsOpen, setSuggestionsOpen] = useState(false);
 
   const form = useForm<ImageEditFormValues>({
     resolver: zodResolver(imageEditSchema),
@@ -78,6 +82,25 @@ export default function ImageDetailDialog({ image, board, boards, isOpen, onOpen
     }
   }, [image, form]);
   
+  useEffect(() => {
+    if (!isOpen) {
+        setSuggestionsOpen(false);
+        setIsEditing(false);
+    }
+  }, [isOpen]);
+
+  const suggestedTags = useMemo(() => {
+    if (!tagInput) return [];
+    const currentTags = form.getValues('tags') || [];
+    return allTags
+        .filter(
+            (tag) =>
+                tag.toLowerCase().includes(tagInput.toLowerCase()) &&
+                !currentTags.includes(tag)
+        )
+        .slice(0, 5);
+  }, [tagInput, allTags, form]);
+
   const handleEditToggle = () => {
     if (isEditing) {
       form.reset({
@@ -100,15 +123,19 @@ export default function ImageDetailDialog({ image, board, boards, isOpen, onOpen
     });
     setIsEditing(false);
   };
+  
+  const handleAddTag = (tag: string, field: any) => {
+    const trimmedTag = tag.trim();
+    if (trimmedTag && !field.value.includes(trimmedTag)) {
+        form.setValue('tags', [...field.value, trimmedTag]);
+    }
+    setTagInput('');
+  }
 
   const handleTagKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, field: any) => {
     if (e.key === 'Enter' && tagInput.trim()) {
       e.preventDefault();
-      const newTag = tagInput.trim();
-      if (!field.value.includes(newTag)) {
-        form.setValue('tags', [...field.value, newTag]);
-      }
-      setTagInput('');
+      handleAddTag(tagInput, field);
     } else if (e.key === 'Backspace' && !tagInput && field.value?.length > 0) {
       e.preventDefault();
       const newTags = field.value.slice(0, -1);
@@ -176,29 +203,54 @@ export default function ImageDetailDialog({ image, board, boards, isOpen, onOpen
                   render={({ field }) => (
                      <FormItem>
                       <FormLabel>Tags</FormLabel>
-                        <FormControl>
-                          <div className="flex flex-wrap gap-2 items-center rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
-                            {field.value?.map((tag: string) => (
-                              <Badge key={tag} variant="secondary">
-                                {tag}
-                                <button
-                                  type="button"
-                                  className="ml-1 rounded-full outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                                  onClick={() => removeTag(tag, field)}
-                                >
-                                  <X className="h-3 w-3" />
-                                </button>
-                              </Badge>
-                            ))}
-                            <Input
-                              placeholder="Add a tag and press Enter"
-                              value={tagInput}
-                              onChange={(e) => setTagInput(e.target.value)}
-                              onKeyDown={(e) => handleTagKeyDown(e, field)}
-                              className="h-auto flex-1 bg-transparent p-0 border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 min-w-[120px]"
-                            />
-                          </div>
-                        </FormControl>
+                        <Popover open={isSuggestionsOpen && suggestedTags.length > 0} onOpenChange={setSuggestionsOpen}>
+                          <FormControl>
+                            <div className="flex flex-wrap gap-2 items-center rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
+                              {field.value?.map((tag: string) => (
+                                <Badge key={tag} variant="secondary">
+                                  {tag}
+                                  <button
+                                    type="button"
+                                    className="ml-1 rounded-full outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                                    onClick={() => removeTag(tag, field)}
+                                  >
+                                    <X className="h-3 w-3" />
+                                  </button>
+                                </Badge>
+                              ))}
+                              <PopoverAnchor asChild>
+                                <Input
+                                  placeholder="Add a tag..."
+                                  value={tagInput}
+                                  onChange={(e) => {
+                                    setTagInput(e.target.value);
+                                    if (!isSuggestionsOpen) setSuggestionsOpen(true);
+                                  }}
+                                  onKeyDown={(e) => handleTagKeyDown(e, field)}
+                                  onFocus={() => setSuggestionsOpen(true)}
+                                  className="h-auto flex-1 bg-transparent p-0 border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 min-w-[120px]"
+                                />
+                              </PopoverAnchor>
+                            </div>
+                          </FormControl>
+                           <PopoverContent className="w-[var(--radix-popover-anchor-width)] p-1">
+                              <div className="max-h-40 overflow-y-auto">
+                                {suggestedTags.map((tag) => (
+                                  <button
+                                    type="button"
+                                    key={tag}
+                                    className="w-full text-left text-sm p-2 rounded-sm hover:bg-accent"
+                                    onMouseDown={(e) => {
+                                        e.preventDefault();
+                                        handleAddTag(tag, field);
+                                    }}
+                                  >
+                                    {tag}
+                                  </button>
+                                ))}
+                              </div>
+                           </PopoverContent>
+                        </Popover>
                       <FormMessage />
                     </FormItem>
                   )}

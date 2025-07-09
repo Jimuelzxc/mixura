@@ -60,6 +60,14 @@ export default function Home() {
     }
   }, [images, boards, isDataLoaded]);
 
+  const allTags = useMemo(() => {
+    const tags = new Set<string>();
+    images.forEach(image => {
+      image.tags.forEach(tag => tags.add(tag));
+    });
+    return Array.from(tags).sort();
+  }, [images]);
+
   const handleAddImage = (newImage: Omit<ImageItem, 'id'>, newBoardName?: string) => {
     let finalBoardId = newImage.boardId;
 
@@ -126,14 +134,6 @@ export default function Home() {
     );
   };
 
-  const allTags = useMemo(() => {
-    const tags = new Set<string>();
-    images.forEach(image => {
-      image.tags.forEach(tag => tags.add(tag));
-    });
-    return Array.from(tags).sort();
-  }, [images]);
-
   const filteredImages = useMemo(() => {
     return images.filter(image => {
       // Search term filter (searches across title, notes, tags, and board name)
@@ -168,6 +168,7 @@ export default function Home() {
         onSearchChange={setSearchTerm}
         onAddImage={handleAddImage}
         boards={boards}
+        allTags={allTags}
       />
       <main className="flex-grow p-4 sm:p-6 md:p-8">
         {images.length > 0 && (
@@ -207,6 +208,7 @@ export default function Home() {
           image={selectedImage}
           board={boards.find(b => b.id === selectedImage.boardId)}
           boards={boards}
+          allTags={allTags}
           isOpen={!!selectedImage}
           onOpenChange={(open) => !open && setSelectedImage(null)}
           onDelete={handleDeleteImage}
