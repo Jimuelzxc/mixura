@@ -53,7 +53,9 @@ export default function FilterToolbar({
       <div className="flex items-center justify-between gap-4 flex-wrap">
         {/* Left: Boards */}
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-sm font-medium text-muted-foreground mr-2">All boards</span>
+          {boards.length > 0 && (
+            <span className="text-sm font-medium text-muted-foreground mr-2">All boards</span>
+          )}
           {boards.map(board => (
             <Button
               key={board.id}
