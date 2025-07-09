@@ -1,6 +1,6 @@
 "use client";
 
-import { List, LayoutGrid, Heading1, Grid3x3, View } from 'lucide-react';
+import { List, LayoutGrid, Heading1, Grid3x3 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -35,7 +35,7 @@ export function ViewOptions({ settings, onChange }: ViewOptionsProps) {
     <Popover>
       <PopoverTrigger asChild>
         <Button variant="outline" size="sm">
-            <View className="mr-2 h-4 w-4" />
+            <LayoutGrid className="mr-2 h-4 w-4" />
             View
         </Button>
       </PopoverTrigger>

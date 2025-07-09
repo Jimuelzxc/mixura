@@ -1,6 +1,6 @@
 "use client";
 
-import { Tag, Hash, Search, Palette } from 'lucide-react';
+import { SlidersHorizontal, Hash, Search, Palette } from 'lucide-react';
 import React from 'react';
 import type { ViewSettings, ImageItem } from '@/lib/types';
 import { Button } from '@/components/ui/button';
@@ -85,7 +85,7 @@ export default function FilterToolbar({
           <Popover>
             <PopoverTrigger asChild>
               <Button variant="outline" size="sm" className="relative">
-                <Tag className="mr-2 h-4 w-4" />
+                <SlidersHorizontal className="mr-2 h-4 w-4" />
                 Filters
                 {activeFilterCount > 0 && (
                   <Badge variant="secondary" className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full p-0">{activeFilterCount}</Badge>
