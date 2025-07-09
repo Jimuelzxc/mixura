@@ -1,7 +1,7 @@
 "use client";
 
 import Image from 'next/image';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -37,7 +37,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 const imageEditSchema = z.object({
   title: z.string().min(2, { message: "Title must be at least 2 characters." }),
   notes: z.string().optional(),
-  tags: z.string().optional(),
+  tags: z.array(z.string()).optional(),
   boardId: z.string({ required_error: "Please select a board." }),
 });
 
@@ -55,38 +55,70 @@ interface ImageDetailDialogProps {
 
 export default function ImageDetailDialog({ image, board, boards, isOpen, onOpenChange, onDelete, onUpdate }: ImageDetailDialogProps) {
   const [isEditing, setIsEditing] = useState(false);
+  const [tagInput, setTagInput] = useState('');
 
   const form = useForm<ImageEditFormValues>({
     resolver: zodResolver(imageEditSchema),
     defaultValues: {
       title: image.title,
       notes: image.notes,
-      tags: image.tags.join(', '),
+      tags: image.tags,
       boardId: image.boardId,
     },
   });
+
+  useEffect(() => {
+    if (image) {
+      form.reset({
+        title: image.title,
+        notes: image.notes,
+        tags: image.tags,
+        boardId: image.boardId,
+      });
+    }
+  }, [image, form]);
   
   const handleEditToggle = () => {
     if (isEditing) {
       form.reset({
         title: image.title,
         notes: image.notes,
-        tags: image.tags.join(', '),
+        tags: image.tags,
         boardId: image.boardId,
       });
+      setTagInput('');
     }
     setIsEditing(!isEditing);
   }
 
   const onSubmit = (data: ImageEditFormValues) => {
-    const tagsArray = data.tags ? data.tags.split(',').map(tag => tag.trim()).filter(Boolean) : [];
     onUpdate({
       ...image,
       ...data,
       notes: data.notes || '',
-      tags: tagsArray
+      tags: data.tags || []
     });
     setIsEditing(false);
+  };
+
+  const handleTagKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, field: any) => {
+    if (e.key === 'Enter' && tagInput.trim()) {
+      e.preventDefault();
+      const newTag = tagInput.trim();
+      if (!field.value.includes(newTag)) {
+        form.setValue('tags', [...field.value, newTag]);
+      }
+      setTagInput('');
+    } else if (e.key === 'Backspace' && !tagInput && field.value?.length > 0) {
+      e.preventDefault();
+      const newTags = field.value.slice(0, -1);
+      form.setValue('tags', newTags);
+    }
+  };
+
+  const removeTag = (tagToRemove: string, field: any) => {
+    const newTags = field.value.filter((tag: string) => tag !== tagToRemove);
+    form.setValue('tags', newTags);
   };
 
   if (!image) return null;
@@ -142,9 +174,32 @@ export default function ImageDetailDialog({ image, board, boards, isOpen, onOpen
                   control={form.control}
                   name="tags"
                   render={({ field }) => (
-                    <FormItem>
+                     <FormItem>
                       <FormLabel>Tags</FormLabel>
-                      <FormControl><Input placeholder="tag1, tag2, ..." {...field} /></FormControl>
+                      <FormControl>
+                        <div>
+                          <div className="flex flex-wrap gap-2 mb-2 min-h-[24px]">
+                            {field.value?.map((tag: string) => (
+                              <Badge key={tag} variant="secondary">
+                                {tag}
+                                <button
+                                  type="button"
+                                  className="ml-1 rounded-full outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                                  onClick={() => removeTag(tag, field)}
+                                >
+                                  <X className="h-3 w-3" />
+                                </button>
+                              </Badge>
+                            ))}
+                          </div>
+                          <Input
+                            placeholder="Add a tag and press Enter"
+                            value={tagInput}
+                            onChange={(e) => setTagInput(e.target.value)}
+                            onKeyDown={(e) => handleTagKeyDown(e, field)}
+                          />
+                        </div>
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}

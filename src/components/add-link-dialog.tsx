@@ -3,7 +3,7 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { PlusCircle } from 'lucide-react';
+import { PlusCircle, X } from 'lucide-react';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
@@ -31,12 +31,13 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import type { Board, ImageItem } from '@/lib/types';
+import { Badge } from './ui/badge';
 
 const imageSchema = z.object({
   url: z.string().url({ message: "Please enter a valid image URL." }),
   title: z.string().min(2, { message: "Title must be at least 2 characters." }),
   notes: z.string().optional(),
-  tags: z.string().optional(),
+  tags: z.array(z.string()).optional(),
   boardType: z.enum(['existing', 'new']),
   boardId: z.string().optional(),
   newBoardName: z.string().optional(),
@@ -63,6 +64,7 @@ interface AddLinkDialogProps {
 
 export default function AddLinkDialog({ onAddImage, boards }: AddLinkDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [tagInput, setTagInput] = useState('');
   const hasBoards = boards.length > 0;
   
   const form = useForm<ImageFormValues>({
@@ -71,7 +73,7 @@ export default function AddLinkDialog({ onAddImage, boards }: AddLinkDialogProps
       url: '',
       title: '',
       notes: '',
-      tags: '',
+      tags: [],
       boardType: hasBoards ? 'existing' : 'new',
       boardId: undefined,
       newBoardName: '',
@@ -84,23 +86,22 @@ export default function AddLinkDialog({ onAddImage, boards }: AddLinkDialogProps
         url: '',
         title: '',
         notes: '',
-        tags: '',
+        tags: [],
         boardType: boards.length > 0 ? 'existing' : 'new',
         boardId: undefined,
         newBoardName: '',
       });
+      setTagInput('');
     }
   }, [isOpen, boards, form]);
 
 
   const onSubmit = (data: ImageFormValues) => {
-    const tagsArray = data.tags ? data.tags.split(',').map(tag => tag.trim()).filter(Boolean) : [];
-    
     const imagePartial = {
         url: data.url,
         title: data.title,
         notes: data.notes || '',
-        tags: tagsArray,
+        tags: data.tags || [],
         boardId: data.boardId || ''
     };
 
@@ -109,6 +110,26 @@ export default function AddLinkDialog({ onAddImage, boards }: AddLinkDialogProps
     onAddImage(imagePartial, newBoardName);
 
     setIsOpen(false);
+  };
+
+  const handleTagKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, field: any) => {
+    if (e.key === 'Enter' && tagInput.trim()) {
+      e.preventDefault();
+      const newTag = tagInput.trim();
+      if (!field.value.includes(newTag)) {
+        form.setValue('tags', [...field.value, newTag]);
+      }
+      setTagInput('');
+    } else if (e.key === 'Backspace' && !tagInput && field.value?.length > 0) {
+      e.preventDefault();
+      const newTags = field.value.slice(0, -1);
+      form.setValue('tags', newTags);
+    }
+  };
+
+  const removeTag = (tagToRemove: string, field: any) => {
+    const newTags = field.value.filter((tag: string) => tag !== tagToRemove);
+    form.setValue('tags', newTags);
   };
 
   const imageUrl = form.watch('url');
@@ -250,7 +271,6 @@ export default function AddLinkDialog({ onAddImage, boards }: AddLinkDialogProps
               />
             )}
 
-
             <FormField
               control={form.control}
               name="tags"
@@ -258,12 +278,34 @@ export default function AddLinkDialog({ onAddImage, boards }: AddLinkDialogProps
                 <FormItem>
                   <FormLabel>Tags</FormLabel>
                   <FormControl>
-                    <Input placeholder="architecture, modern (comma-separated)" {...field} />
+                    <div>
+                      <div className="flex flex-wrap gap-2 mb-2 min-h-[24px]">
+                        {field.value?.map((tag: string) => (
+                          <Badge key={tag} variant="secondary">
+                            {tag}
+                            <button
+                              type="button"
+                              className="ml-1 rounded-full outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                              onClick={() => removeTag(tag, field)}
+                            >
+                              <X className="h-3 w-3" />
+                            </button>
+                          </Badge>
+                        ))}
+                      </div>
+                      <Input
+                        placeholder="Add a tag and press Enter"
+                        value={tagInput}
+                        onChange={(e) => setTagInput(e.target.value)}
+                        onKeyDown={(e) => handleTagKeyDown(e, field)}
+                      />
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="notes"
