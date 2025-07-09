@@ -3,7 +3,7 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { PlusCircle, X } from 'lucide-react';
+import { PlusCircle, X, Sparkles, Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import { useEffect, useState, useMemo } from 'react';
 
@@ -33,6 +33,8 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import type { Board, ImageItem } from '@/lib/types';
 import { Badge } from './ui/badge';
 import { Popover, PopoverContent, PopoverAnchor } from '@/components/ui/popover';
+import { useToast } from '@/hooks/use-toast';
+import { suggestDetails } from '@/ai/flows/suggest-details';
 
 
 const imageSchema = z.object({
@@ -66,6 +68,8 @@ export default function AddLinkDialog({ onAddImage, boards, allTags }: AddLinkDi
   const [tagInput, setTagInput] = useState('');
   const [isSuggestionsOpen, setSuggestionsOpen] = useState(false);
   const [isPreviewLarge, setIsPreviewLarge] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const { toast } = useToast();
   const hasBoards = boards.length > 0;
   
   const form = useForm<ImageFormValues>({
@@ -93,6 +97,7 @@ export default function AddLinkDialog({ onAddImage, boards, allTags }: AddLinkDi
         newBoardName: '',
       });
       setTagInput('');
+      setIsGenerating(false);
     } else {
       setSuggestionsOpen(false);
     }
@@ -150,6 +155,61 @@ export default function AddLinkDialog({ onAddImage, boards, allTags }: AddLinkDi
     form.setValue('tags', newTags);
   };
 
+  const handleAiFill = async () => {
+      const url = form.getValues('url');
+      if (!url) return;
+
+      setIsGenerating(true);
+      try {
+        const proxyResponse = await fetch('/api/proxy-image', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ imageUrl: url }),
+        });
+
+        if (!proxyResponse.ok) {
+          const errorData = await proxyResponse.json();
+          throw new Error(errorData.error || 'Failed to fetch image from URL.');
+        }
+
+        const { dataUri } = await proxyResponse.json();
+
+        const suggestions = await suggestDetails({
+          photoDataUri: dataUri,
+          boards,
+        });
+
+        if (suggestions.title) form.setValue('title', suggestions.title);
+        if (suggestions.notes) form.setValue('notes', suggestions.notes);
+        if (suggestions.tags) form.setValue('tags', suggestions.tags);
+
+        if (suggestions.suggestedBoardId) {
+          form.setValue('boardType', 'existing');
+          form.setValue('boardId', suggestions.suggestedBoardId);
+          form.setValue('newBoardName', '');
+        } else if (suggestions.suggestedNewBoardName) {
+          form.setValue('boardType', 'new');
+          form.setValue('newBoardName', suggestions.suggestedNewBoardName);
+          form.setValue('boardId', undefined);
+        }
+
+        toast({
+            title: "Suggestions applied!",
+            description: "AI has filled in the details for you.",
+        });
+
+      } catch (error: any) {
+        console.error("AI suggestion failed:", error);
+        toast({
+          title: "AI Suggestion Failed",
+          description: error.message || "Could not generate suggestions for this image.",
+          variant: 'destructive',
+        });
+      } finally {
+        setIsGenerating(false);
+      }
+    };
+
   const imageUrl = form.watch('url');
   const isUrlValid = z.string().url().safeParse(imageUrl).success;
   const boardType = form.watch('boardType');
@@ -190,19 +250,35 @@ export default function AddLinkDialog({ onAddImage, boards, allTags }: AddLinkDi
               />
 
               {isUrlValid && (
-                <div
-                  className="relative mt-4 aspect-video w-full cursor-zoom-in"
-                  onClick={() => setIsPreviewLarge(true)}
-                  role="button"
-                  aria-label="Enlarge image preview"
-                >
-                  <Image
-                    src={imageUrl}
-                    alt="Image preview"
-                    fill
-                    className="rounded-md object-cover"
-                    data-ai-hint="image preview"
-                  />
+                <div className="space-y-3">
+                  <div
+                    className="relative mt-1 aspect-video w-full cursor-zoom-in"
+                    onClick={() => setIsPreviewLarge(true)}
+                    role="button"
+                    aria-label="Enlarge image preview"
+                  >
+                    <Image
+                      src={imageUrl}
+                      alt="Image preview"
+                      fill
+                      className="rounded-md object-cover"
+                      data-ai-hint="image preview"
+                    />
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleAiFill}
+                    disabled={!isUrlValid || isGenerating}
+                    className="w-full"
+                  >
+                    {isGenerating ? (
+                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    ) : (
+                      <Sparkles className="mr-2 h-5 w-5" />
+                    )}
+                    Auto-fill with AI
+                  </Button>
                 </div>
               )}
 
@@ -387,7 +463,8 @@ export default function AddLinkDialog({ onAddImage, boards, allTags }: AddLinkDi
         <Dialog open={isPreviewLarge} onOpenChange={setIsPreviewLarge}>
           <DialogContent className="max-w-4xl h-auto p-0 bg-transparent border-0 shadow-none">
              <DialogHeader>
-              <DialogTitle className="sr-only">Large image preview</DialogTitle>
+                <DialogTitle className="sr-only">Large image preview</DialogTitle>
+                <DialogDescription className="sr-only">A larger view of the selected image.</DialogDescription>
             </DialogHeader>
             <Image
               src={imageUrl}
