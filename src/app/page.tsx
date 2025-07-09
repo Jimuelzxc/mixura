@@ -21,6 +21,7 @@ export default function Home() {
   const [selectedBoards, setSelectedBoards] = useState<string[]>([]);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const { toast } = useToast();
+  const [gridColumns, setGridColumns] = useState(3);
 
   // Load data from localStorage on initial render
   useEffect(() => {
@@ -32,6 +33,10 @@ export default function Home() {
       const storedBoards = window.localStorage.getItem('tarsus-boards');
       if (storedBoards) {
         setBoards(JSON.parse(storedBoards));
+      }
+      const storedColumns = window.localStorage.getItem('tarsus-grid-columns');
+      if (storedColumns) {
+        setGridColumns(JSON.parse(storedColumns));
       }
     } catch (error) {
       console.error('Failed to load from localStorage', error);
@@ -51,6 +56,7 @@ export default function Home() {
       try {
         window.localStorage.setItem('tarsus-images', JSON.stringify(images));
         window.localStorage.setItem('tarsus-boards', JSON.stringify(boards));
+        window.localStorage.setItem('tarsus-grid-columns', JSON.stringify(gridColumns));
       } catch (error) {
         console.error('Failed to save to localStorage', error);
           toast({
@@ -60,7 +66,7 @@ export default function Home() {
         });
       }
     }
-  }, [images, boards, isDataLoaded]);
+  }, [images, boards, gridColumns, isDataLoaded]);
 
   const allTags = useMemo(() => {
     const tags = new Set<string>();
@@ -184,6 +190,8 @@ export default function Home() {
                 onBoardSelect={handleBoardSelect}
                 selectedTags={selectedTags}
                 onTagSelect={handleTagSelect}
+                gridColumns={gridColumns}
+                onGridColumnsChange={setGridColumns}
             />
         )}
         {images.length === 0 && !searchTerm ? (
@@ -200,7 +208,7 @@ export default function Home() {
               </p>
           </div>
         ) : filteredImages.length > 0 ? (
-          <ImageGrid images={filteredImages} onImageSelect={setSelectedImage} onTagClick={handleTagSelect} />
+          <ImageGrid images={filteredImages} onImageSelect={setSelectedImage} onTagClick={handleTagSelect} gridColumns={gridColumns} />
         ) : (
           <div className="flex flex-col items-center justify-center text-center h-full mt-20 text-muted-foreground">
             <h2 className="text-2xl font-semibold">No Images Found</h2>
