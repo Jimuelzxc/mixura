@@ -57,7 +57,8 @@ export default function FilterToolbar({
                 onClick={() => onTagSelect(tag)}
                 className="rounded-full"
                 >
-                {tag}
+                  <Tag />
+                  {tag}
                 </Button>
             ))}
             </div>
