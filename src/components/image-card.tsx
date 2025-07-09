@@ -33,13 +33,13 @@ export default function ImageCard({ image, onSelect, onTagClick, viewMode }: Ima
                 alt=""
                 fill
                 aria-hidden
-                className="object-cover blur-lg opacity-70 scale-110"
+                className="object-cover blur-xl opacity-50"
                 data-ai-hint="abstract texture"
             />
         </div>
 
         {/* Content Layer */}
-        <div className="relative overflow-hidden">
+        <div className="relative overflow-hidden border border-solid">
             <div className={cn(
                 "w-full",
                 viewMode === 'cards' && "aspect-[4/3]"
