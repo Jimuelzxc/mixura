@@ -5,7 +5,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Trash2, Edit, X, Check, Tag, Notebook, LayoutGrid, AlertTriangle, Sparkles, Loader2 } from 'lucide-react';
+import { Trash2, Edit, X, Check, Tag, Notebook, LayoutGrid, AlertTriangle, Sparkles, Loader2, Link } from 'lucide-react';
 
 import type { ImageItem, Board } from '@/lib/types';
 import { Button } from '@/components/ui/button';
@@ -347,6 +347,15 @@ export default function ImageDetailDialog({ image, board, boards, allTags, isOpe
                 <DialogTitle className="text-2xl font-bold">{image.title || 'Untitled'}</DialogTitle>
               </DialogHeader>
               <div className="mt-4 space-y-4 text-sm">
+                 <div className="flex items-start gap-3">
+                  <Link className="h-4 w-4 mt-1 text-muted-foreground"/>
+                  <div>
+                    <h4 className="font-semibold text-muted-foreground">URL</h4>
+                    <a href={image.url} target="_blank" rel="noopener noreferrer" className="break-all text-primary hover:underline">
+                        {image.url}
+                    </a>
+                  </div>
+                </div>
                 <div className="flex items-start gap-3">
                   <LayoutGrid className="h-4 w-4 mt-1 text-muted-foreground"/>
                   <div>
