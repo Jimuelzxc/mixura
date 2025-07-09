@@ -94,31 +94,31 @@ export default function FilterToolbar({
         
         {/* Right: Filter and View */}
         <div className="flex items-center gap-2">
-           {tags.length > 0 && (
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="outline" size="sm" className="relative">
-                  <Tag className="mr-2 h-4 w-4" />
-                  Filters
-                  {selectedTags.length > 0 && (
-                    <Badge variant="secondary" className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full p-0">{selectedTags.length}</Badge>
-                  )}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-80">
-                <div className="grid gap-4">
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-1">
-                      <h4 className="font-medium leading-none">Filters</h4>
-                      <p className="text-sm text-muted-foreground">
-                        Select one or more tags.
-                      </p>
-                    </div>
-                    {selectedTags.length > 0 && (
-                      <Button variant="ghost" size="sm" onClick={onClearTagFilters}>Clear</Button>
-                    )}
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="sm" className="relative">
+                <Tag className="mr-2 h-4 w-4" />
+                Filters
+                {selectedTags.length > 0 && (
+                  <Badge variant="secondary" className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full p-0">{selectedTags.length}</Badge>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-80">
+              <div className="grid gap-4">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <h4 className="font-medium leading-none">Filters</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Select one or more tags to filter.
+                    </p>
                   </div>
-                  <Separator />
+                  {selectedTags.length > 0 && (
+                    <Button variant="ghost" size="sm" onClick={onClearTagFilters}>Clear</Button>
+                  )}
+                </div>
+                <Separator />
+                {tags.length > 0 ? (
                   <div className="flex flex-wrap gap-1">
                     {tags.map(tag => (
                       <Button
@@ -133,10 +133,12 @@ export default function FilterToolbar({
                       </Button>
                     ))}
                   </div>
-                </div>
-              </PopoverContent>
-            </Popover>
-          )}
+                ) : (
+                  <p className="text-sm text-muted-foreground text-center py-4">No tags available yet.</p>
+                )}
+              </div>
+            </PopoverContent>
+          </Popover>
           <ViewOptions settings={viewSettings} onChange={onViewSettingsChange} />
         </div>
       </div>
