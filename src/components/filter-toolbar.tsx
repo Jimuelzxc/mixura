@@ -1,5 +1,6 @@
 "use client";
 
+import { LayoutGrid, Tag } from 'lucide-react';
 import type { Board } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 
@@ -23,7 +24,10 @@ export default function FilterToolbar({
   return (
     <div className="px-4 md:px-6 space-y-4 mb-8">
       <div className="flex items-center gap-4 flex-wrap">
-        <span className="text-sm font-medium text-muted-foreground">Boards:</span>
+        <span className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+          <LayoutGrid className="h-4 w-4" />
+          Boards:
+        </span>
         <div className="flex items-center gap-2 flex-wrap">
           {boards.map(board => (
             <Button
@@ -40,7 +44,10 @@ export default function FilterToolbar({
       </div>
       {tags.length > 0 && (
          <div className="flex items-center gap-4 flex-wrap">
-            <span className="text-sm font-medium text-muted-foreground">Tags:</span>
+            <span className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+              <Tag className="h-4 w-4" />
+              Tags:
+            </span>
             <div className="flex items-center gap-2 flex-wrap">
             {tags.map(tag => (
                 <Button
