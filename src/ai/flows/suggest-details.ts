@@ -11,7 +11,7 @@ import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 import type { Board } from '@/lib/types';
 
-export const SuggestDetailsInputSchema = z.object({
+const SuggestDetailsInputSchema = z.object({
   photoDataUri: z
     .string()
     .describe(
@@ -24,7 +24,7 @@ export const SuggestDetailsInputSchema = z.object({
 });
 export type SuggestDetailsInput = z.infer<typeof SuggestDetailsInputSchema>;
 
-export const SuggestDetailsOutputSchema = z.object({
+const SuggestDetailsOutputSchema = z.object({
   title: z.string().describe('A concise and descriptive title for the image, no more than 10 words.'),
   notes: z.string().describe("Brief, insightful notes about the image's style, mood, or potential use. Keep it to 1-2 sentences."),
   tags: z.array(z.string()).describe('An array of 3-5 relevant lowercase tags for the image.'),
