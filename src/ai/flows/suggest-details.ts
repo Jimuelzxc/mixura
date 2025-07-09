@@ -9,7 +9,6 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
-import type { Board } from '@/lib/types';
 
 const SuggestDetailsInputSchema = z.object({
   photoDataUri: z
@@ -17,10 +16,6 @@ const SuggestDetailsInputSchema = z.object({
     .describe(
       "A photo of a plant, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."
     ),
-  boards: z.array(z.object({
-    id: z.string(),
-    name: z.string()
-  })).describe('A list of existing boards to choose from.'),
 });
 export type SuggestDetailsInput = z.infer<typeof SuggestDetailsInputSchema>;
 
@@ -29,8 +24,6 @@ const SuggestDetailsOutputSchema = z.object({
   notes: z.string().describe("Brief, insightful notes about the image's style, mood, or potential use. Keep it to 1-2 sentences."),
   tags: z.array(z.string()).describe('An array of 3-5 relevant lowercase tags for the image.'),
   colors: z.array(z.string()).describe('An array of 1-3 dominant basic colors from the provided list.'),
-  suggestedBoardId: z.string().optional().describe('The ID of an existing board if the image fits well into one.'),
-  suggestedNewBoardName: z.string().optional().describe('A new board name if the image does not fit into any existing boards.'),
 });
 export type SuggestDetailsOutput = z.infer<typeof SuggestDetailsOutputSchema>;
 
@@ -51,10 +44,6 @@ Based on your analysis:
 2.  Write brief, insightful notes about the image (1-2 sentences).
 3.  Suggest 3-5 relevant, lowercase, single-word tags.
 4.  Identify the 1-3 most dominant colors in the image. From the following list of basic colors, choose the ones that best represent the dominant colors in the image: Red, Orange, Yellow, Green, Teal, Blue, Purple, Pink, Brown, Black, Gray, White. Return only the names of the colors.
-5.  Review the list of existing boards: {{{json boards}}}.
-    - If the image's theme closely matches an existing board, provide its 'id' in the 'suggestedBoardId' field.
-    - If no existing boards are a good fit, suggest a short, descriptive name for a new board in the 'suggestedNewBoardName' field.
-    - Only provide one or the other: 'suggestedBoardId' or 'suggestedNewBoardName', never both.
 
 The image to analyze is here:
 {{media url=photoDataUri}}`,

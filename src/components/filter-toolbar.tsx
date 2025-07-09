@@ -2,7 +2,7 @@
 
 import { Tag, Hash, Search, Palette } from 'lucide-react';
 import React from 'react';
-import type { Board, ViewSettings, ImageItem } from '@/lib/types';
+import type { ViewSettings, ImageItem } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { ViewOptions } from './view-options';
 import {
@@ -17,12 +17,8 @@ import AddLinkDialog from './add-link-dialog';
 import { cn, basicColorMap } from '@/lib/utils';
 
 interface FilterToolbarProps {
-  boards: Board[];
-  allBoards: Board[];
-  tags: string[];
+  allTags: string[];
   allColors: string[];
-  selectedBoards: string[];
-  onBoardSelect: (boardId: string) => void;
   selectedTags: string[];
   onTagSelect: (tag: string) => void;
   selectedColors: string[];
@@ -32,17 +28,13 @@ interface FilterToolbarProps {
   onClearFilters: () => void;
   searchTerm: string;
   onSearchChange: (term: string) => void;
-  onAddImage: (image: Omit<ImageItem, 'id'>, newBoardName?: string) => void;
+  onAddImage: (image: Omit<ImageItem, 'id'>) => void;
   itemCount: number;
 }
 
 export default function FilterToolbar({
-  boards,
-  allBoards,
-  tags,
+  allTags,
   allColors,
-  selectedBoards,
-  onBoardSelect,
   selectedTags,
   onTagSelect,
   selectedColors,
@@ -64,27 +56,8 @@ export default function FilterToolbar({
 
   return (
     <div className="mb-6 flex flex-col gap-4">
-      {/* Row 1: Boards and Search/Add */}
-      <div className="flex items-center justify-between gap-4 flex-wrap">
-        {/* Left: Boards */}
-        <div className="flex items-center gap-2 flex-wrap">
-          {boards.length > 0 && (
-            <span className="text-sm font-medium text-muted-foreground mr-2">All boards</span>
-          )}
-          {boards.map(board => (
-            <Button
-              key={board.id}
-              variant={selectedBoards.includes(board.id) ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => onBoardSelect(board.id)}
-              className="rounded-md"
-            >
-              {board.name}
-            </Button>
-          ))}
-        </div>
-        
-        {/* Right: Search and Add */}
+      {/* Row 1: Search/Add */}
+      <div className="flex items-center justify-end gap-4 flex-wrap">
         <div className="flex items-center gap-2">
           <div className="relative w-full max-w-xs">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -96,7 +69,7 @@ export default function FilterToolbar({
               onChange={(e) => onSearchChange(e.target.value)}
             />
           </div>
-          <AddLinkDialog onAddImage={onAddImage} boards={allBoards} allTags={tags} />
+          <AddLinkDialog onAddImage={onAddImage} allTags={allTags} />
         </div>
       </div>
 
@@ -137,9 +110,9 @@ export default function FilterToolbar({
                 
                 <div>
                   <h5 className="mb-2 text-xs font-medium text-muted-foreground flex items-center"><Hash className="w-3 h-3 mr-1.5"/> Tags</h5>
-                  {tags.length > 0 ? (
+                  {allTags.length > 0 ? (
                     <div className="flex flex-wrap gap-1">
-                      {tags.map(tag => (
+                      {allTags.map(tag => (
                         <Button
                           key={tag}
                           variant={selectedTags.includes(tag) ? 'default' : 'outline'}

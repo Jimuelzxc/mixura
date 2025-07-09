@@ -6,9 +6,9 @@ import { useState, useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Trash2, Edit, X, Check, Tag, Notebook, LayoutGrid, AlertTriangle, Sparkles, Loader2, Link, Palette } from 'lucide-react';
+import { Trash2, Edit, X, Check, Tag, Notebook, AlertTriangle, Sparkles, Loader2, Link, Palette } from 'lucide-react';
 
-import type { ImageItem, Board } from '@/lib/types';
+import type { ImageItem } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
@@ -33,7 +33,6 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Popover, PopoverContent, PopoverAnchor } from '@/components/ui/popover';
 import { useToast } from '@/hooks/use-toast';
 import { suggestDetails } from '@/ai/flows/suggest-details';
@@ -45,15 +44,12 @@ const imageEditSchema = z.object({
   notes: z.string().optional(),
   tags: z.array(z.string()).optional(),
   colors: z.array(z.string()).optional(),
-  boardId: z.string().optional(),
 });
 
 type ImageEditFormValues = z.infer<typeof imageEditSchema>;
 
 interface ImageDetailDialogProps {
   image: ImageItem;
-  board?: Board;
-  boards: Board[];
   allTags: string[];
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
@@ -61,7 +57,7 @@ interface ImageDetailDialogProps {
   onUpdate: (image: ImageItem) => void;
 }
 
-export default function ImageDetailDialog({ image, board, boards, allTags, isOpen, onOpenChange, onDelete, onUpdate }: ImageDetailDialogProps) {
+export default function ImageDetailDialog({ image, allTags, isOpen, onOpenChange, onDelete, onUpdate }: ImageDetailDialogProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [tagInput, setTagInput] = useState('');
   const [isSuggestionsOpen, setSuggestionsOpen] = useState(false);
@@ -75,7 +71,6 @@ export default function ImageDetailDialog({ image, board, boards, allTags, isOpe
       notes: image.notes,
       tags: image.tags,
       colors: image.colors || [],
-      boardId: image.boardId,
     },
   });
 
@@ -86,7 +81,6 @@ export default function ImageDetailDialog({ image, board, boards, allTags, isOpe
         notes: image.notes,
         tags: image.tags,
         colors: image.colors || [],
-        boardId: image.boardId,
       });
     }
   }, [image, form]);
@@ -117,7 +111,6 @@ export default function ImageDetailDialog({ image, board, boards, allTags, isOpe
         notes: image.notes,
         tags: image.tags,
         colors: image.colors || [],
-        boardId: image.boardId,
       });
       setTagInput('');
     }
@@ -131,7 +124,6 @@ export default function ImageDetailDialog({ image, board, boards, allTags, isOpe
       notes: data.notes || '',
       tags: data.tags || [],
       colors: data.colors || [],
-      boardId: data.boardId === 'uncategorized' ? undefined : data.boardId,
     });
     setIsEditing(false);
   };
@@ -180,17 +172,12 @@ export default function ImageDetailDialog({ image, board, boards, allTags, isOpe
 
         const suggestions = await suggestDetails({
           photoDataUri: dataUri,
-          boards,
         });
 
         if (suggestions.title) form.setValue('title', suggestions.title);
         if (suggestions.notes) form.setValue('notes', suggestions.notes);
         if (suggestions.tags) form.setValue('tags', suggestions.tags);
         if (suggestions.colors) form.setValue('colors', suggestions.colors);
-
-        if (suggestions.suggestedBoardId) {
-          form.setValue('boardId', suggestions.suggestedBoardId);
-        }
 
         toast({
             title: "Suggestions applied!",
@@ -250,25 +237,6 @@ export default function ImageDetailDialog({ image, board, boards, allTags, isOpe
                     <FormItem>
                       <FormLabel>Title</FormLabel>
                       <FormControl><Input {...field} /></FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                 <FormField
-                  control={form.control}
-                  name="boardId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Board</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value || 'uncategorized'}>
-                        <FormControl>
-                          <SelectTrigger><SelectValue placeholder="Select a board" /></SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="uncategorized">Uncategorized</SelectItem>
-                          {boards.map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}
-                        </SelectContent>
-                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -365,13 +333,6 @@ export default function ImageDetailDialog({ image, board, boards, allTags, isOpe
                     </a>
                   </div>
                 </div>
-                <div className="flex items-start gap-3">
-                  <LayoutGrid className="h-4 w-4 mt-1 text-muted-foreground flex-shrink-0"/>
-                  <div>
-                    <h4 className="font-semibold text-muted-foreground">Board</h4>
-                    <p>{board?.name || 'Uncategorized'}</p>
-                  </div>
-                </div>
                 {image.tags.length > 0 && (
                   <div className="flex items-start gap-3">
                     <Tag className="h-4 w-4 mt-1 text-muted-foreground flex-shrink-0"/>
@@ -425,7 +386,7 @@ export default function ImageDetailDialog({ image, board, boards, allTags, isOpe
                     <AlertDialogHeader>
                       <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                       <AlertDialogDescription>
-                        This action cannot be undone. This will permanently delete the image from your board.
+                        This action cannot be undone. This will permanently delete the image from your collection.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>

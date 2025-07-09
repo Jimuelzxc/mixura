@@ -1,5 +1,3 @@
-import type { Board, ImageItem } from './types';
-
-export const mockBoards: Board[] = [];
+import type { ImageItem } from './types';
 
 export const mockImages: ImageItem[] = [];
