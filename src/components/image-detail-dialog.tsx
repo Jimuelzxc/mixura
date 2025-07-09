@@ -5,7 +5,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Trash2, Edit, X, Check, Tag, Notebook, LayoutGrid, AlertTriangle } from 'lucide-react';
+import { Trash2, Edit, X, Check, Tag, Notebook, LayoutGrid, AlertTriangle, Sparkles, Loader2 } from 'lucide-react';
 
 import type { ImageItem, Board } from '@/lib/types';
 import { Button } from '@/components/ui/button';
@@ -34,6 +34,8 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Popover, PopoverContent, PopoverAnchor } from '@/components/ui/popover';
+import { useToast } from '@/hooks/use-toast';
+import { suggestDetails } from '@/ai/flows/suggest-details';
 
 
 const imageEditSchema = z.object({
@@ -60,6 +62,8 @@ export default function ImageDetailDialog({ image, board, boards, allTags, isOpe
   const [isEditing, setIsEditing] = useState(false);
   const [tagInput, setTagInput] = useState('');
   const [isSuggestionsOpen, setSuggestionsOpen] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const { toast } = useToast();
 
   const form = useForm<ImageEditFormValues>({
     resolver: zodResolver(imageEditSchema),
@@ -148,6 +152,54 @@ export default function ImageDetailDialog({ image, board, boards, allTags, isOpe
     const newTags = field.value.filter((tag: string) => tag !== tagToRemove);
     form.setValue('tags', newTags);
   };
+  
+  const handleAiFill = async () => {
+      if (!image.url) return;
+
+      setIsGenerating(true);
+      try {
+        const proxyResponse = await fetch('/api/proxy-image', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ imageUrl: image.url }),
+        });
+
+        if (!proxyResponse.ok) {
+          const errorData = await proxyResponse.json();
+          throw new Error(errorData.error || 'Failed to fetch image from URL.');
+        }
+
+        const { dataUri } = await proxyResponse.json();
+
+        const suggestions = await suggestDetails({
+          photoDataUri: dataUri,
+          boards,
+        });
+
+        if (suggestions.title) form.setValue('title', suggestions.title);
+        if (suggestions.notes) form.setValue('notes', suggestions.notes);
+        if (suggestions.tags) form.setValue('tags', suggestions.tags);
+
+        if (suggestions.suggestedBoardId) {
+          form.setValue('boardId', suggestions.suggestedBoardId);
+        }
+
+        toast({
+            title: "Suggestions applied!",
+            description: "AI has filled in the details for you.",
+        });
+
+      } catch (error: any) {
+        console.error("AI suggestion failed:", error);
+        toast({
+          title: "AI Suggestion Failed",
+          description: error.message || "Could not generate suggestions for this image.",
+          variant: 'destructive',
+        });
+      } finally {
+        setIsGenerating(false);
+      }
+    };
 
   if (!image) return null;
 
@@ -169,6 +221,20 @@ export default function ImageDetailDialog({ image, board, boards, allTags, isOpe
           {isEditing ? (
              <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                 <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleAiFill}
+                    disabled={isGenerating}
+                    className="w-full"
+                  >
+                    {isGenerating ? (
+                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    ) : (
+                      <Sparkles className="mr-2 h-5 w-5" />
+                    )}
+                    Auto-fill with AI
+                  </Button>
                 <FormField
                   control={form.control}
                   name="title"
