@@ -2,14 +2,14 @@
 "use client";
 
 import { ThemeToggle } from './theme-toggle';
-import { LogoWithText } from './assets/logo-with-text';
+import { Logo } from './assets/logo';
 
 export default function AppHeader() {
   return (
     <header className="sticky top-0 z-10 w-full bg-background/80 backdrop-blur-sm">
       <div className="container mx-auto flex h-24 items-center justify-between px-4 md:px-6">
         <div className="flex items-center">
-            <LogoWithText className="h-[150px] w-auto translate-x-[-20px]" />
+            <Logo className="h-12 w-auto" />
         </div>
         <div className="flex items-center gap-2">
           <ThemeToggle />
