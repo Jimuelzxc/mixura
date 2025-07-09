@@ -9,7 +9,7 @@ import { ThemeToggle } from './theme-toggle';
 interface AppHeaderProps {
   searchTerm: string;
   onSearchChange: (term: string) => void;
-  onAddImage: (image: Omit<ImageItem, 'id'>) => void;
+  onAddImage: (image: Omit<ImageItem, 'id'>, newBoardName?: string) => void;
   boards: Board[];
 }
 

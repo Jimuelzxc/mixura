@@ -19,15 +19,36 @@ export default function Home() {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const { toast } = useToast();
 
-  const handleAddImage = (newImage: Omit<ImageItem, 'id'>) => {
+  const handleAddImage = (newImage: Omit<ImageItem, 'id'>, newBoardName?: string) => {
+    let finalBoardId = newImage.boardId;
+
+    if (newBoardName && newBoardName.trim()) {
+      const newBoard: Board = {
+        id: `board-${Date.now()}`,
+        name: newBoardName.trim(),
+      };
+      setBoards(prevBoards => [...prevBoards, newBoard]);
+      finalBoardId = newBoard.id;
+    }
+
+    if (!finalBoardId) {
+      toast({
+        title: "Cannot save image",
+        description: "A board is required to save an image.",
+        variant: 'destructive',
+      });
+      return;
+    }
+    
     const fullImage: ImageItem = {
       ...newImage,
       id: `img-${Date.now()}`,
+      boardId: finalBoardId,
     };
     setImages(prevImages => [fullImage, ...prevImages]);
     toast({
       title: "Image saved!",
-      description: "Your new image has been added to the board.",
+      description: "Your new image has been added to your board.",
     });
   };
 
