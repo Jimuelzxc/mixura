@@ -13,18 +13,22 @@ import { Separator } from './ui/separator';
 import { Badge } from './ui/badge';
 import { Input } from '@/components/ui/input';
 import AddLinkDialog from './add-link-dialog';
+import { cn } from '@/lib/utils';
 
 interface FilterToolbarProps {
   boards: Board[];
   allBoards: Board[];
   tags: string[];
+  allColors: string[];
   selectedBoards: string[];
   onBoardSelect: (boardId: string) => void;
   selectedTags: string[];
   onTagSelect: (tag: string) => void;
+  selectedColors: string[];
+  onColorSelect: (color: string) => void;
   viewSettings: ViewSettings;
   onViewSettingsChange: (settings: Partial<ViewSettings>) => void;
-  onClearTagFilters: () => void;
+  onClearFilters: () => void;
   searchTerm: string;
   onSearchChange: (term: string) => void;
   onAddImage: (image: Omit<ImageItem, 'id'>, newBoardName?: string) => void;
@@ -35,18 +39,23 @@ export default function FilterToolbar({
   boards,
   allBoards,
   tags,
+  allColors,
   selectedBoards,
   onBoardSelect,
   selectedTags,
   onTagSelect,
+  selectedColors,
+  onColorSelect,
   viewSettings,
   onViewSettingsChange,
-  onClearTagFilters,
+  onClearFilters,
   searchTerm,
   onSearchChange,
   onAddImage,
   itemCount,
 }: FilterToolbarProps) {
+  const activeFilterCount = selectedTags.length + selectedColors.length;
+
   return (
     <div className="mb-6 flex flex-col gap-4">
       {/* Row 1: Boards and Search/Add */}
@@ -99,8 +108,8 @@ export default function FilterToolbar({
               <Button variant="outline" size="sm" className="relative">
                 <Tag className="mr-2 h-4 w-4" />
                 Filters
-                {selectedTags.length > 0 && (
-                  <Badge variant="secondary" className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full p-0">{selectedTags.length}</Badge>
+                {activeFilterCount > 0 && (
+                  <Badge variant="secondary" className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full p-0">{activeFilterCount}</Badge>
                 )}
               </Button>
             </PopoverTrigger>
@@ -110,31 +119,61 @@ export default function FilterToolbar({
                   <div className="space-y-1">
                     <h4 className="font-medium leading-none">Filters</h4>
                     <p className="text-sm text-muted-foreground">
-                      Select one or more tags to filter.
+                      Filter by tags and colors.
                     </p>
                   </div>
-                  {selectedTags.length > 0 && (
-                    <Button variant="ghost" size="sm" onClick={onClearTagFilters}>Clear</Button>
+                  {activeFilterCount > 0 && (
+                    <Button variant="ghost" size="sm" onClick={onClearFilters}>Clear</Button>
                   )}
                 </div>
+                
                 <Separator />
-                {tags.length > 0 ? (
-                  <div className="flex flex-wrap gap-1">
-                    {tags.map(tag => (
-                      <Button
-                        key={tag}
-                        variant={selectedTags.includes(tag) ? 'default' : 'outline'}
-                        size="sm"
-                        onClick={() => onTagSelect(tag)}
-                        className="rounded-full"
-                      >
-                        <Hash className="w-3 h-3 mr-1"/>
-                        {tag}
-                      </Button>
-                    ))}
+                
+                <div>
+                  <h5 className="mb-2 text-xs font-medium text-muted-foreground">Tags</h5>
+                  {tags.length > 0 ? (
+                    <div className="flex flex-wrap gap-1">
+                      {tags.map(tag => (
+                        <Button
+                          key={tag}
+                          variant={selectedTags.includes(tag) ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => onTagSelect(tag)}
+                          className="rounded-full"
+                        >
+                          <Hash className="w-3 h-3 mr-1"/>
+                          {tag}
+                        </Button>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-muted-foreground text-center py-4">No tags available yet.</p>
+                  )}
+                </div>
+
+                {allColors.length > 0 && (
+                  <>
+                  <Separator />
+                  <div>
+                    <h5 className="mb-2 text-xs font-medium text-muted-foreground">Colors</h5>
+                    <div className="flex flex-wrap gap-2">
+                        {allColors.map(color => (
+                            <button
+                                key={color}
+                                onClick={() => onColorSelect(color)}
+                                className={cn(
+                                    "w-6 h-6 rounded-full border-2 transition-all",
+                                    selectedColors.includes(color) ? 'border-primary ring-2 ring-primary ring-offset-2' : 'border-card hover:border-muted-foreground',
+                                    'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2'
+                                )}
+                                style={{ backgroundColor: color }}
+                                title={color}
+                                aria-label={`Filter by color ${color}`}
+                            />
+                        ))}
+                    </div>
                   </div>
-                ) : (
-                  <p className="text-sm text-muted-foreground text-center py-4">No tags available yet.</p>
+                  </>
                 )}
               </div>
             </PopoverContent>

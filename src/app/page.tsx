@@ -20,6 +20,7 @@ export default function Home() {
   const [selectedImage, setSelectedImage] = useState<ImageItem | null>(null);
   const [selectedBoards, setSelectedBoards] = useState<string[]>([]);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [selectedColors, setSelectedColors] = useState<string[]>([]);
   const { toast } = useToast();
   const [viewSettings, setViewSettings] = useState<ViewSettings>({
     viewMode: 'moodboard',
@@ -82,6 +83,14 @@ export default function Home() {
       image.tags.forEach(tag => tags.add(tag));
     });
     return Array.from(tags).sort();
+  }, [images]);
+  
+  const allColors = useMemo(() => {
+    const colors = new Set<string>();
+    images.forEach(image => {
+      (image.colors || []).forEach(color => colors.add(color));
+    });
+    return Array.from(colors).sort();
   }, [images]);
 
   const boardsForFilter = useMemo(() => {
@@ -150,8 +159,17 @@ export default function Home() {
     );
   };
   
-  const handleClearTagFilters = () => {
+  const handleColorSelect = (color: string) => {
+    setSelectedColors(prev =>
+      prev.includes(color)
+        ? prev.filter(c => c !== color)
+        : [...prev, color]
+    );
+  };
+
+  const handleClearFilters = () => {
     setSelectedTags([]);
+    setSelectedColors([]);
   };
 
   const handleUpdateViewSettings = (newSettings: Partial<ViewSettings>) => {
@@ -186,9 +204,17 @@ export default function Home() {
         return false;
       }
 
+      // Selected colors filter (OR logic for multiple colors)
+      if (selectedColors.length > 0) {
+        const imageColors = image.colors || [];
+        if (!selectedColors.some(selectedColor => imageColors.includes(selectedColor))) {
+            return false;
+        }
+      }
+
       return true;
     });
-  }, [images, searchTerm, boards, selectedBoards, selectedTags]);
+  }, [images, searchTerm, boards, selectedBoards, selectedTags, selectedColors]);
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -206,7 +232,10 @@ export default function Home() {
                 onBoardSelect={handleBoardSelect}
                 selectedTags={selectedTags}
                 onTagSelect={handleTagSelect}
-                onClearTagFilters={handleClearTagFilters}
+                allColors={allColors}
+                selectedColors={selectedColors}
+                onColorSelect={handleColorSelect}
+                onClearFilters={handleClearFilters}
                 itemCount={filteredImages.length}
                 viewSettings={viewSettings}
                 onViewSettingsChange={handleUpdateViewSettings}
