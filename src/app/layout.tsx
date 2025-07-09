@@ -4,7 +4,7 @@ import { Toaster } from "@/components/ui/toaster"
 import { ThemeProvider } from '@/components/theme-provider';
 
 export const metadata: Metadata = {
-  title: 'Tarsus',
+  title: 'Mixura',
   description: 'Your personal space to save and organize image links.',
 };
 
