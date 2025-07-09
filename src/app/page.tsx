@@ -149,6 +149,10 @@ export default function Home() {
     );
   };
   
+  const handleClearTagFilters = () => {
+    setSelectedTags([]);
+  };
+
   const handleUpdateViewSettings = (newSettings: Partial<ViewSettings>) => {
     setViewSettings(prev => ({ ...prev, ...newSettings }));
   };
@@ -202,6 +206,7 @@ export default function Home() {
                 onBoardSelect={handleBoardSelect}
                 selectedTags={selectedTags}
                 onTagSelect={handleTagSelect}
+                onClearTagFilters={handleClearTagFilters}
                 viewSettings={viewSettings}
                 onViewSettingsChange={handleUpdateViewSettings}
             />
