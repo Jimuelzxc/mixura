@@ -6,6 +6,7 @@ import { mockImages, mockBoards } from '@/lib/data';
 import AppHeader from '@/components/app-header';
 import ImageGrid from '@/components/image-grid';
 import ImageDetailDialog from '@/components/image-detail-dialog';
+import FilterToolbar from '@/components/filter-toolbar';
 import { useToast } from '@/hooks/use-toast';
 import { Triangle } from 'lucide-react';
 
@@ -14,6 +15,8 @@ export default function Home() {
   const [boards, setBoards] = useState<Board[]>(mockBoards);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedImage, setSelectedImage] = useState<ImageItem | null>(null);
+  const [selectedBoards, setSelectedBoards] = useState<string[]>([]);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const { toast } = useToast();
 
   const handleAddImage = (newImage: Omit<ImageItem, 'id'>) => {
@@ -47,16 +50,54 @@ export default function Home() {
     });
   }
 
-  const filteredImages = useMemo(() => {
-    if (!searchTerm) return images;
-    const lowercasedFilter = searchTerm.toLowerCase();
-    return images.filter(image =>
-      image.title.toLowerCase().includes(lowercasedFilter) ||
-      image.notes.toLowerCase().includes(lowercasedFilter) ||
-      image.tags.some(tag => tag.toLowerCase().includes(lowercasedFilter)) ||
-      boards.find(b => b.id === image.boardId)?.name.toLowerCase().includes(lowercasedFilter)
+  const handleBoardSelect = (boardId: string) => {
+    setSelectedBoards(prev =>
+      prev.includes(boardId)
+        ? prev.filter(id => id !== boardId)
+        : [...prev, boardId]
     );
-  }, [images, searchTerm, boards]);
+  };
+
+  const handleTagSelect = (tag: string) => {
+    setSelectedTags(prev =>
+      prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
+    );
+  };
+
+  const allTags = useMemo(() => {
+    const tags = new Set<string>();
+    images.forEach(image => {
+      image.tags.forEach(tag => tags.add(tag));
+    });
+    return Array.from(tags).sort();
+  }, [images]);
+
+  const filteredImages = useMemo(() => {
+    return images.filter(image => {
+      // Search term filter (searches across title, notes, tags, and board name)
+      if (searchTerm) {
+        const lowercasedFilter = searchTerm.toLowerCase();
+        const searchMatch =
+          image.title.toLowerCase().includes(lowercasedFilter) ||
+          image.notes.toLowerCase().includes(lowercasedFilter) ||
+          image.tags.some(tag => tag.toLowerCase().includes(lowercasedFilter)) ||
+          boards.find(b => b.id === image.boardId)?.name.toLowerCase().includes(lowercasedFilter);
+        if (!searchMatch) return false;
+      }
+
+      // Selected boards filter (OR logic)
+      if (selectedBoards.length > 0 && !selectedBoards.includes(image.boardId)) {
+        return false;
+      }
+
+      // Selected tags filter (AND logic)
+      if (selectedTags.length > 0 && !selectedTags.every(tag => image.tags.includes(tag))) {
+        return false;
+      }
+
+      return true;
+    });
+  }, [images, searchTerm, boards, selectedBoards, selectedTags]);
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -67,6 +108,16 @@ export default function Home() {
         boards={boards}
       />
       <main className="flex-grow p-4 sm:p-6 md:p-8">
+        {images.length > 0 && (
+            <FilterToolbar
+                boards={boards}
+                tags={allTags}
+                selectedBoards={selectedBoards}
+                onBoardSelect={handleBoardSelect}
+                selectedTags={selectedTags}
+                onTagSelect={handleTagSelect}
+            />
+        )}
         {images.length === 0 && !searchTerm ? (
             <div className="flex flex-col items-center justify-center text-center py-24 px-4 sm:px-6 lg:px-8">
               <div className="relative mb-8 text-primary">
@@ -85,7 +136,7 @@ export default function Home() {
         ) : (
           <div className="flex flex-col items-center justify-center text-center h-full mt-20 text-muted-foreground">
             <h2 className="text-2xl font-semibold">No Images Found</h2>
-            <p className="mt-2">Try adjusting your search or add a new image.</p>
+            <p className="mt-2">Try adjusting your filters or add a new image.</p>
           </div>
         )}
       </main>
