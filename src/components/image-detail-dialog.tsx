@@ -357,7 +357,7 @@ export default function ImageDetailDialog({ image, board, boards, allTags, isOpe
               </DialogHeader>
               <div className="mt-4 space-y-4 text-sm">
                  <div className="flex items-start gap-3">
-                  <Link className="h-4 w-4 mt-1 text-muted-foreground"/>
+                  <Link className="h-4 w-4 mt-1 text-muted-foreground flex-shrink-0"/>
                   <div>
                     <h4 className="font-semibold text-muted-foreground">URL</h4>
                     <a href={image.url} target="_blank" rel="noopener noreferrer" className="break-all text-primary hover:underline">
@@ -366,7 +366,7 @@ export default function ImageDetailDialog({ image, board, boards, allTags, isOpe
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <LayoutGrid className="h-4 w-4 mt-1 text-muted-foreground"/>
+                  <LayoutGrid className="h-4 w-4 mt-1 text-muted-foreground flex-shrink-0"/>
                   <div>
                     <h4 className="font-semibold text-muted-foreground">Board</h4>
                     <p>{board?.name || 'Uncategorized'}</p>
@@ -374,7 +374,7 @@ export default function ImageDetailDialog({ image, board, boards, allTags, isOpe
                 </div>
                 {image.tags.length > 0 && (
                   <div className="flex items-start gap-3">
-                    <Tag className="h-4 w-4 mt-1 text-muted-foreground"/>
+                    <Tag className="h-4 w-4 mt-1 text-muted-foreground flex-shrink-0"/>
                      <div>
                       <h4 className="font-semibold text-muted-foreground">Tags</h4>
                       <div className="flex flex-wrap gap-2 mt-1">
@@ -385,7 +385,7 @@ export default function ImageDetailDialog({ image, board, boards, allTags, isOpe
                 )}
                 {image.colors && image.colors.length > 0 && (
                   <div className="flex items-start gap-3">
-                    <Palette className="h-4 w-4 mt-1 text-muted-foreground"/>
+                    <Palette className="h-4 w-4 mt-1 text-muted-foreground flex-shrink-0"/>
                      <div>
                       <h4 className="font-semibold text-muted-foreground">Colors</h4>
                       <div className="flex flex-wrap gap-2 mt-1">
@@ -401,7 +401,7 @@ export default function ImageDetailDialog({ image, board, boards, allTags, isOpe
                 )}
                 {image.notes && (
                   <div className="flex items-start gap-3">
-                    <Notebook className="h-4 w-4 mt-1 text-muted-foreground"/>
+                    <Notebook className="h-4 w-4 mt-1 text-muted-foreground flex-shrink-0"/>
                      <div>
                       <h4 className="font-semibold text-muted-foreground">Notes</h4>
                       <p className="whitespace-pre-wrap">{image.notes}</p>
