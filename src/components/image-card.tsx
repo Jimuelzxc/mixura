@@ -46,22 +46,25 @@ export default function ImageCard({ image, onSelect, onTagClick, viewMode }: Ima
             {image.notes}
           </p>
         )}
-        {image.tags && image.tags.length > 0 && (
-          <div className="mt-2 flex flex-wrap gap-1">
-            {image.tags.map((tag) => (
-              <Badge
-                key={tag}
-                variant="outline"
-                className="border-white/40 bg-white/20 text-white backdrop-blur-sm cursor-pointer px-2 py-0.5 text-xs font-normal transition-colors hover:bg-white/30"
-                onClick={(e) => {
-                    e.stopPropagation();
-                    onTagClick(tag);
-                }}
-              >
-                {tag}
-              </Badge>
-            ))}
-          </div>
+        {(image.tags?.length > 0 || image.colors?.length > 0) && (
+            <div className="mt-2 flex flex-wrap items-center gap-2">
+              {image.tags && image.tags.map((tag) => (
+                <Badge
+                  key={tag}
+                  variant="outline"
+                  className="border-white/40 bg-white/20 text-white backdrop-blur-sm cursor-pointer px-2 py-0.5 text-xs font-normal transition-colors hover:bg-white/30"
+                  onClick={(e) => {
+                      e.stopPropagation();
+                      onTagClick(tag);
+                  }}
+                >
+                  {tag}
+                </Badge>
+              ))}
+              {image.colors && image.colors.map((color) => (
+                  <div key={color} className="w-3 h-3 rounded-full border border-white/50" style={{ backgroundColor: color }} title={color} />
+              ))}
+            </div>
         )}
       </div>
     </div>

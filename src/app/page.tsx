@@ -108,6 +108,7 @@ export default function Home() {
       ...newImage,
       id: `img-${Date.now()}`,
       boardId: finalBoardId,
+      colors: newImage.colors || [],
     };
     setImages(prevImages => [fullImage, ...prevImages]);
     toast({
@@ -167,6 +168,7 @@ export default function Home() {
           image.title.toLowerCase().includes(lowercasedFilter) ||
           image.notes.toLowerCase().includes(lowercasedFilter) ||
           image.tags.some(tag => tag.toLowerCase().includes(lowercasedFilter)) ||
+          (image.colors || []).some(color => color.toLowerCase().includes(lowercasedFilter)) ||
           boardName.toLowerCase().includes(lowercasedFilter);
         if (!searchMatch) return false;
       }

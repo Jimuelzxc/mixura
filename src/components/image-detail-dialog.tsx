@@ -6,7 +6,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Trash2, Edit, X, Check, Tag, Notebook, LayoutGrid, AlertTriangle, Sparkles, Loader2, Link } from 'lucide-react';
+import { Trash2, Edit, X, Check, Tag, Notebook, LayoutGrid, AlertTriangle, Sparkles, Loader2, Link, Palette } from 'lucide-react';
 
 import type { ImageItem, Board } from '@/lib/types';
 import { Button } from '@/components/ui/button';
@@ -43,6 +43,7 @@ const imageEditSchema = z.object({
   title: z.string().optional(),
   notes: z.string().optional(),
   tags: z.array(z.string()).optional(),
+  colors: z.array(z.string().regex(/^#([0-9a-f]{3}){1,2}$/i, "Must be a valid hex color code")).optional(),
   boardId: z.string().optional(),
 });
 
@@ -62,6 +63,7 @@ interface ImageDetailDialogProps {
 export default function ImageDetailDialog({ image, board, boards, allTags, isOpen, onOpenChange, onDelete, onUpdate }: ImageDetailDialogProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [tagInput, setTagInput] = useState('');
+  const [colorInput, setColorInput] = useState('');
   const [isSuggestionsOpen, setSuggestionsOpen] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const { toast } = useToast();
@@ -72,6 +74,7 @@ export default function ImageDetailDialog({ image, board, boards, allTags, isOpe
       title: image.title,
       notes: image.notes,
       tags: image.tags,
+      colors: image.colors || [],
       boardId: image.boardId,
     },
   });
@@ -82,6 +85,7 @@ export default function ImageDetailDialog({ image, board, boards, allTags, isOpe
         title: image.title,
         notes: image.notes,
         tags: image.tags,
+        colors: image.colors || [],
         boardId: image.boardId,
       });
     }
@@ -112,9 +116,11 @@ export default function ImageDetailDialog({ image, board, boards, allTags, isOpe
         title: image.title,
         notes: image.notes,
         tags: image.tags,
+        colors: image.colors || [],
         boardId: image.boardId,
       });
       setTagInput('');
+      setColorInput('');
     }
     setIsEditing(!isEditing);
   }
@@ -125,6 +131,7 @@ export default function ImageDetailDialog({ image, board, boards, allTags, isOpe
       title: data.title || '',
       notes: data.notes || '',
       tags: data.tags || [],
+      colors: data.colors || [],
       boardId: data.boardId === 'uncategorized' ? undefined : data.boardId,
     });
     setIsEditing(false);
@@ -153,6 +160,38 @@ export default function ImageDetailDialog({ image, board, boards, allTags, isOpe
     const newTags = field.value.filter((tag: string) => tag !== tagToRemove);
     form.setValue('tags', newTags);
   };
+
+  const handleAddColor = (color: string, field: any) => {
+    const trimmedColor = color.trim();
+    if (trimmedColor && !field.value.includes(trimmedColor)) {
+      if (/^#([0-9a-f]{3}){1,2}$/i.test(trimmedColor)) {
+        form.setValue('colors', [...field.value, trimmedColor.toUpperCase()]);
+        setColorInput('');
+      } else {
+        toast({
+          title: 'Invalid Color',
+          description: 'Please enter a valid hex color code (e.g., #RRGGBB).',
+          variant: 'destructive',
+        });
+      }
+    }
+  };
+
+  const handleColorKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, field: any) => {
+    if (e.key === 'Enter' && colorInput.trim()) {
+      e.preventDefault();
+      handleAddColor(colorInput, field);
+    } else if (e.key === 'Backspace' && !colorInput && field.value?.length > 0) {
+      e.preventDefault();
+      const newColors = field.value.slice(0, -1);
+      form.setValue('colors', newColors);
+    }
+  };
+
+  const removeColor = (colorToRemove: string, field: any) => {
+    const newColors = field.value.filter((color: string) => color !== colorToRemove);
+    form.setValue('colors', newColors);
+  };
   
   const handleAiFill = async () => {
       if (!image.url) return;
@@ -180,6 +219,7 @@ export default function ImageDetailDialog({ image, board, boards, allTags, isOpe
         if (suggestions.title) form.setValue('title', suggestions.title);
         if (suggestions.notes) form.setValue('notes', suggestions.notes);
         if (suggestions.tags) form.setValue('tags', suggestions.tags);
+        if (suggestions.colors) form.setValue('colors', suggestions.colors.map(c => c.toUpperCase()));
 
         if (suggestions.suggestedBoardId) {
           form.setValue('boardId', suggestions.suggestedBoardId);
@@ -328,6 +368,40 @@ export default function ImageDetailDialog({ image, board, boards, allTags, isOpe
                 />
                 <FormField
                   control={form.control}
+                  name="colors"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Colors</FormLabel>
+                      <FormControl>
+                        <div className="flex flex-wrap gap-2 items-center rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
+                          {field.value?.map((color: string) => (
+                            <Badge key={color} variant="secondary" className="pl-2">
+                              <span className="w-3 h-3 rounded-full mr-2 border" style={{ backgroundColor: color }} />
+                              {color}
+                              <button
+                                type="button"
+                                className="ml-1 rounded-full outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                                onClick={() => removeColor(color, field)}
+                              >
+                                <X className="h-3 w-3" />
+                              </button>
+                            </Badge>
+                          ))}
+                          <Input
+                            placeholder="Add a color..."
+                            value={colorInput}
+                            onChange={(e) => setColorInput(e.target.value)}
+                            onKeyDown={(e) => handleColorKeyDown(e, field)}
+                            className="h-auto flex-1 bg-transparent p-0 border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 min-w-[120px]"
+                          />
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
                   name="notes"
                   render={({ field }) => (
                     <FormItem>
@@ -372,6 +446,22 @@ export default function ImageDetailDialog({ image, board, boards, allTags, isOpe
                       <h4 className="font-semibold text-muted-foreground">Tags</h4>
                       <div className="flex flex-wrap gap-2 mt-1">
                         {image.tags.map(tag => <Badge key={tag} variant="secondary">{tag}</Badge>)}
+                      </div>
+                    </div>
+                  </div>
+                )}
+                {image.colors && image.colors.length > 0 && (
+                  <div className="flex items-start gap-3">
+                    <Palette className="h-4 w-4 mt-1 text-muted-foreground"/>
+                     <div>
+                      <h4 className="font-semibold text-muted-foreground">Colors</h4>
+                      <div className="flex flex-wrap gap-2 mt-1">
+                        {image.colors.map(color => 
+                          <Badge key={color} variant="secondary" className="pl-2">
+                            <span className="w-3 h-3 rounded-full mr-2 border" style={{ backgroundColor: color }} />
+                            {color}
+                          </Badge>
+                        )}
                       </div>
                     </div>
                   </div>

@@ -28,6 +28,7 @@ const SuggestDetailsOutputSchema = z.object({
   title: z.string().describe('A concise and descriptive title for the image, no more than 10 words.'),
   notes: z.string().describe("Brief, insightful notes about the image's style, mood, or potential use. Keep it to 1-2 sentences."),
   tags: z.array(z.string()).describe('An array of 3-5 relevant lowercase tags for the image.'),
+  colors: z.array(z.string()).describe('An array of 3-5 dominant color hex codes from the image (e.g., #RRGGBB).'),
   suggestedBoardId: z.string().optional().describe('The ID of an existing board if the image fits well into one.'),
   suggestedNewBoardName: z.string().optional().describe('A new board name if the image does not fit into any existing boards.'),
 });
@@ -49,7 +50,8 @@ Based on your analysis:
 1.  Generate a concise and descriptive title (max 10 words).
 2.  Write brief, insightful notes about the image (1-2 sentences).
 3.  Suggest 3-5 relevant, lowercase, single-word tags.
-4.  Review the list of existing boards: {{{json boards}}}.
+4.  Identify the 3-5 most dominant colors in the image and provide their hex codes in #RRGGBB format.
+5.  Review the list of existing boards: {{{json boards}}}.
     - If the image's theme closely matches an existing board, provide its 'id' in the 'suggestedBoardId' field.
     - If no existing boards are a good fit, suggest a short, descriptive name for a new board in the 'suggestedNewBoardName' field.
     - Only provide one or the other: 'suggestedBoardId' or 'suggestedNewBoardName', never both.

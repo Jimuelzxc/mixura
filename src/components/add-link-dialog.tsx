@@ -42,6 +42,7 @@ const imageSchema = z.object({
   title: z.string().optional(),
   notes: z.string().optional(),
   tags: z.array(z.string()).optional(),
+  colors: z.array(z.string().regex(/^#([0-9a-f]{3}){1,2}$/i, "Must be a valid hex color code")).optional(),
   boardType: z.enum(['existing', 'new']),
   boardId: z.string().optional(),
   newBoardName: z.string().optional(),
@@ -66,6 +67,7 @@ interface AddLinkDialogProps {
 export default function AddLinkDialog({ onAddImage, boards, allTags }: AddLinkDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [tagInput, setTagInput] = useState('');
+  const [colorInput, setColorInput] = useState('');
   const [isSuggestionsOpen, setSuggestionsOpen] = useState(false);
   const [isPreviewLarge, setIsPreviewLarge] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -79,6 +81,7 @@ export default function AddLinkDialog({ onAddImage, boards, allTags }: AddLinkDi
       title: '',
       notes: '',
       tags: [],
+      colors: [],
       boardType: hasBoards ? 'existing' : 'new',
       boardId: undefined,
       newBoardName: '',
@@ -92,11 +95,13 @@ export default function AddLinkDialog({ onAddImage, boards, allTags }: AddLinkDi
         title: '',
         notes: '',
         tags: [],
+        colors: [],
         boardType: boards.length > 0 ? 'existing' : 'new',
         boardId: undefined,
         newBoardName: '',
       });
       setTagInput('');
+      setColorInput('');
       setIsGenerating(false);
     } else {
       setSuggestionsOpen(false);
@@ -121,6 +126,7 @@ export default function AddLinkDialog({ onAddImage, boards, allTags }: AddLinkDi
         title: data.title || '',
         notes: data.notes || '',
         tags: data.tags || [],
+        colors: data.colors || [],
         boardId: data.boardId
     };
 
@@ -155,6 +161,39 @@ export default function AddLinkDialog({ onAddImage, boards, allTags }: AddLinkDi
     form.setValue('tags', newTags);
   };
 
+  const handleAddColor = (color: string, field: any) => {
+    const trimmedColor = color.trim();
+    if (trimmedColor && !field.value.includes(trimmedColor)) {
+      if (/^#([0-9a-f]{3}){1,2}$/i.test(trimmedColor)) {
+        form.setValue('colors', [...field.value, trimmedColor.toUpperCase()]);
+        setColorInput('');
+      } else {
+        toast({
+          title: 'Invalid Color',
+          description: 'Please enter a valid hex color code (e.g., #RRGGBB).',
+          variant: 'destructive',
+        });
+      }
+    }
+  };
+
+  const handleColorKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, field: any) => {
+    if (e.key === 'Enter' && colorInput.trim()) {
+      e.preventDefault();
+      handleAddColor(colorInput, field);
+    } else if (e.key === 'Backspace' && !colorInput && field.value?.length > 0) {
+      e.preventDefault();
+      const newColors = field.value.slice(0, -1);
+      form.setValue('colors', newColors);
+    }
+  };
+
+  const removeColor = (colorToRemove: string, field: any) => {
+    const newColors = field.value.filter((color: string) => color !== colorToRemove);
+    form.setValue('colors', newColors);
+  };
+
+
   const handleAiFill = async () => {
       const url = form.getValues('url');
       if (!url) return;
@@ -182,6 +221,7 @@ export default function AddLinkDialog({ onAddImage, boards, allTags }: AddLinkDi
         if (suggestions.title) form.setValue('title', suggestions.title);
         if (suggestions.notes) form.setValue('notes', suggestions.notes);
         if (suggestions.tags) form.setValue('tags', suggestions.tags);
+        if (suggestions.colors) form.setValue('colors', suggestions.colors.map(c => c.toUpperCase()));
 
         if (suggestions.suggestedBoardId) {
           form.setValue('boardType', 'existing');
@@ -430,6 +470,41 @@ export default function AddLinkDialog({ onAddImage, boards, allTags }: AddLinkDi
                           </div>
                        </PopoverContent>
                     </Popover>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="colors"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Colors</FormLabel>
+                    <FormControl>
+                      <div className="flex flex-wrap gap-2 items-center rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
+                        {field.value?.map((color: string) => (
+                          <Badge key={color} variant="secondary" className="pl-2">
+                            <span className="w-3 h-3 rounded-full mr-2 border" style={{ backgroundColor: color }} />
+                            {color}
+                            <button
+                              type="button"
+                              className="ml-1 rounded-full outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                              onClick={() => removeColor(color, field)}
+                            >
+                              <X className="h-3 w-3" />
+                            </button>
+                          </Badge>
+                        ))}
+                        <Input
+                          placeholder="Add a color..."
+                          value={colorInput}
+                          onChange={(e) => setColorInput(e.target.value)}
+                          onKeyDown={(e) => handleColorKeyDown(e, field)}
+                          className="h-auto flex-1 bg-transparent p-0 border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 min-w-[120px]"
+                        />
+                      </div>
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}

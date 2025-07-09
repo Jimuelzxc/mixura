@@ -10,6 +10,7 @@ export interface ImageItem {
   notes: string;
   tags: string[];
   boardId?: string;
+  colors?: string[];
 }
 
 export type ViewMode = 'moodboard' | 'list' | 'cards' | 'headlines';

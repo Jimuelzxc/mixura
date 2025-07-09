@@ -4,7 +4,7 @@ import Image from 'next/image';
 import type { ImageItem, ViewSettings } from '@/lib/types';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { Notebook, Tag } from 'lucide-react';
+import { Notebook, Tag, Palette } from 'lucide-react';
 
 interface ImageListItemProps {
   image: ImageItem;
@@ -69,6 +69,19 @@ export default function ImageListItem({ image, settings, onSelect, onTagClick }:
               ))}
             </div>
           </div>
+        )}
+         {listShowTags && image.colors && image.colors.length > 0 && (
+            <div className="flex items-start gap-2">
+            <Palette className="h-4 w-4 mt-1.5 flex-shrink-0 text-muted-foreground"/>
+            <div className="flex flex-wrap items-center gap-4">
+                {image.colors.map((color) => (
+                <div key={color} className="flex items-center gap-2">
+                    <div className="w-4 h-4 rounded-full border" style={{backgroundColor: color}} />
+                    <span className="text-sm font-mono">{color}</span>
+                </div>
+                ))}
+            </div>
+            </div>
         )}
       </div>
     </div>
