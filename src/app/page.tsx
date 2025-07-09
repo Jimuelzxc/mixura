@@ -7,7 +7,7 @@ import ImageGrid from '@/components/image-grid';
 import ImageDetailDialog from '@/components/image-detail-dialog';
 import FilterToolbar from '@/components/filter-toolbar';
 import { useToast } from '@/hooks/use-toast';
-import { Triangle } from 'lucide-react';
+import { ImagePlus } from 'lucide-react';
 
 const UNCATEGORIZED_BOARD: Board = { id: 'uncategorized', name: 'Uncategorized' };
 
@@ -209,18 +209,26 @@ export default function Home() {
                 viewSettings={viewSettings}
                 onViewSettingsChange={handleUpdateViewSettings}
             />
-            {images.length === 0 && !searchTerm ? null : filteredImages.length > 0 ? (
-              <ImageGrid 
-                images={filteredImages} 
-                onImageSelect={setSelectedImage} 
-                onTagClick={handleTagSelect} 
-                viewSettings={viewSettings}
-              />
-            ) : (
-              <div className="flex flex-col items-center justify-center text-center h-full mt-20 text-muted-foreground">
-                <h2 className="text-2xl font-semibold">No Images Found</h2>
-                <p className="mt-2">Try adjusting your filters or add a new image.</p>
-              </div>
+            {isDataLoaded && (
+              images.length === 0 && !searchTerm ? (
+                <div className="flex flex-col items-center justify-center text-center h-full mt-20 text-muted-foreground">
+                  <ImagePlus size={64} className="mb-4 text-muted-foreground/50" />
+                  <h2 className="text-2xl font-semibold">Your board is empty</h2>
+                  <p className="mt-2">Click "Add Image" to save your first inspiration.</p>
+                </div>
+              ) : filteredImages.length > 0 ? (
+                <ImageGrid 
+                  images={filteredImages} 
+                  onImageSelect={setSelectedImage} 
+                  onTagClick={handleTagSelect} 
+                  viewSettings={viewSettings}
+                />
+              ) : (
+                <div className="flex flex-col items-center justify-center text-center h-full mt-20 text-muted-foreground">
+                  <h2 className="text-2xl font-semibold">No Images Found</h2>
+                  <p className="mt-2">Try adjusting your filters or add a new image.</p>
+                </div>
+              )
             )}
         </div>
       </main>
