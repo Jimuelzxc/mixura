@@ -97,7 +97,7 @@ export default function FilterToolbar({
               <PopoverTrigger asChild>
                 <Button variant="outline" size="sm" className="relative">
                   <Tag className="mr-2 h-4 w-4" />
-                  Filter by tags
+                  Filters
                   {selectedTags.length > 0 && (
                     <Badge variant="secondary" className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full p-0">{selectedTags.length}</Badge>
                   )}
@@ -107,7 +107,7 @@ export default function FilterToolbar({
                 <div className="grid gap-4">
                   <div className="flex items-center justify-between">
                     <div className="space-y-1">
-                      <h4 className="font-medium leading-none">Filter by Tag</h4>
+                      <h4 className="font-medium leading-none">Filters</h4>
                       <p className="text-sm text-muted-foreground">
                         Select one or more tags.
                       </p>
