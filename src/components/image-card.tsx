@@ -39,7 +39,7 @@ export default function ImageCard({ image, onSelect, onTagClick, viewMode }: Ima
         </div>
 
         {/* Content Layer */}
-        <div className="relative overflow-hidden border border-solid">
+        <div className="relative overflow-hidden">
             <div className={cn(
                 "w-full",
                 viewMode === 'cards' && "aspect-[4/3]"
