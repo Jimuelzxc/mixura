@@ -200,7 +200,7 @@ export default function Home() {
               </p>
           </div>
         ) : filteredImages.length > 0 ? (
-          <ImageGrid images={filteredImages} onImageSelect={setSelectedImage} />
+          <ImageGrid images={filteredImages} onImageSelect={setSelectedImage} onTagClick={handleTagSelect} />
         ) : (
           <div className="flex flex-col items-center justify-center text-center h-full mt-20 text-muted-foreground">
             <h2 className="text-2xl font-semibold">No Images Found</h2>

@@ -8,9 +8,10 @@ import { Badge } from '@/components/ui/badge';
 interface ImageCardProps {
   image: ImageItem;
   onSelect: () => void;
+  onTagClick: (tag: string) => void;
 }
 
-export default function ImageCard({ image, onSelect }: ImageCardProps) {
+export default function ImageCard({ image, onSelect, onTagClick }: ImageCardProps) {
   return (
     <div
       className="group mb-4 break-inside-avoid cursor-pointer"
@@ -43,7 +44,24 @@ export default function ImageCard({ image, onSelect }: ImageCardProps) {
         {image.tags && image.tags.length > 0 && (
           <div className="mt-2 flex flex-wrap gap-1">
             {image.tags.map((tag) => (
-              <Badge key={tag} variant="secondary" className="px-2 py-0.5 text-xs font-normal">
+              <Badge
+                key={tag}
+                variant="secondary"
+                className="cursor-pointer px-2 py-0.5 text-xs font-normal transition-colors hover:bg-primary hover:text-primary-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                role="button"
+                tabIndex={0}
+                onClick={(e) => {
+                    e.stopPropagation();
+                    onTagClick(tag);
+                }}
+                onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        onTagClick(tag);
+                    }
+                }}
+              >
                 {tag}
               </Badge>
             ))}
