@@ -32,7 +32,7 @@ export default function FilterToolbar({
           {boards.map(board => (
             <Button
               key={board.id}
-              variant={selectedBoards.includes(board.id) ? 'secondary' : 'ghost'}
+              variant={selectedBoards.includes(board.id) ? 'default' : 'ghost'}
               size="sm"
               onClick={() => onBoardSelect(board.id)}
               className="rounded-full"
@@ -52,7 +52,7 @@ export default function FilterToolbar({
             {tags.map(tag => (
                 <Button
                 key={tag}
-                variant={selectedTags.includes(tag) ? 'secondary' : 'ghost'}
+                variant={selectedTags.includes(tag) ? 'default' : 'ghost'}
                 size="sm"
                 onClick={() => onTagSelect(tag)}
                 className="rounded-full"
