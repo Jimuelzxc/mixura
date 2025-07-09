@@ -278,26 +278,25 @@ export default function AddLinkDialog({ onAddImage, boards }: AddLinkDialogProps
                 <FormItem>
                   <FormLabel>Tags</FormLabel>
                   <FormControl>
-                    <div>
-                      <div className="flex flex-wrap gap-2 mb-2 min-h-[24px]">
-                        {field.value?.map((tag: string) => (
-                          <Badge key={tag} variant="secondary">
-                            {tag}
-                            <button
-                              type="button"
-                              className="ml-1 rounded-full outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                              onClick={() => removeTag(tag, field)}
-                            >
-                              <X className="h-3 w-3" />
-                            </button>
-                          </Badge>
-                        ))}
-                      </div>
+                    <div className="flex flex-wrap gap-2 items-center rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
+                      {field.value?.map((tag: string) => (
+                        <Badge key={tag} variant="secondary">
+                          {tag}
+                          <button
+                            type="button"
+                            className="ml-1 rounded-full outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                            onClick={() => removeTag(tag, field)}
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        </Badge>
+                      ))}
                       <Input
                         placeholder="Add a tag and press Enter"
                         value={tagInput}
                         onChange={(e) => setTagInput(e.target.value)}
                         onKeyDown={(e) => handleTagKeyDown(e, field)}
+                        className="h-auto flex-1 bg-transparent p-0 border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 min-w-[120px]"
                       />
                     </div>
                   </FormControl>
