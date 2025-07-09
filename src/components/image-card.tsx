@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import type { ImageItem } from '@/lib/types';
 import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 
 interface ImageCardProps {
   image: ImageItem;
@@ -32,6 +33,23 @@ export default function ImageCard({ image, onSelect }: ImageCardProps) {
           </div>
         </CardContent>
       </Card>
+      <div className="pt-3 px-1">
+        <h3 className="font-semibold text-primary truncate">{image.title}</h3>
+        {image.notes && (
+          <p className="text-sm text-muted-foreground mt-1 truncate">
+            {image.notes}
+          </p>
+        )}
+        {image.tags && image.tags.length > 0 && (
+          <div className="mt-2 flex flex-wrap gap-1">
+            {image.tags.map((tag) => (
+              <Badge key={tag} variant="secondary" className="px-2 py-0.5 text-xs font-normal">
+                {tag}
+              </Badge>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
