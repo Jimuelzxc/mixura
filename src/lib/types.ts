@@ -9,5 +9,5 @@ export interface ImageItem {
   title: string;
   notes: string;
   tags: string[];
-  boardId: string;
+  boardId?: string;
 }

@@ -79,15 +79,6 @@ export default function Home() {
       setBoards(prevBoards => [...prevBoards, newBoard]);
       finalBoardId = newBoard.id;
     }
-
-    if (!finalBoardId) {
-      toast({
-        title: "Cannot save image",
-        description: "A board is required to save an image.",
-        variant: 'destructive',
-      });
-      return;
-    }
     
     const fullImage: ImageItem = {
       ...newImage,
@@ -139,16 +130,17 @@ export default function Home() {
       // Search term filter (searches across title, notes, tags, and board name)
       if (searchTerm) {
         const lowercasedFilter = searchTerm.toLowerCase();
+        const boardName = image.boardId ? boards.find(b => b.id === image.boardId)?.name || '' : '';
         const searchMatch =
           image.title.toLowerCase().includes(lowercasedFilter) ||
           image.notes.toLowerCase().includes(lowercasedFilter) ||
           image.tags.some(tag => tag.toLowerCase().includes(lowercasedFilter)) ||
-          boards.find(b => b.id === image.boardId)?.name.toLowerCase().includes(lowercasedFilter);
+          boardName.toLowerCase().includes(lowercasedFilter);
         if (!searchMatch) return false;
       }
 
       // Selected boards filter (OR logic)
-      if (selectedBoards.length > 0 && !selectedBoards.includes(image.boardId)) {
+      if (selectedBoards.length > 0 && (!image.boardId || !selectedBoards.includes(image.boardId))) {
         return false;
       }
 

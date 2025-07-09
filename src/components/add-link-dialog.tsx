@@ -37,20 +37,16 @@ import { Popover, PopoverContent, PopoverAnchor } from '@/components/ui/popover'
 
 const imageSchema = z.object({
   url: z.string().url({ message: "Please enter a valid image URL." }),
-  title: z.string().min(2, { message: "Title must be at least 2 characters." }),
+  title: z.string().optional(),
   notes: z.string().optional(),
   tags: z.array(z.string()).optional(),
   boardType: z.enum(['existing', 'new']),
   boardId: z.string().optional(),
   newBoardName: z.string().optional(),
 }).refine((data) => {
-    if (data.boardType === 'existing') return !!data.boardId;
-    return true;
-}, {
-    message: 'Please select a board.',
-    path: ['boardId'],
-}).refine((data) => {
-    if (data.boardType === 'new') return data.newBoardName && data.newBoardName.length >= 2;
+    if (data.boardType === 'new' && data.newBoardName) {
+      return data.newBoardName.length >= 2;
+    }
     return true;
 }, {
     message: 'Board name must be at least 2 characters.',
@@ -115,12 +111,12 @@ export default function AddLinkDialog({ onAddImage, boards, allTags }: AddLinkDi
   }, [tagInput, allTags, form]);
 
   const onSubmit = (data: ImageFormValues) => {
-    const imagePartial = {
+    const imagePartial: Omit<ImageItem, 'id'> = {
         url: data.url,
-        title: data.title,
+        title: data.title || '',
         notes: data.notes || '',
         tags: data.tags || [],
-        boardId: data.boardId || ''
+        boardId: data.boardId
     };
 
     const newBoardName = data.boardType === 'new' ? data.newBoardName : undefined;

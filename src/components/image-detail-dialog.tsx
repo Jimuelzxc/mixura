@@ -37,10 +37,10 @@ import { Popover, PopoverContent, PopoverAnchor } from '@/components/ui/popover'
 
 
 const imageEditSchema = z.object({
-  title: z.string().min(2, { message: "Title must be at least 2 characters." }),
+  title: z.string().optional(),
   notes: z.string().optional(),
   tags: z.array(z.string()).optional(),
-  boardId: z.string({ required_error: "Please select a board." }),
+  boardId: z.string().optional(),
 });
 
 type ImageEditFormValues = z.infer<typeof imageEditSchema>;
@@ -117,9 +117,10 @@ export default function ImageDetailDialog({ image, board, boards, allTags, isOpe
   const onSubmit = (data: ImageEditFormValues) => {
     onUpdate({
       ...image,
-      ...data,
+      title: data.title || '',
       notes: data.notes || '',
-      tags: data.tags || []
+      tags: data.tags || [],
+      boardId: data.boardId
     });
     setIsEditing(false);
   };
@@ -277,7 +278,7 @@ export default function ImageDetailDialog({ image, board, boards, allTags, isOpe
           ) : (
             <>
               <DialogHeader>
-                <DialogTitle className="text-2xl font-bold">{image.title}</DialogTitle>
+                <DialogTitle className="text-2xl font-bold">{image.title || 'Untitled'}</DialogTitle>
               </DialogHeader>
               <div className="mt-4 space-y-4 text-sm">
                 <div className="flex items-start gap-3">
