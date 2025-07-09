@@ -9,6 +9,8 @@ import FilterToolbar from '@/components/filter-toolbar';
 import { useToast } from '@/hooks/use-toast';
 import { Triangle } from 'lucide-react';
 
+const UNCATEGORIZED_BOARD: Board = { id: 'uncategorized', name: 'Uncategorized' };
+
 export default function Home() {
   const [images, setImages] = useState<ImageItem[]>([]);
   const [boards, setBoards] = useState<Board[]>([]);
@@ -67,6 +69,14 @@ export default function Home() {
     });
     return Array.from(tags).sort();
   }, [images]);
+
+  const boardsForFilter = useMemo(() => {
+    const hasUncategorizedImages = images.some(image => !image.boardId);
+    if (hasUncategorizedImages) {
+      return [UNCATEGORIZED_BOARD, ...boards];
+    }
+    return boards;
+  }, [images, boards]);
 
   const handleAddImage = (newImage: Omit<ImageItem, 'id'>, newBoardName?: string) => {
     let finalBoardId = newImage.boardId;
@@ -130,7 +140,7 @@ export default function Home() {
       // Search term filter (searches across title, notes, tags, and board name)
       if (searchTerm) {
         const lowercasedFilter = searchTerm.toLowerCase();
-        const boardName = image.boardId ? boards.find(b => b.id === image.boardId)?.name || '' : '';
+        const boardName = image.boardId ? boards.find(b => b.id === image.boardId)?.name || '' : 'Uncategorized';
         const searchMatch =
           image.title.toLowerCase().includes(lowercasedFilter) ||
           image.notes.toLowerCase().includes(lowercasedFilter) ||
@@ -140,8 +150,11 @@ export default function Home() {
       }
 
       // Selected boards filter (OR logic)
-      if (selectedBoards.length > 0 && (!image.boardId || !selectedBoards.includes(image.boardId))) {
-        return false;
+      if (selectedBoards.length > 0) {
+        const imageBoardId = image.boardId || 'uncategorized';
+        if (!selectedBoards.includes(imageBoardId)) {
+          return false;
+        }
       }
 
       // Selected tags filter (AND logic)
@@ -165,7 +178,7 @@ export default function Home() {
       <main className="flex-grow p-4 sm:p-6 md:p-8">
         {images.length > 0 && (
             <FilterToolbar
-                boards={boards}
+                boards={boardsForFilter}
                 tags={allTags}
                 selectedBoards={selectedBoards}
                 onBoardSelect={handleBoardSelect}
