@@ -387,13 +387,22 @@ export default function ImageDetailDialog({ image, board, boards, allTags, isOpe
                               </button>
                             </Badge>
                           ))}
-                          <Input
-                            placeholder="Add a color..."
-                            value={colorInput}
-                            onChange={(e) => setColorInput(e.target.value)}
-                            onKeyDown={(e) => handleColorKeyDown(e, field)}
-                            className="h-auto flex-1 bg-transparent p-0 border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 min-w-[120px]"
-                          />
+                          <div className="flex items-center gap-2 flex-1 min-w-[160px]">
+                            <Input
+                                placeholder="Add #RRGGBB..."
+                                value={colorInput}
+                                onChange={(e) => setColorInput(e.target.value)}
+                                onKeyDown={(e) => handleColorKeyDown(e, field)}
+                                className="h-auto flex-1 bg-transparent p-0 border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
+                            />
+                            <input
+                                type="color"
+                                className="p-0 border-none rounded-sm cursor-pointer w-6 h-6 appearance-none bg-transparent"
+                                onChange={(e) => handleAddColor(e.target.value.toUpperCase(), field)}
+                                title="Pick a color"
+                                aria-label="Color picker"
+                            />
+                          </div>
                         </div>
                       </FormControl>
                       <FormMessage />
