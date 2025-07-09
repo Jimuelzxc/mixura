@@ -313,7 +313,7 @@ export default function ImageDetailDialog({ image, board, boards, allTags, isOpe
             )}
             </div>
             {!isEditing && (
-              <DialogFooter className="p-6 pt-0 bg-background border-t mt-auto">
+              <DialogFooter className="p-6 pt-4 bg-background border-t mt-auto">
                 <div className="flex justify-end gap-2 w-full">
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
