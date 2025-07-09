@@ -1,3 +1,4 @@
+
 "use client";
 
 import Image from 'next/image';
@@ -19,7 +20,7 @@ export default function ImageListItem({ image, settings, onSelect, onTagClick }:
   return (
     <div
       className={cn(
-        "flex gap-4 p-4 rounded-lg border bg-card text-card-foreground shadow-sm cursor-pointer hover:bg-accent transition-colors",
+        "flex gap-4 p-4 border bg-card text-card-foreground shadow-sm cursor-pointer hover:bg-accent transition-colors",
         listCoverPosition === 'right' ? 'flex-row-reverse' : 'flex-row'
       )}
       onClick={onSelect}
@@ -29,7 +30,7 @@ export default function ImageListItem({ image, settings, onSelect, onTagClick }:
     >
       {listShowCover && (
         <div className="w-32 md:w-48 flex-shrink-0">
-          <div className="aspect-square relative rounded-md overflow-hidden">
+          <div className="aspect-square relative overflow-hidden">
             <Image
               src={image.url}
               alt={image.title}

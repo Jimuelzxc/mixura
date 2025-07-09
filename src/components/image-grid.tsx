@@ -1,3 +1,4 @@
+
 "use client";
 
 import type { ImageItem, ViewSettings } from '@/lib/types';
@@ -65,7 +66,7 @@ export default function ImageGrid({ images, onImageSelect, onTagClick, viewSetti
 
   if (viewMode === 'headlines') {
     return (
-      <div className="border rounded-md">
+      <div className="border">
         {images.map((image) => (
           <ImageHeadlineItem key={image.id} image={image} onSelect={() => onImageSelect(image)} />
         ))}

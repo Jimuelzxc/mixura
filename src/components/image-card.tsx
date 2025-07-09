@@ -1,3 +1,4 @@
+
 "use client";
 
 import Image from 'next/image';
@@ -16,7 +17,7 @@ export default function ImageCard({ image, onSelect, onTagClick, viewMode }: Ima
   return (
     <div
       className={cn(
-        "group relative break-inside-avoid cursor-pointer overflow-hidden rounded-lg shadow-lg",
+        "group relative break-inside-avoid cursor-pointer overflow-hidden shadow-lg",
         viewMode === 'cards' && 'mb-4', // Masonry handles its own bottom margin
         viewMode === 'moodboard' && 'mb-4'
       )}
