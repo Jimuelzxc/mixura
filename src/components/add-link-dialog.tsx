@@ -342,6 +342,9 @@ export default function AddLinkDialog({ onAddImage, boards }: AddLinkDialogProps
       {isUrlValid && (
         <Dialog open={isPreviewLarge} onOpenChange={setIsPreviewLarge}>
           <DialogContent className="max-w-4xl h-auto p-0 bg-transparent border-0 shadow-none">
+            <DialogHeader>
+              <DialogTitle className="sr-only">Large image preview</DialogTitle>
+            </DialogHeader>
             <Image
               src={imageUrl}
               alt="Large image preview"
