@@ -1,3 +1,4 @@
+
 "use client";
 
 import Image from 'next/image';
@@ -124,7 +125,7 @@ export default function ImageDetailDialog({ image, board, boards, allTags, isOpe
       title: data.title || '',
       notes: data.notes || '',
       tags: data.tags || [],
-      boardId: data.boardId
+      boardId: data.boardId === 'uncategorized' ? undefined : data.boardId,
     });
     setIsEditing(false);
   };
@@ -252,11 +253,12 @@ export default function ImageDetailDialog({ image, board, boards, allTags, isOpe
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Board</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <Select onValueChange={field.onChange} value={field.value || 'uncategorized'}>
                         <FormControl>
                           <SelectTrigger><SelectValue placeholder="Select a board" /></SelectTrigger>
                         </FormControl>
                         <SelectContent>
+                          <SelectItem value="uncategorized">Uncategorized</SelectItem>
                           {boards.map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}
                         </SelectContent>
                       </Select>
