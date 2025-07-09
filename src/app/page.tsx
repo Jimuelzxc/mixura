@@ -190,24 +190,23 @@ export default function Home() {
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
-      <AppHeader
-        searchTerm={searchTerm}
-        onSearchChange={setSearchTerm}
-        onAddImage={handleAddImage}
-        boards={boards}
-        allTags={allTags}
-      />
+      <AppHeader />
       <main className="flex-grow">
         <div className="container mx-auto px-4 md:px-6 py-8">
             {images.length > 0 && (
                 <FilterToolbar
+                    searchTerm={searchTerm}
+                    onSearchChange={setSearchTerm}
+                    onAddImage={handleAddImage}
                     boards={boardsForFilter}
+                    allBoards={boards}
                     tags={allTags}
                     selectedBoards={selectedBoards}
                     onBoardSelect={handleBoardSelect}
                     selectedTags={selectedTags}
                     onTagSelect={handleTagSelect}
                     onClearTagFilters={handleClearTagFilters}
+                    itemCount={filteredImages.length}
                     viewSettings={viewSettings}
                     onViewSettingsChange={handleUpdateViewSettings}
                 />
