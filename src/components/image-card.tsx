@@ -18,7 +18,7 @@ export default function ImageCard({ image, onSelect }: ImageCardProps) {
       tabIndex={0}
       onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && onSelect()}
     >
-      <Card className="overflow-hidden rounded-lg shadow-sm transition-shadow duration-300 hover:shadow-xl">
+      <Card className="overflow-hidden rounded-md border-transparent bg-transparent transition-all hover:border-primary">
         <CardContent className="p-0">
           <div className="relative w-full">
             <Image

@@ -100,7 +100,7 @@ export default function ImageDetailDialog({ image, board, boards, isOpen, onOpen
             alt={image.title}
             width={1200}
             height={1200}
-            className="object-contain w-full h-full max-h-[90vh] rounded-l-lg bg-muted"
+            className="object-contain w-full h-full max-h-[90vh] rounded-l-md bg-background/20"
             data-ai-hint="abstract texture"
           />
         </div>

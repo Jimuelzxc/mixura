@@ -7,6 +7,7 @@ import AppHeader from '@/components/app-header';
 import ImageGrid from '@/components/image-grid';
 import ImageDetailDialog from '@/components/image-detail-dialog';
 import { useToast } from '@/hooks/use-toast';
+import { Triangle } from 'lucide-react';
 
 export default function Home() {
   const [images, setImages] = useState<ImageItem[]>(mockImages);
@@ -58,7 +59,7 @@ export default function Home() {
   }, [images, searchTerm, boards]);
 
   return (
-    <div className="flex flex-col min-h-screen bg-background text-foreground">
+    <div className="flex flex-col min-h-screen bg-background">
       <AppHeader
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
@@ -66,7 +67,20 @@ export default function Home() {
         boards={boards}
       />
       <main className="flex-grow p-4 sm:p-6 md:p-8">
-        {filteredImages.length > 0 ? (
+        {images.length === 0 && !searchTerm ? (
+            <div className="flex flex-col items-center justify-center text-center py-24 px-4 sm:px-6 lg:px-8">
+              <div className="relative mb-8 text-primary">
+                  <div className="absolute -inset-2 bg-primary/20 rounded-full blur-3xl" />
+                  <Triangle className="h-24 w-24 relative" fill="currentColor" strokeWidth={1} />
+              </div>
+              <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tighter text-foreground">
+                  The Visual Cortex for Your Ideas
+              </h1>
+              <p className="mt-4 max-w-xl text-lg text-muted-foreground">
+                  Save, organize, and rediscover your visual inspirations with AI-powered tagging and search.
+              </p>
+          </div>
+        ) : filteredImages.length > 0 ? (
           <ImageGrid images={filteredImages} onImageSelect={setSelectedImage} />
         ) : (
           <div className="flex flex-col items-center justify-center text-center h-full mt-20 text-muted-foreground">

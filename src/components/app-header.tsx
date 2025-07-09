@@ -1,6 +1,6 @@
 "use client";
 
-import { LayoutGrid, Search } from 'lucide-react';
+import { Triangle, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import AddLinkDialog from './add-link-dialog';
 import type { Board, ImageItem } from '@/lib/types';
@@ -14,11 +14,11 @@ interface AppHeaderProps {
 
 export default function AppHeader({ searchTerm, onSearchChange, onAddImage, boards }: AppHeaderProps) {
   return (
-    <header className="sticky top-0 z-10 w-full bg-primary text-primary-foreground shadow-md">
+    <header className="sticky top-0 z-10 w-full bg-background/80 backdrop-blur-sm border-b border-white/10">
       <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
         <div className="flex items-center gap-3">
-          <LayoutGrid className="h-7 w-7" />
-          <h1 className="text-xl font-bold tracking-tight">LinkBoard</h1>
+          <Triangle className="h-6 w-6 text-foreground" fill="currentColor"/>
+          <h1 className="text-xl font-bold tracking-tight text-foreground">TARS</h1>
         </div>
         <div className="flex flex-1 items-center justify-center px-8 md:px-16">
           <div className="relative w-full max-w-md">
@@ -26,7 +26,7 @@ export default function AppHeader({ searchTerm, onSearchChange, onAddImage, boar
             <Input
               type="search"
               placeholder="Search by keyword, tag, or board..."
-              className="w-full rounded-full bg-background/90 pl-10 text-foreground"
+              className="w-full rounded-full bg-secondary border-transparent pl-10 text-foreground transition-colors focus:border-primary focus:bg-background"
               value={searchTerm}
               onChange={(e) => onSearchChange(e.target.value)}
             />

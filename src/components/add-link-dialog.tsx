@@ -73,9 +73,9 @@ export default function AddLinkDialog({ onAddImage, boards }: AddLinkDialogProps
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="secondary" className="bg-primary-foreground/10 hover:bg-primary-foreground/20 text-primary-foreground">
+        <Button variant="default">
           <PlusCircle className="mr-2 h-5 w-5" />
-          Add Link
+          Add Image
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
@@ -176,7 +176,7 @@ export default function AddLinkDialog({ onAddImage, boards }: AddLinkDialogProps
             />
             <DialogFooter>
                 <DialogClose asChild>
-                   <Button type="button" variant="secondary">Cancel</Button>
+                   <Button type="button" variant="ghost">Cancel</Button>
                 </DialogClose>
                 <Button type="submit">Save Image</Button>
             </DialogFooter>
