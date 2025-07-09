@@ -47,19 +47,10 @@ export default function ImageCard({ image, onSelect, onTagClick }: ImageCardProp
               <Badge
                 key={tag}
                 variant="secondary"
-                className="cursor-pointer px-2 py-0.5 text-xs font-normal transition-colors hover:bg-primary hover:text-primary-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-                role="button"
-                tabIndex={0}
+                className="cursor-pointer px-2 py-0.5 text-xs font-normal transition-colors hover:bg-primary hover:text-primary-foreground"
                 onClick={(e) => {
                     e.stopPropagation();
                     onTagClick(tag);
-                }}
-                onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        onTagClick(tag);
-                    }
                 }}
               >
                 {tag}
