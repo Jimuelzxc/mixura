@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { PlusCircle } from 'lucide-react';
+import Image from 'next/image';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -66,6 +67,9 @@ export default function AddLinkDialog({ onAddImage, boards }: AddLinkDialogProps
     setIsOpen(false);
   };
 
+  const imageUrl = form.watch('url');
+  const isUrlValid = z.string().url().safeParse(imageUrl).success;
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
@@ -96,6 +100,19 @@ export default function AddLinkDialog({ onAddImage, boards }: AddLinkDialogProps
                 </FormItem>
               )}
             />
+
+            {isUrlValid && (
+              <div className="relative mt-4 aspect-video w-full">
+                <Image
+                  src={imageUrl}
+                  alt="Image preview"
+                  fill
+                  className="rounded-md object-cover"
+                  data-ai-hint="image preview"
+                />
+              </div>
+            )}
+
             <FormField
               control={form.control}
               name="title"
