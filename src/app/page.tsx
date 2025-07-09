@@ -1,8 +1,7 @@
 "use client";
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import type { ImageItem, Board } from '@/lib/types';
-import { mockImages, mockBoards } from '@/lib/data';
 import AppHeader from '@/components/app-header';
 import ImageGrid from '@/components/image-grid';
 import ImageDetailDialog from '@/components/image-detail-dialog';
@@ -11,13 +10,55 @@ import { useToast } from '@/hooks/use-toast';
 import { Triangle } from 'lucide-react';
 
 export default function Home() {
-  const [images, setImages] = useState<ImageItem[]>(mockImages);
-  const [boards, setBoards] = useState<Board[]>(mockBoards);
+  const [images, setImages] = useState<ImageItem[]>([]);
+  const [boards, setBoards] = useState<Board[]>([]);
+  const [isDataLoaded, setIsDataLoaded] = useState(false);
+  
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedImage, setSelectedImage] = useState<ImageItem | null>(null);
   const [selectedBoards, setSelectedBoards] = useState<string[]>([]);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const { toast } = useToast();
+
+  // Load data from localStorage on initial render
+  useEffect(() => {
+    try {
+      const storedImages = window.localStorage.getItem('tarsus-images');
+      if (storedImages) {
+        setImages(JSON.parse(storedImages));
+      }
+      const storedBoards = window.localStorage.getItem('tarsus-boards');
+      if (storedBoards) {
+        setBoards(JSON.parse(storedBoards));
+      }
+    } catch (error) {
+      console.error('Failed to load from localStorage', error);
+      toast({
+        title: "Error",
+        description: "Could not load saved data from your browser.",
+        variant: 'destructive',
+      });
+    } finally {
+      setIsDataLoaded(true);
+    }
+  }, []); // Empty dependency array ensures this runs only once
+
+  // Save data to localStorage whenever it changes
+  useEffect(() => {
+    if (isDataLoaded) {
+      try {
+        window.localStorage.setItem('tarsus-images', JSON.stringify(images));
+        window.localStorage.setItem('tarsus-boards', JSON.stringify(boards));
+      } catch (error) {
+        console.error('Failed to save to localStorage', error);
+          toast({
+          title: "Error",
+          description: "Could not save your changes to your browser.",
+          variant: 'destructive',
+        });
+      }
+    }
+  }, [images, boards, isDataLoaded]);
 
   const handleAddImage = (newImage: Omit<ImageItem, 'id'>, newBoardName?: string) => {
     let finalBoardId = newImage.boardId;
