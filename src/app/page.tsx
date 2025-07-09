@@ -193,24 +193,22 @@ export default function Home() {
       <AppHeader />
       <main className="flex-grow">
         <div className="container mx-auto px-4 md:px-6 py-8">
-            {images.length > 0 && (
-                <FilterToolbar
-                    searchTerm={searchTerm}
-                    onSearchChange={setSearchTerm}
-                    onAddImage={handleAddImage}
-                    boards={boardsForFilter}
-                    allBoards={boards}
-                    tags={allTags}
-                    selectedBoards={selectedBoards}
-                    onBoardSelect={handleBoardSelect}
-                    selectedTags={selectedTags}
-                    onTagSelect={handleTagSelect}
-                    onClearTagFilters={handleClearTagFilters}
-                    itemCount={filteredImages.length}
-                    viewSettings={viewSettings}
-                    onViewSettingsChange={handleUpdateViewSettings}
-                />
-            )}
+            <FilterToolbar
+                searchTerm={searchTerm}
+                onSearchChange={setSearchTerm}
+                onAddImage={handleAddImage}
+                boards={boardsForFilter}
+                allBoards={boards}
+                tags={allTags}
+                selectedBoards={selectedBoards}
+                onBoardSelect={handleBoardSelect}
+                selectedTags={selectedTags}
+                onTagSelect={handleTagSelect}
+                onClearTagFilters={handleClearTagFilters}
+                itemCount={filteredImages.length}
+                viewSettings={viewSettings}
+                onViewSettingsChange={handleUpdateViewSettings}
+            />
             {images.length === 0 && !searchTerm ? (
                 <div className="flex flex-col items-center justify-center text-center py-24 px-4 sm:px-6 lg:px-8">
                   <div className="relative mb-8 text-primary">
@@ -218,7 +216,7 @@ export default function Home() {
                       <Triangle className="h-24 w-24 relative" fill="currentColor" strokeWidth={1} />
                   </div>
                   <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tighter text-foreground">
-                      The Visual Cortex for Your Ideas
+                      The Visual Cortex for <span className="text-primary">Your</span> Ideas
                   </h1>
                   <p className="mt-4 max-w-xl text-lg text-muted-foreground">
                       Save, organize, and rediscover your visual inspirations with AI-powered tagging and search.
@@ -251,6 +249,11 @@ export default function Home() {
           onUpdate={handleUpdateImage}
         />
       )}
+      <div className="fixed bottom-4 left-4 z-50">
+        <div className="h-10 w-10 bg-foreground text-background rounded-full flex items-center justify-center text-lg font-bold">
+            M
+        </div>
+      </div>
     </div>
   );
 }
