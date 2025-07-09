@@ -27,8 +27,8 @@ export default function ImageCard({ image, onSelect, onTagClick }: ImageCardProp
         className="h-auto w-full object-cover transition-transform duration-300 group-hover:scale-105"
         data-ai-hint="abstract texture"
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent transition-all duration-300 group-hover:from-black/90" />
-      <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+      <div className="absolute bottom-0 left-0 right-0 p-4 text-white opacity-0 transition-all duration-300 transform translate-y-4 group-hover:opacity-100 group-hover:translate-y-0">
         <h3 className="font-bold text-lg truncate drop-shadow-md">{image.title}</h3>
         {image.notes && (
           <p className="text-sm mt-1 truncate opacity-90 drop-shadow-sm">
