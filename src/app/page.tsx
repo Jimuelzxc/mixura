@@ -197,46 +197,48 @@ export default function Home() {
         boards={boards}
         allTags={allTags}
       />
-      <main className="flex-grow p-4 sm:p-6 md:p-8">
-        {images.length > 0 && (
-            <FilterToolbar
-                boards={boardsForFilter}
-                tags={allTags}
-                selectedBoards={selectedBoards}
-                onBoardSelect={handleBoardSelect}
-                selectedTags={selectedTags}
-                onTagSelect={handleTagSelect}
-                onClearTagFilters={handleClearTagFilters}
-                viewSettings={viewSettings}
-                onViewSettingsChange={handleUpdateViewSettings}
-            />
-        )}
-        {images.length === 0 && !searchTerm ? (
-            <div className="flex flex-col items-center justify-center text-center py-24 px-4 sm:px-6 lg:px-8">
-              <div className="relative mb-8 text-primary">
-                  <div className="absolute -inset-2 bg-primary/20 rounded-full blur-3xl" />
-                  <Triangle className="h-24 w-24 relative" fill="currentColor" strokeWidth={1} />
+      <main className="flex-grow">
+        <div className="container mx-auto px-4 md:px-6 py-8">
+            {images.length > 0 && (
+                <FilterToolbar
+                    boards={boardsForFilter}
+                    tags={allTags}
+                    selectedBoards={selectedBoards}
+                    onBoardSelect={handleBoardSelect}
+                    selectedTags={selectedTags}
+                    onTagSelect={handleTagSelect}
+                    onClearTagFilters={handleClearTagFilters}
+                    viewSettings={viewSettings}
+                    onViewSettingsChange={handleUpdateViewSettings}
+                />
+            )}
+            {images.length === 0 && !searchTerm ? (
+                <div className="flex flex-col items-center justify-center text-center py-24 px-4 sm:px-6 lg:px-8">
+                  <div className="relative mb-8 text-primary">
+                      <div className="absolute -inset-2 bg-primary/20 rounded-full blur-3xl" />
+                      <Triangle className="h-24 w-24 relative" fill="currentColor" strokeWidth={1} />
+                  </div>
+                  <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tighter text-foreground">
+                      The Visual Cortex for Your Ideas
+                  </h1>
+                  <p className="mt-4 max-w-xl text-lg text-muted-foreground">
+                      Save, organize, and rediscover your visual inspirations with AI-powered tagging and search.
+                  </p>
               </div>
-              <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tighter text-foreground">
-                  The Visual Cortex for Your Ideas
-              </h1>
-              <p className="mt-4 max-w-xl text-lg text-muted-foreground">
-                  Save, organize, and rediscover your visual inspirations with AI-powered tagging and search.
-              </p>
-          </div>
-        ) : filteredImages.length > 0 ? (
-          <ImageGrid 
-            images={filteredImages} 
-            onImageSelect={setSelectedImage} 
-            onTagClick={handleTagSelect} 
-            viewSettings={viewSettings}
-          />
-        ) : (
-          <div className="flex flex-col items-center justify-center text-center h-full mt-20 text-muted-foreground">
-            <h2 className="text-2xl font-semibold">No Images Found</h2>
-            <p className="mt-2">Try adjusting your filters or add a new image.</p>
-          </div>
-        )}
+            ) : filteredImages.length > 0 ? (
+              <ImageGrid 
+                images={filteredImages} 
+                onImageSelect={setSelectedImage} 
+                onTagClick={handleTagSelect} 
+                viewSettings={viewSettings}
+              />
+            ) : (
+              <div className="flex flex-col items-center justify-center text-center h-full mt-20 text-muted-foreground">
+                <h2 className="text-2xl font-semibold">No Images Found</h2>
+                <p className="mt-2">Try adjusting your filters or add a new image.</p>
+              </div>
+            )}
+        </div>
       </main>
       {selectedImage && (
         <ImageDetailDialog

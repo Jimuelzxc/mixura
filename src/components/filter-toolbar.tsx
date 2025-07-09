@@ -36,7 +36,7 @@ export default function FilterToolbar({
   onClearTagFilters,
 }: FilterToolbarProps) {
   return (
-    <div className="px-4 md:px-6 mb-8">
+    <div className="mb-8">
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div className="flex items-center gap-4 flex-wrap">
           <span className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
