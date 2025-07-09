@@ -1,6 +1,5 @@
 "use client";
 
-import { Home, Tag } from 'lucide-react';
 import type { Board } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 
@@ -34,7 +33,6 @@ export default function FilterToolbar({
               onClick={() => onBoardSelect(board.id)}
               className="rounded-full"
             >
-              <Home className="mr-2 h-4 w-4" />
               {board.name}
             </Button>
           ))}
@@ -52,7 +50,6 @@ export default function FilterToolbar({
                 onClick={() => onTagSelect(tag)}
                 className="rounded-full"
                 >
-                <Tag className="mr-2 h-4 w-4" />
                 {tag}
                 </Button>
             ))}
