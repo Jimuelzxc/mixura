@@ -4,6 +4,7 @@ import { Triangle, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import AddLinkDialog from './add-link-dialog';
 import type { Board, ImageItem } from '@/lib/types';
+import { ThemeToggle } from './theme-toggle';
 
 interface AppHeaderProps {
   searchTerm: string;
@@ -32,7 +33,10 @@ export default function AppHeader({ searchTerm, onSearchChange, onAddImage, boar
             />
           </div>
         </div>
-        <AddLinkDialog onAddImage={onAddImage} boards={boards} />
+        <div className="flex items-center gap-2">
+          <AddLinkDialog onAddImage={onAddImage} boards={boards} />
+          <ThemeToggle />
+        </div>
       </div>
     </header>
   );
