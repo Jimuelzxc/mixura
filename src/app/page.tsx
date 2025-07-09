@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect } from 'react';
-import type { ImageItem, Board } from '@/lib/types';
+import type { ImageItem, Board, ViewSettings } from '@/lib/types';
 import AppHeader from '@/components/app-header';
 import ImageGrid from '@/components/image-grid';
 import ImageDetailDialog from '@/components/image-detail-dialog';
@@ -21,7 +21,15 @@ export default function Home() {
   const [selectedBoards, setSelectedBoards] = useState<string[]>([]);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const { toast } = useToast();
-  const [gridColumns, setGridColumns] = useState(3);
+  const [viewSettings, setViewSettings] = useState<ViewSettings>({
+    viewMode: 'moodboard',
+    gridColumns: 3,
+    listShowCover: true,
+    listShowTitle: true,
+    listShowNotes: true,
+    listShowTags: true,
+    listCoverPosition: 'left',
+  });
 
   // Load data from localStorage on initial render
   useEffect(() => {
@@ -34,9 +42,9 @@ export default function Home() {
       if (storedBoards) {
         setBoards(JSON.parse(storedBoards));
       }
-      const storedColumns = window.localStorage.getItem('tarsus-grid-columns');
-      if (storedColumns) {
-        setGridColumns(JSON.parse(storedColumns));
+      const storedSettings = window.localStorage.getItem('tarsus-view-settings');
+      if (storedSettings) {
+        setViewSettings(JSON.parse(storedSettings));
       }
     } catch (error) {
       console.error('Failed to load from localStorage', error);
@@ -56,7 +64,7 @@ export default function Home() {
       try {
         window.localStorage.setItem('tarsus-images', JSON.stringify(images));
         window.localStorage.setItem('tarsus-boards', JSON.stringify(boards));
-        window.localStorage.setItem('tarsus-grid-columns', JSON.stringify(gridColumns));
+        window.localStorage.setItem('tarsus-view-settings', JSON.stringify(viewSettings));
       } catch (error) {
         console.error('Failed to save to localStorage', error);
           toast({
@@ -66,7 +74,7 @@ export default function Home() {
         });
       }
     }
-  }, [images, boards, gridColumns, isDataLoaded]);
+  }, [images, boards, viewSettings, isDataLoaded]);
 
   const allTags = useMemo(() => {
     const tags = new Set<string>();
@@ -140,6 +148,10 @@ export default function Home() {
       prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
     );
   };
+  
+  const handleUpdateViewSettings = (newSettings: Partial<ViewSettings>) => {
+    setViewSettings(prev => ({ ...prev, ...newSettings }));
+  };
 
   const filteredImages = useMemo(() => {
     return images.filter(image => {
@@ -190,8 +202,8 @@ export default function Home() {
                 onBoardSelect={handleBoardSelect}
                 selectedTags={selectedTags}
                 onTagSelect={handleTagSelect}
-                gridColumns={gridColumns}
-                onGridColumnsChange={setGridColumns}
+                viewSettings={viewSettings}
+                onViewSettingsChange={handleUpdateViewSettings}
             />
         )}
         {images.length === 0 && !searchTerm ? (
@@ -208,7 +220,12 @@ export default function Home() {
               </p>
           </div>
         ) : filteredImages.length > 0 ? (
-          <ImageGrid images={filteredImages} onImageSelect={setSelectedImage} onTagClick={handleTagSelect} gridColumns={gridColumns} />
+          <ImageGrid 
+            images={filteredImages} 
+            onImageSelect={setSelectedImage} 
+            onTagClick={handleTagSelect} 
+            viewSettings={viewSettings}
+          />
         ) : (
           <div className="flex flex-col items-center justify-center text-center h-full mt-20 text-muted-foreground">
             <h2 className="text-2xl font-semibold">No Images Found</h2>

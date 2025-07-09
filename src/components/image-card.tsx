@@ -3,30 +3,41 @@
 import Image from 'next/image';
 import type { ImageItem } from '@/lib/types';
 import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
 
 interface ImageCardProps {
   image: ImageItem;
   onSelect: () => void;
   onTagClick: (tag: string) => void;
+  viewMode: 'moodboard' | 'cards';
 }
 
-export default function ImageCard({ image, onSelect, onTagClick }: ImageCardProps) {
+export default function ImageCard({ image, onSelect, onTagClick, viewMode }: ImageCardProps) {
   return (
     <div
-      className="group relative mb-4 break-inside-avoid cursor-pointer overflow-hidden rounded-lg shadow-lg"
+      className={cn(
+        "group relative break-inside-avoid cursor-pointer overflow-hidden rounded-lg shadow-lg",
+        viewMode === 'cards' && 'mb-4', // Masonry handles its own bottom margin
+        viewMode === 'moodboard' && 'mb-4'
+      )}
       onClick={onSelect}
       role="button"
       tabIndex={0}
       onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && onSelect()}
     >
-      <Image
-        src={image.url}
-        alt={image.title}
-        width={500}
-        height={500}
-        className="h-auto w-full object-cover transition-transform duration-300 group-hover:scale-105"
-        data-ai-hint="abstract texture"
-      />
+      <div className={cn(
+        "w-full",
+        viewMode === 'cards' && "aspect-[4/3]"
+      )}>
+        <Image
+          src={image.url}
+          alt={image.title}
+          width={500}
+          height={viewMode === 'cards' ? 375 : 500}
+          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+          data-ai-hint="abstract texture"
+        />
+      </div>
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
       <div className="absolute bottom-0 left-0 right-0 p-4 text-white opacity-0 transition-all duration-300 transform translate-y-4 group-hover:opacity-100 group-hover:translate-y-0">
         <h3 className="font-bold text-lg truncate drop-shadow-md">{image.title}</h3>

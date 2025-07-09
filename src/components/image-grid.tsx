@@ -1,17 +1,22 @@
 "use client";
 
-import type { ImageItem } from '@/lib/types';
+import type { ImageItem, ViewSettings } from '@/lib/types';
 import ImageCard from './image-card';
 import { cn } from '@/lib/utils';
+import ImageListItem from './image-list-item';
+import ImageHeadlineItem from './image-headline-item';
+
 
 interface ImageGridProps {
   images: ImageItem[];
   onImageSelect: (image: ImageItem) => void;
   onTagClick: (tag: string) => void;
-  gridColumns: number;
+  viewSettings: ViewSettings;
 }
 
-export default function ImageGrid({ images, onImageSelect, onTagClick, gridColumns }: ImageGridProps) {
+export default function ImageGrid({ images, onImageSelect, onTagClick, viewSettings }: ImageGridProps) {
+  const { viewMode, gridColumns } = viewSettings;
+
   const columnClasses: { [key: number]: string } = {
     1: 'columns-1',
     2: 'columns-2',
@@ -19,14 +24,54 @@ export default function ImageGrid({ images, onImageSelect, onTagClick, gridColum
     4: 'columns-4',
     5: 'columns-5',
   };
-  
-  return (
-    <div
-      className={cn("gap-4", columnClasses[gridColumns] || 'columns-3')}
-    >
-      {images.map((image) => (
-        <ImageCard key={image.id} image={image} onSelect={() => onImageSelect(image)} onTagClick={onTagClick} />
-      ))}
-    </div>
-  );
+
+  const gridClasses: { [key: number]: string } = {
+    1: 'grid-cols-1',
+    2: 'grid-cols-2',
+    3: 'grid-cols-3',
+    4: 'grid-cols-4',
+    5: 'grid-cols-5',
+  };
+
+  if (viewMode === 'moodboard') {
+    return (
+      <div className={cn("gap-4", columnClasses[gridColumns] || 'columns-3')}>
+        {images.map((image) => (
+          <ImageCard key={image.id} image={image} onSelect={() => onImageSelect(image)} onTagClick={onTagClick} viewMode="moodboard" />
+        ))}
+      </div>
+    );
+  }
+
+  if (viewMode === 'cards') {
+    return (
+        <div className={cn("grid gap-4", gridClasses[gridColumns] || 'grid-cols-3')}>
+            {images.map((image) => (
+                <ImageCard key={image.id} image={image} onSelect={() => onImageSelect(image)} onTagClick={onTagClick} viewMode="cards" />
+            ))}
+        </div>
+    );
+  }
+
+  if (viewMode === 'list') {
+    return (
+      <div className="space-y-4">
+        {images.map((image) => (
+          <ImageListItem key={image.id} image={image} onSelect={() => onImageSelect(image)} onTagClick={onTagClick} settings={viewSettings} />
+        ))}
+      </div>
+    );
+  }
+
+  if (viewMode === 'headlines') {
+    return (
+      <div className="border rounded-md">
+        {images.map((image) => (
+          <ImageHeadlineItem key={image.id} image={image} onSelect={() => onImageSelect(image)} />
+        ))}
+      </div>
+    )
+  }
+
+  return null;
 }
