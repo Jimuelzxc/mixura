@@ -79,9 +79,9 @@ body {
   z-index: 9999;
   transform: translate(-50%, -50%);
   transition:
-    transform 0.2s ease-out,
-    width 0.2s ease-out,
-    height 0.2s ease-out;
+    transform 0.1s ease-out,
+    width 0.1s ease-out,
+    height 0.1s ease-out;
 }
 
 .custom-cursor.hovered {
