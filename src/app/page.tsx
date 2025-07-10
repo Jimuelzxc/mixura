@@ -13,6 +13,7 @@ import AddLinkDialog from '@/components/add-link-dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { cn } from '@/lib/utils';
 
 const LOCALSTORAGE_KEY = 'mixura-data';
 
@@ -31,6 +32,7 @@ export default function Home() {
   const [editingBoardName, setEditingBoardName] = useState('');
 
   const [deletingBoardId, setDeletingBoardId] = useState<string | null>(null);
+  const [isFreedomFullscreen, setIsFreedomFullscreen] = useState(false);
   
   const { toast } = useToast();
   
@@ -152,13 +154,17 @@ export default function Home() {
         event.preventDefault();
         setAddLinkDialogOpen(true);
       }
+      if (event.key === 'Escape' && isFreedomFullscreen) {
+        event.preventDefault();
+        setIsFreedomFullscreen(false);
+      }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, []);
+  }, [isFreedomFullscreen]);
 
   const allTags = useMemo(() => {
     const tags = new Set<string>();
@@ -452,52 +458,58 @@ export default function Home() {
       return true;
     });
   }, [images, searchTerm, selectedTags, selectedColors]);
+  
+  const isFreedomViewActive = viewSettings?.viewMode === 'freedom';
 
   return (
-    <div className="flex flex-col h-screen bg-background">
-      <AppHeader
-        onAddImageClick={() => setAddLinkDialogOpen(true)}
-        onImportClick={handleImportClick}
-        onExportClick={handleExport}
-        onDeleteAllClick={() => setDeleteAllAlertOpen(true)}
-        boards={boards}
-        activeBoardId={activeBoardId}
-        onNewBoard={handleNewBoard}
-        onSwitchBoard={handleSwitchBoard}
-        onDeleteBoard={handleOpenDeleteBoardDialog}
-        onRenameBoard={handleStartEditingBoardName}
-        isAllBoardsView={isAllBoardsView}
-      />
-      <main className="flex-grow flex flex-col min-h-0">
-        <div className="container mx-auto px-4 md:px-6 py-8 flex flex-col flex-grow min-h-0">
-            {isAllBoardsView ? (
-                <div className="mb-8">
-                    <h1 className="text-[5rem] font-bold tracking-tighter leading-none">All Boards</h1>
-                </div>
-            ) : activeBoard && (
-                <div className="mb-8">
-                    <div className="flex items-center gap-4">
-                        <h1 className="text-[5rem] font-bold tracking-tighter leading-none">{activeBoard.name}</h1>
-                    </div>
-                </div>
-            )}
-            <FilterToolbar
-                searchTerm={searchTerm}
-                onSearchChange={setSearchTerm}
-                onAddImageClick={() => setAddLinkDialogOpen(true)}
-                allTags={allTags}
-                selectedTags={selectedTags}
-                onTagSelect={handleTagSelect}
-                allColors={allColors}
-                selectedColors={selectedColors}
-                onColorSelect={handleColorSelect}
-                onClearFilters={handleClearFilters}
-                itemCount={filteredImages.length}
-                viewSettings={viewSettings}
-                onViewSettingsChange={handleUpdateViewSettings}
-                isAddDisabled={isAllBoardsView}
-            />
-            <div className="flex-grow min-h-0">
+    <div className={cn("flex flex-col h-screen bg-background", isFreedomFullscreen && "overflow-hidden")}>
+      <div className={cn(isFreedomFullscreen && "hidden")}>
+        <AppHeader
+          onAddImageClick={() => setAddLinkDialogOpen(true)}
+          onImportClick={handleImportClick}
+          onExportClick={handleExport}
+          onDeleteAllClick={() => setDeleteAllAlertOpen(true)}
+          boards={boards}
+          activeBoardId={activeBoardId}
+          onNewBoard={handleNewBoard}
+          onSwitchBoard={handleSwitchBoard}
+          onDeleteBoard={handleOpenDeleteBoardDialog}
+          onRenameBoard={handleStartEditingBoardName}
+          isAllBoardsView={isAllBoardsView}
+        />
+      </div>
+      <main className={cn("flex-grow flex flex-col min-h-0", isFreedomFullscreen && "h-screen")}>
+        <div className={cn("container mx-auto px-4 md:px-6 py-8 flex flex-col flex-grow min-h-0", isFreedomFullscreen && "p-0 max-w-full h-full")}>
+            <div className={cn(isFreedomFullscreen && "hidden")}>
+              {isAllBoardsView ? (
+                  <div className="mb-8">
+                      <h1 className="text-[5rem] font-bold tracking-tighter leading-none">All Boards</h1>
+                  </div>
+              ) : activeBoard && (
+                  <div className="mb-8">
+                      <div className="flex items-center gap-4">
+                          <h1 className="text-[5rem] font-bold tracking-tighter leading-none">{activeBoard.name}</h1>
+                      </div>
+                  </div>
+              )}
+              <FilterToolbar
+                  searchTerm={searchTerm}
+                  onSearchChange={setSearchTerm}
+                  onAddImageClick={() => setAddLinkDialogOpen(true)}
+                  allTags={allTags}
+                  selectedTags={selectedTags}
+                  onTagSelect={handleTagSelect}
+                  allColors={allColors}
+                  selectedColors={selectedColors}
+                  onColorSelect={handleColorSelect}
+                  onClearFilters={handleClearFilters}
+                  itemCount={filteredImages.length}
+                  viewSettings={viewSettings}
+                  onViewSettingsChange={handleUpdateViewSettings}
+                  isAddDisabled={isAllBoardsView}
+              />
+            </div>
+            <div className={cn("flex-grow min-h-0", isFreedomViewActive && "flex flex-col")}>
                 {isDataLoaded && (
                   images.length === 0 && !searchTerm ? (
                     <div className="flex flex-col items-center justify-center text-center h-full mt-20 text-muted-foreground">
@@ -512,6 +524,8 @@ export default function Home() {
                       onTagClick={handleTagSelect} 
                       viewSettings={viewSettings}
                       onUpdateImage={handleUpdateImage}
+                      isFreedomFullscreen={isFreedomFullscreen}
+                      onToggleFullscreen={() => setIsFreedomFullscreen(prev => !prev)}
                     />
                   ) : (
                     <div className="flex flex-col items-center justify-center text-center h-full mt-20 text-muted-foreground">

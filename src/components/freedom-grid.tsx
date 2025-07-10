@@ -6,13 +6,15 @@ import type { ImageItem } from '@/lib/types';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { TransformWrapper, TransformComponent, useControls } from "react-zoom-pan-pinch";
-import { Plus, Minus, Maximize, RefreshCcw } from 'lucide-react';
+import { Plus, Minus, Maximize, RefreshCcw, Expand, Minimize } from 'lucide-react';
 import { Button } from './ui/button';
 
 interface FreedomGridProps {
   images: ImageItem[];
   onImageSelect: (image: ImageItem) => void;
   onUpdateImage: (image: ImageItem, showToast?: boolean) => void;
+  isFullscreen: boolean;
+  onToggleFullscreen: () => void;
 }
 
 interface DraggableImageProps {
@@ -115,23 +117,26 @@ const DraggableImage: React.FC<DraggableImageProps> = ({ image, onSelect, onUpda
   );
 };
 
-const Controls = () => {
+const Controls = ({ onToggleFullscreen, isFullscreen }: { onToggleFullscreen: () => void, isFullscreen: boolean }) => {
   const { zoomIn, zoomOut, resetTransform, centerView } = useControls();
   return (
     <div className="absolute bottom-4 left-4 z-10 flex items-center gap-2">
       <Button variant="outline" size="icon" onClick={() => zoomIn()}><Plus /></Button>
       <Button variant="outline" size="icon" onClick={() => zoomOut()}><Minus /></Button>
       <Button variant="outline" size="icon" onClick={() => resetTransform()}><RefreshCcw /></Button>
-       <Button variant="outline" size="icon" onClick={() => centerView()}><Maximize /></Button>
+      <Button variant="outline" size="icon" onClick={() => centerView()}><Maximize /></Button>
+      <Button variant="outline" size="icon" onClick={onToggleFullscreen}>
+        {isFullscreen ? <Minimize /> : <Expand />}
+      </Button>
     </div>
   );
 };
 
 
-export default function FreedomGrid({ images, onImageSelect, onUpdateImage }: FreedomGridProps) {
+export default function FreedomGrid({ images, onImageSelect, onUpdateImage, isFullscreen, onToggleFullscreen }: FreedomGridProps) {
   const [currentScale, setCurrentScale] = useState(1);
   return (
-    <div className="relative w-full h-full border rounded-md bg-card/50 overflow-hidden touch-none">
+    <div className={cn("relative w-full border rounded-md bg-card/50 overflow-hidden touch-none", isFullscreen ? "h-full" : "flex-grow")}>
        <TransformWrapper
         minScale={0.1}
         maxScale={8}
@@ -146,7 +151,7 @@ export default function FreedomGrid({ images, onImageSelect, onUpdateImage }: Fr
             disabled: true,
         }}
        >
-        <Controls />
+        <Controls onToggleFullscreen={onToggleFullscreen} isFullscreen={isFullscreen} />
         <TransformComponent
             wrapperClass="!w-full !h-full"
             contentClass="relative"
