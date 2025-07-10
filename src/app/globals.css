@@ -57,11 +57,8 @@ body {
   * {
     @apply border-border;
   }
-  body {
+  body, a, button, [role="button"], input, textarea, [tabindex="0"] {
     @apply bg-background text-foreground;
-    cursor: none;
-  }
-  a, button, [role="button"], input, textarea, [tabindex="0"] {
     cursor: none;
   }
 }
