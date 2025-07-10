@@ -71,11 +71,6 @@ body {
     cursor: none;
   }
   
-  /* Selectors for image cards and list items */
-  .group.relative.break-inside-avoid.cursor-pointer,
-  .flex.gap-4.p-4.border.bg-card {
-      cursor: default !important;
-  }
 }
 
 .custom-cursor {
