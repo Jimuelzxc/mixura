@@ -19,7 +19,7 @@ import {
   DropdownMenuRadioItem,
 } from "@/components/ui/dropdown-menu"
 import { Button } from './ui/button';
-import { Menu, Plus, Upload, Download, Trash2, Check, CopyPlus, Trash, LayoutGrid } from 'lucide-react';
+import { Menu, Plus, Upload, Download, Trash2, Check, CopyPlus, Trash, LayoutGrid, ChevronsUpDown } from 'lucide-react';
 
 
 interface AppHeaderProps {
@@ -47,6 +47,9 @@ export default function AppHeader({
   onDeleteBoard,
   isAllBoardsView
 }: AppHeaderProps) {
+  const activeBoard = boards.find(b => b.id === activeBoardId);
+  const activeBoardName = isAllBoardsView ? "All Boards" : (activeBoard?.name || "Select Board");
+
   return (
     <header className="sticky top-0 z-10 w-full bg-background/80 backdrop-blur-sm">
       <div className="container mx-auto flex h-24 items-center justify-between px-4 md:px-6">
@@ -54,6 +57,40 @@ export default function AppHeader({
             <LogoWithText className="h-[120px] w-auto translate-x-[-15px]" />
         </div>
         <div className="flex items-center gap-2">
+          
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="w-[200px] justify-between">
+                    <span className="truncate">{activeBoardName}</span>
+                    <ChevronsUpDown className="h-4 w-4 opacity-50"/>
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-[200px]" align="end">
+                <DropdownMenuRadioGroup value={activeBoardId || ''} onValueChange={onSwitchBoard}>
+                    <DropdownMenuRadioItem value="all">
+                      <LayoutGrid className="mr-2 h-4 w-4" />
+                      All Boards
+                    </DropdownMenuRadioItem>
+                    <DropdownMenuSeparator />
+                     <DropdownMenuLabel>Your Boards</DropdownMenuLabel>
+                    {boards.map(board => (
+                      <DropdownMenuRadioItem key={board.id} value={board.id}>
+                        {board.name}
+                      </DropdownMenuRadioItem>
+                    ))}
+                  </DropdownMenuRadioGroup>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={onNewBoard}>
+                    <CopyPlus className="mr-2" />
+                    <span>New Board</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={onDeleteBoard} className="text-destructive focus:text-destructive focus:bg-destructive/10" disabled={isAllBoardsView}>
+                    <Trash className="mr-2" />
+                    <span>Delete Current Board...</span>
+                  </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
           <ThemeToggle />
            <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -69,36 +106,6 @@ export default function AppHeader({
                 <span>New Image</span>
                 <DropdownMenuShortcut>⌘N</DropdownMenuShortcut>
               </DropdownMenuItem>
-              <DropdownMenuSeparator />
-
-              <DropdownMenuLabel>Board</DropdownMenuLabel>
-               <DropdownMenuSub>
-                <DropdownMenuSubTrigger>Switch Board</DropdownMenuSubTrigger>
-                <DropdownMenuSubContent>
-                  <DropdownMenuRadioGroup value={activeBoardId || ''} onValueChange={onSwitchBoard}>
-                    <DropdownMenuRadioItem value="all">
-                      <LayoutGrid className="mr-2 h-4 w-4" />
-                      All Boards
-                    </DropdownMenuRadioItem>
-                    <DropdownMenuSeparator />
-                    {boards.map(board => (
-                      <DropdownMenuRadioItem key={board.id} value={board.id}>
-                        {board.name}
-                      </DropdownMenuRadioItem>
-                    ))}
-                  </DropdownMenuRadioGroup>
-                </DropdownMenuSubContent>
-              </DropdownMenuSub>
-
-              <DropdownMenuItem onClick={onNewBoard}>
-                <CopyPlus className="mr-2" />
-                <span>New Board</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={onDeleteBoard} className="text-destructive focus:text-destructive focus:bg-destructive/10" disabled={isAllBoardsView}>
-                <Trash className="mr-2" />
-                <span>Delete Current Board...</span>
-              </DropdownMenuItem>
-              
               <DropdownMenuSeparator />
               <DropdownMenuLabel>Data</DropdownMenuLabel>
                <DropdownMenuItem onClick={onImportClick}>
