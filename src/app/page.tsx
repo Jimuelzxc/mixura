@@ -26,13 +26,15 @@ export default function Home() {
   const [selectedImage, setSelectedImage] = useState<ImageItem | null>(null);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
-  const [isEditingBoardName, setIsEditingBoardName] = useState(false);
+  
+  const [editingBoardId, setEditingBoardId] = useState<string | null>(null);
   const [editingBoardName, setEditingBoardName] = useState('');
+
+  const [deletingBoardId, setDeletingBoardId] = useState<string | null>(null);
   
   const { toast } = useToast();
   
   const [isDeleteAllAlertOpen, setDeleteAllAlertOpen] = useState(false);
-  const [isDeleteBoardAlertOpen, setDeleteBoardAlertOpen] = useState(false);
   const importInputRef = useRef<HTMLInputElement>(null);
   const boardNameInputRef = useRef<HTMLInputElement>(null);
 
@@ -50,8 +52,6 @@ export default function Home() {
   }, [activeBoard, boards, isAllBoardsView]);
   
   const viewSettings = useMemo(() => {
-    // In "All Boards" view, use the settings from the first board as a default
-    // This could be made more sophisticated later if needed
     if (isAllBoardsView) {
       return boards[0]?.viewSettings;
     }
@@ -138,10 +138,11 @@ export default function Home() {
   }, [boards, activeBoardId, isDataLoaded, toast]);
   
   useEffect(() => {
-    if (isEditingBoardName && boardNameInputRef.current) {
+    // This effect is for editing the *active* board's name inline on the page
+    if (editingBoardId === activeBoardId && boardNameInputRef.current) {
         boardNameInputRef.current.select();
     }
-  }, [isEditingBoardName]);
+  }, [editingBoardId, activeBoardId]);
 
   // Keyboard shortcut for adding a new image
   useEffect(() => {
@@ -174,21 +175,25 @@ export default function Home() {
     return Array.from(colors).sort();
   }, [images]);
 
-  const updateActiveBoard = (updater: (board: Board) => Board) => {
-    if (!activeBoardId || isAllBoardsView) return;
-    setBoards(currentBoards => 
-      currentBoards.map(board => 
-        board.id === activeBoardId ? updater(board) : board
+  const updateBoard = (boardId: string, updater: (board: Board) => Board) => {
+     if (!boardId) return;
+    setBoards(currentBoards =>
+      currentBoards.map(board =>
+        board.id === boardId ? updater(board) : board
       )
     );
   };
+
+  const updateActiveBoard = (updater: (board: Board) => Board) => {
+    updateBoard(activeBoardId!, updater);
+  }
   
   const updateBoards = (updater: (board: Board[]) => Board[]) => {
     setBoards(updater);
   };
 
   const handleAddImage = (newImage: Omit<ImageItem, 'id'>) => {
-    if (isAllBoardsView) {
+    if (isAllBoardsView || !activeBoardId) {
       toast({
         title: "Cannot Add Image",
         description: "Please select a specific board to add an image.",
@@ -201,7 +206,7 @@ export default function Home() {
       id: `img-${Date.now()}`,
       colors: newImage.colors || [],
     };
-    updateActiveBoard(board => ({
+    updateBoard(activeBoardId, board => ({
       ...board,
       images: [fullImage, ...board.images]
     }));
@@ -212,7 +217,6 @@ export default function Home() {
   };
 
   const handleDeleteImage = (imageId: string) => {
-    // This will delete the image from whichever board it belongs to
     updateBoards(currentBoards => 
         currentBoards.map(board => ({
             ...board,
@@ -228,7 +232,6 @@ export default function Home() {
   };
 
   const handleUpdateImage = (updatedImage: ImageItem) => {
-    // This will update the image on whichever board it belongs to
     updateBoards(currentBoards => 
       currentBoards.map(board => ({
         ...board,
@@ -263,13 +266,12 @@ export default function Home() {
 
   const handleUpdateViewSettings = (newSettings: Partial<ViewSettings>) => {
     if (isAllBoardsView) {
-        // Apply view settings to all boards
         updateBoards(boards => boards.map(b => ({
             ...b,
             viewSettings: { ...b.viewSettings, ...newSettings }
         })));
-    } else {
-        updateActiveBoard(board => ({
+    } else if (activeBoardId) {
+        updateBoard(activeBoardId, board => ({
             ...board,
             viewSettings: { ...board.viewSettings, ...newSettings }
         }));
@@ -377,44 +379,53 @@ export default function Home() {
     }
   };
 
-  const handleDeleteBoard = () => {
+  const handleOpenDeleteBoardDialog = (boardId: string) => {
     if (isAllBoardsView) {
         toast({ title: 'Cannot Delete', description: 'Switch to a specific board to delete it.', variant: 'destructive' });
-        setDeleteBoardAlertOpen(false);
         return;
     }
+    setDeletingBoardId(boardId);
+  };
+  
+  const handleDeleteBoard = () => {
+    if (!deletingBoardId) return;
+
     if (boards.length <= 1) {
         toast({ title: 'Cannot Delete', description: 'You cannot delete the last board.', variant: 'destructive' });
-        setDeleteBoardAlertOpen(false);
+        setDeletingBoardId(null);
         return;
     }
-    setBoards(prev => prev.filter(b => b.id !== activeBoardId));
-    // Switch to 'All Boards' view after deleting one
-    const newActiveBoardId = 'all';
-    setActiveBoardId(newActiveBoardId);
-    setDeleteBoardAlertOpen(false);
-    toast({ title: 'Board Deleted', variant: 'destructive'});
+    const boardToDelete = boards.find(b => b.id === deletingBoardId);
+    setBoards(prev => prev.filter(b => b.id !== deletingBoardId));
+
+    if (activeBoardId === deletingBoardId) {
+        setActiveBoardId('all');
+    }
+    
+    setDeletingBoardId(null);
+    toast({ title: `Board "${boardToDelete?.name}" Deleted`, variant: 'destructive'});
   };
 
-  const handleStartEditingBoardName = () => {
-    if (activeBoard) {
-        setEditingBoardName(activeBoard.name);
-        setIsEditingBoardName(true);
+  const handleStartEditingBoardName = (boardId: string) => {
+    const boardToEdit = boards.find(b => b.id === boardId);
+    if (boardToEdit) {
+        setEditingBoardId(boardId);
+        setEditingBoardName(boardToEdit.name);
     }
   };
 
   const handleCancelEditingBoardName = () => {
-    setIsEditingBoardName(false);
+    setEditingBoardId(null);
     setEditingBoardName('');
   };
   
   const handleSaveBoardName = () => {
-    if (editingBoardName.trim() && activeBoard) {
-        updateActiveBoard(board => ({ ...board, name: editingBoardName.trim() }));
-        setIsEditingBoardName(false);
+    if (editingBoardName.trim() && editingBoardId) {
+        updateBoard(editingBoardId, board => ({ ...board, name: editingBoardName.trim() }));
+        setEditingBoardId(null);
         toast({ title: 'Board Renamed', description: `The board is now named "${editingBoardName.trim()}".`});
     } else {
-        setIsEditingBoardName(false);
+        setEditingBoardId(null);
     }
   };
 
@@ -438,6 +449,8 @@ export default function Home() {
     });
   }, [images, searchTerm, selectedTags, selectedColors]);
 
+  const isEditingActiveBoard = !isAllBoardsView && editingBoardId === activeBoardId;
+
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <AppHeader
@@ -449,7 +462,8 @@ export default function Home() {
         activeBoardId={activeBoardId}
         onNewBoard={handleNewBoard}
         onSwitchBoard={handleSwitchBoard}
-        onDeleteBoard={() => setDeleteBoardAlertOpen(true)}
+        onDeleteBoard={handleOpenDeleteBoardDialog}
+        onRenameBoard={handleStartEditingBoardName}
         isAllBoardsView={isAllBoardsView}
       />
       <main className="flex-grow">
@@ -463,7 +477,7 @@ export default function Home() {
                 </div>
             ) : activeBoard && (
                 <div className="mb-8">
-                    {isEditingBoardName ? (
+                    {isEditingActiveBoard ? (
                         <div className="space-y-4 max-w-xl">
                             <Input
                                 ref={boardNameInputRef}
@@ -484,7 +498,7 @@ export default function Home() {
                     ) : (
                          <div className="flex items-center gap-4">
                             <h1 className="text-4xl font-bold tracking-tighter">{activeBoard.name}</h1>
-                            <Button size="sm" variant="outline" onClick={handleStartEditingBoardName}>
+                            <Button size="sm" variant="outline" onClick={() => handleStartEditingBoardName(activeBoard.id)}>
                                 <Edit className="w-4 h-4 mr-2"/>
                                 Edit Name
                             </Button>
@@ -552,6 +566,33 @@ export default function Home() {
         />
       )}
 
+      {/* Inline edit dialog */}
+       <AlertDialog open={!!editingBoardId && editingBoardId !== activeBoardId} onOpenChange={(open) => !open && handleCancelEditingBoardName()}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Rename Board</AlertDialogTitle>
+            <AlertDialogDescription>
+              Enter a new name for this board.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+            <Input
+              value={editingBoardName}
+              onChange={(e) => setEditingBoardName(e.target.value)}
+              onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleSaveBoardName();
+                  if (e.key === 'Escape') handleCancelEditingBoardName();
+              }}
+              className="mt-4"
+              placeholder="Board name..."
+              autoFocus
+            />
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={handleCancelEditingBoardName}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleSaveBoardName}>Save</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <AlertDialog open={isDeleteAllAlertOpen} onOpenChange={setDeleteAllAlertOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -574,7 +615,7 @@ export default function Home() {
         </AlertDialogContent>
       </AlertDialog>
 
-      <AlertDialog open={isDeleteBoardAlertOpen} onOpenChange={setDeleteBoardAlertOpen}>
+      <AlertDialog open={!!deletingBoardId} onOpenChange={(open) => !open && setDeletingBoardId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <div className="flex items-center gap-4">
@@ -584,17 +625,14 @@ export default function Home() {
               <div className="flex-grow">
                 <AlertDialogTitle>Delete this board?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  {isAllBoardsView 
-                    ? "You cannot delete from this view. Please switch to a specific board to delete it."
-                    : `Are you sure you want to delete the board "${activeBoard?.name}"? This action cannot be undone.`
-                  }
+                    {`Are you sure you want to delete the board "${boards.find(b => b.id === deletingBoardId)?.name}"? This action cannot be undone.`}
                 </AlertDialogDescription>
               </div>
             </div>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteBoard} disabled={isAllBoardsView}>Yes, delete board</AlertDialogAction>
+            <AlertDialogAction onClick={handleDeleteBoard}>Yes, delete board</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -602,3 +640,5 @@ export default function Home() {
     </div>
   );
 }
+
+    

@@ -11,15 +11,10 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  DropdownMenuSub,
-  DropdownMenuSubTrigger,
-  DropdownMenuSubContent,
   DropdownMenuShortcut,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
 } from "@/components/ui/dropdown-menu"
 import { Button } from './ui/button';
-import { Menu, Plus, Upload, Download, Trash2, Check, CopyPlus, Trash, LayoutGrid, ChevronsUpDown } from 'lucide-react';
+import { Menu, Plus, Upload, Download, Trash2, Check, CopyPlus, Trash, LayoutGrid, ChevronsUpDown, Pencil } from 'lucide-react';
 
 
 interface AppHeaderProps {
@@ -31,7 +26,8 @@ interface AppHeaderProps {
   activeBoardId: string | null;
   onNewBoard: () => void;
   onSwitchBoard: (boardId: string) => void;
-  onDeleteBoard: () => void;
+  onDeleteBoard: (boardId: string) => void;
+  onRenameBoard: (boardId: string) => void;
   isAllBoardsView: boolean;
 }
 
@@ -45,6 +41,7 @@ export default function AppHeader({
   onNewBoard,
   onSwitchBoard,
   onDeleteBoard,
+  onRenameBoard,
   isAllBoardsView
 }: AppHeaderProps) {
   const activeBoard = boards.find(b => b.id === activeBoardId);
@@ -66,28 +63,42 @@ export default function AppHeader({
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-[200px]" align="end">
-                <DropdownMenuRadioGroup value={activeBoardId || ''} onValueChange={onSwitchBoard}>
-                    <DropdownMenuRadioItem value="all">
-                      <LayoutGrid className="mr-2 h-4 w-4" />
-                      All Boards
-                    </DropdownMenuRadioItem>
-                    <DropdownMenuSeparator />
-                     <DropdownMenuLabel>Your Boards</DropdownMenuLabel>
-                    {boards.map(board => (
-                      <DropdownMenuRadioItem key={board.id} value={board.id}>
-                        {board.name}
-                      </DropdownMenuRadioItem>
-                    ))}
-                  </DropdownMenuRadioGroup>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={onNewBoard}>
-                    <CopyPlus className="mr-2" />
-                    <span>New Board</span>
+                <DropdownMenuItem onSelect={() => onSwitchBoard('all')}>
+                    <LayoutGrid className="mr-2 h-4 w-4" />
+                    <span>All Boards</span>
+                    {activeBoardId === 'all' && <Check className="ml-auto h-4 w-4" />}
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuLabel>Your Boards</DropdownMenuLabel>
+                {boards.map(board => (
+                  <DropdownMenuItem key={board.id} onSelect={() => onSwitchBoard(board.id)} className="group justify-between">
+                    <span className="truncate pr-2">{board.name}</span>
+                    <div className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-6 w-6" 
+                            onClick={(e) => { e.stopPropagation(); onRenameBoard(board.id); }}
+                        >
+                            <Pencil className="h-3 w-3" />
+                        </Button>
+                        <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-6 w-6 hover:bg-destructive/10 text-destructive" 
+                            onClick={(e) => { e.stopPropagation(); onDeleteBoard(board.id); }}
+                        >
+                            <Trash className="h-3 w-3" />
+                        </Button>
+                    </div>
+                    {activeBoardId === board.id && <Check className="ml-2 h-4 w-4 opacity-100 group-hover:opacity-0" />}
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={onDeleteBoard} className="text-destructive focus:text-destructive focus:bg-destructive/10" disabled={isAllBoardsView}>
-                    <Trash className="mr-2" />
-                    <span>Delete Current Board...</span>
-                  </DropdownMenuItem>
+                ))}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onSelect={onNewBoard}>
+                  <CopyPlus className="mr-2" />
+                  <span>New Board</span>
+                </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
 
@@ -128,3 +139,5 @@ export default function AppHeader({
     </header>
   );
 }
+
+    
