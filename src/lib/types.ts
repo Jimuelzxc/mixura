@@ -6,9 +6,11 @@ export interface ImageItem {
   notes: string;
   tags: string[];
   colors?: string[];
+  x?: number;
+  y?: number;
 }
 
-export type ViewMode = 'moodboard' | 'list' | 'cards' | 'headlines';
+export type ViewMode = 'moodboard' | 'list' | 'cards' | 'freedom';
 
 export interface ViewSettings {
   viewMode: ViewMode;

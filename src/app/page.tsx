@@ -206,6 +206,8 @@ export default function Home() {
       ...newImage,
       id: `img-${Date.now()}`,
       colors: newImage.colors || [],
+      x: 100,
+      y: 100
     };
     updateBoard(activeBoardId, board => ({
       ...board,
@@ -508,6 +510,7 @@ export default function Home() {
                   onImageSelect={setSelectedImage} 
                   onTagClick={handleTagSelect} 
                   viewSettings={viewSettings}
+                  onUpdateImage={handleUpdateImage}
                 />
               ) : (
                 <div className="flex flex-col items-center justify-center text-center h-full mt-20 text-muted-foreground">

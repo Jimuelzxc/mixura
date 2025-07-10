@@ -5,7 +5,7 @@ import type { ImageItem, ViewSettings } from '@/lib/types';
 import ImageCard from './image-card';
 import { cn } from '@/lib/utils';
 import ImageListItem from './image-list-item';
-import ImageHeadlineItem from './image-headline-item';
+import FreedomGrid from './freedom-grid';
 
 
 interface ImageGridProps {
@@ -13,9 +13,10 @@ interface ImageGridProps {
   onImageSelect: (image: ImageItem) => void;
   onTagClick: (tag: string) => void;
   viewSettings: ViewSettings | undefined;
+  onUpdateImage: (image: ImageItem) => void;
 }
 
-export default function ImageGrid({ images, onImageSelect, onTagClick, viewSettings }: ImageGridProps) {
+export default function ImageGrid({ images, onImageSelect, onTagClick, viewSettings, onUpdateImage }: ImageGridProps) {
   if (!viewSettings) {
     return null; // Or a loading skeleton
   }
@@ -67,14 +68,10 @@ export default function ImageGrid({ images, onImageSelect, onTagClick, viewSetti
       </div>
     );
   }
-
-  if (viewMode === 'headlines') {
+  
+  if (viewMode === 'freedom') {
     return (
-      <div className="border">
-        {images.map((image) => (
-          <ImageHeadlineItem key={image.id} image={image} onSelect={() => onImageSelect(image)} />
-        ))}
-      </div>
+      <FreedomGrid images={images} onImageSelect={onImageSelect} onUpdateImage={onUpdateImage} />
     )
   }
 

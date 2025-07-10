@@ -1,6 +1,6 @@
 "use client";
 
-import { List, LayoutGrid, Heading1, Grid3x3 } from 'lucide-react';
+import { List, LayoutGrid, Move, Grid3x3 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -24,7 +24,7 @@ const viewOptions: { value: ViewMode, label: string, icon: React.ElementType }[]
     { value: 'moodboard', label: 'Moodboard', icon: Grid3x3 },
     { value: 'cards', label: 'Cards', icon: LayoutGrid },
     { value: 'list', label: 'List', icon: List },
-    { value: 'headlines', label: 'Headlines', icon: Heading1 },
+    { value: 'freedom', label: 'Freedom', icon: Move },
 ]
 
 export function ViewOptions({ settings, onChange }: ViewOptionsProps) {
