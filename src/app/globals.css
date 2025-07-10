@@ -27,7 +27,6 @@ body {
     --border: 0 0% 82%;
     --input: 0 0% 82%;
     --ring: 262 84% 60%;
-    --radius: 0.5rem;
   }
 
   .dark {
@@ -87,4 +86,22 @@ body {
 .custom-cursor.hovered {
     width: 30px;
     height: 30px;
+}
+
+@layer utilities {
+  .bg-dots {
+    background-image: radial-gradient(hsl(var(--muted-foreground)) 1px, transparent 0);
+    background-size: 20px 20px;
+    background-position: -10px -10px;
+  }
+  .bg-grid {
+    background-size: 40px 40px;
+    background-image:
+      linear-gradient(to right, hsl(var(--border)) 1px, transparent 1px),
+      linear-gradient(to bottom, hsl(var(--border)) 1px, transparent 1px);
+  }
+  .bg-lines {
+     background-image: linear-gradient(hsl(var(--border)) 1px, transparent 1px);
+     background-size: 100% 2rem;
+  }
 }

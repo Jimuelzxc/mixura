@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { useState, useMemo, useEffect, useRef } from 'react';
@@ -16,6 +17,18 @@ import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 
 const LOCALSTORAGE_KEY = 'mixura-data';
+
+const defaultViewSettings: ViewSettings = {
+  viewMode: 'moodboard',
+  gridColumns: 3,
+  listShowCover: true,
+  listShowTitle: true,
+  listShowNotes: true,
+  listShowTags: true,
+  listCoverPosition: 'left',
+  backgroundPattern: 'dots',
+};
+
 
 export default function Home() {
   const [boards, setBoards] = useState<Board[]>([]);
@@ -68,7 +81,15 @@ export default function Home() {
       if (storedData) {
         const data = JSON.parse(storedData);
         if (data.boards && data.activeBoardId) {
-          setBoards(data.boards);
+          // ensure all boards have viewsettings
+          const sanitizedBoards = data.boards.map((board: Board) => ({
+            ...board,
+            viewSettings: {
+              ...defaultViewSettings,
+              ...(board.viewSettings || {}),
+            }
+          }))
+          setBoards(sanitizedBoards);
           setActiveBoardId(data.activeBoardId);
         } else {
           // Migration for old data structure
@@ -79,15 +100,10 @@ export default function Home() {
             id: `board-${Date.now()}`,
             name: 'My Board',
             images: oldImages ? JSON.parse(oldImages) : [],
-            viewSettings: oldSettings ? JSON.parse(oldSettings) : {
-              viewMode: 'moodboard',
-              gridColumns: 3,
-              listShowCover: true,
-              listShowTitle: true,
-              listShowNotes: true,
-              listShowTags: true,
-              listCoverPosition: 'left',
-            },
+            viewSettings: {
+              ...defaultViewSettings,
+              ...(oldSettings ? JSON.parse(oldSettings) : {}),
+            }
           };
           setBoards([defaultBoard]);
           setActiveBoardId(defaultBoard.id);
@@ -98,15 +114,7 @@ export default function Home() {
           id: `board-${Date.now()}`,
           name: 'My First Board',
           images: [],
-          viewSettings: {
-            viewMode: 'moodboard',
-            gridColumns: 3,
-            listShowCover: true,
-            listShowTitle: true,
-            listShowNotes: true,
-            listShowTags: true,
-            listCoverPosition: 'left',
-          },
+          viewSettings: defaultViewSettings,
         };
         setBoards([newBoard]);
         setActiveBoardId(newBoard.id);
@@ -344,15 +352,7 @@ export default function Home() {
         id: `board-${Date.now()}`,
         name: 'My First Board',
         images: [],
-        viewSettings: {
-            viewMode: 'moodboard',
-            gridColumns: 3,
-            listShowCover: true,
-            listShowTitle: true,
-            listShowNotes: true,
-            listShowTags: true,
-            listCoverPosition: 'left',
-        },
+        viewSettings: defaultViewSettings,
     };
     setBoards([newBoard]);
     setActiveBoardId(newBoard.id);
@@ -365,15 +365,7 @@ export default function Home() {
       id: `board-${Date.now()}`,
       name: `Board ${boards.length + 1}`,
       images: [],
-      viewSettings: {
-        viewMode: 'moodboard',
-        gridColumns: 3,
-        listShowCover: true,
-        listShowTitle: true,
-        listShowNotes: true,
-        listShowTags: true,
-        listCoverPosition: 'left',
-      },
+      viewSettings: defaultViewSettings,
     };
     setBoards(prev => [...prev, newBoard]);
     setActiveBoardId(newBoard.id);
@@ -526,6 +518,7 @@ export default function Home() {
                       onUpdateImage={handleUpdateImage}
                       isFreedomFullscreen={isFreedomFullscreen}
                       onToggleFullscreen={() => setIsFreedomFullscreen(prev => !prev)}
+                      onUpdateViewSettings={handleUpdateViewSettings}
                     />
                   ) : (
                     <div className="flex flex-col items-center justify-center text-center h-full mt-20 text-muted-foreground">

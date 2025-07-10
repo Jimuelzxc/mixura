@@ -16,9 +16,19 @@ interface ImageGridProps {
   onUpdateImage: (image: ImageItem, showToast?: boolean) => void;
   isFreedomFullscreen?: boolean;
   onToggleFullscreen?: () => void;
+  onUpdateViewSettings?: (settings: Partial<ViewSettings>) => void;
 }
 
-export default function ImageGrid({ images, onImageSelect, onTagClick, viewSettings, onUpdateImage, isFreedomFullscreen = false, onToggleFullscreen = () => {} }: ImageGridProps) {
+export default function ImageGrid({ 
+  images, 
+  onImageSelect, 
+  onTagClick, 
+  viewSettings, 
+  onUpdateImage, 
+  isFreedomFullscreen = false, 
+  onToggleFullscreen = () => {},
+  onUpdateViewSettings = () => {}
+}: ImageGridProps) {
   if (!viewSettings) {
     return null; // Or a loading skeleton
   }
@@ -79,6 +89,8 @@ export default function ImageGrid({ images, onImageSelect, onTagClick, viewSetti
         onUpdateImage={onUpdateImage} 
         isFullscreen={isFreedomFullscreen}
         onToggleFullscreen={onToggleFullscreen}
+        viewSettings={viewSettings}
+        onUpdateViewSettings={onUpdateViewSettings}
       />
     )
   }

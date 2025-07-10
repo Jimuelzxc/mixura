@@ -2,12 +2,13 @@
 "use client"
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import type { ImageItem } from '@/lib/types';
+import type { ImageItem, ViewSettings, BackgroundPattern } from '@/lib/types';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { TransformWrapper, TransformComponent, useControls } from "react-zoom-pan-pinch";
-import { Plus, Minus, RefreshCcw, Expand, Minimize } from 'lucide-react';
+import { Plus, Minus, RefreshCcw, Expand, Minimize, AppWindow } from 'lucide-react';
 import { Button } from './ui/button';
+import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 
 interface FreedomGridProps {
   images: ImageItem[];
@@ -15,6 +16,8 @@ interface FreedomGridProps {
   onUpdateImage: (image: ImageItem, showToast?: boolean) => void;
   isFullscreen: boolean;
   onToggleFullscreen: () => void;
+  viewSettings: ViewSettings;
+  onUpdateViewSettings: (settings: Partial<ViewSettings>) => void;
 }
 
 interface DraggableImageProps {
@@ -53,10 +56,9 @@ const DraggableImage: React.FC<DraggableImageProps> = ({ image, onSelect, onUpda
         const initialHeight = initialWidth / imgAspectRatio;
         setSize({ width: initialWidth, height: initialHeight });
     } else {
-        // If width/height is set, ensure it respects the aspect ratio on first load
         setSize(prevSize => {
             const newHeight = prevSize.width / imgAspectRatio;
-            if (Math.abs(newHeight - prevSize.height) > 1) { // allow for small floating point differences
+            if (Math.abs(newHeight - prevSize.height) > 1) { 
                 return { width: prevSize.width, height: newHeight };
             }
             return prevSize;
@@ -192,31 +194,86 @@ const DraggableImage: React.FC<DraggableImageProps> = ({ image, onSelect, onUpda
       onClick={handleClick}
       onDoubleClick={handleDoubleClick}
     >
-      <Image
-          src={image.url}
-          alt={image.title}
-          fill
-          className="object-contain pointer-events-none"
-          unoptimized
-          onLoad={handleImageLoad}
-      />
-      {isSelected && (
-        <div 
-          className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-primary border-2 border-background cursor-se-resize z-20"
-          onMouseDown={handleResizeMouseDown}
+        <Image
+            src={image.url}
+            alt={image.title}
+            fill
+            className="object-contain pointer-events-none"
+            unoptimized
+            onLoad={handleImageLoad}
         />
-      )}
+        {isSelected && (
+          <div 
+            className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-primary border-2 border-background cursor-se-resize z-20"
+            onMouseDown={handleResizeMouseDown}
+          />
+        )}
     </div>
   );
 };
 
-const Controls = ({ onToggleFullscreen, isFullscreen }: { onToggleFullscreen: () => void, isFullscreen: boolean }) => {
+const PatternSelector = ({
+  currentPattern,
+  onPatternChange,
+}: {
+  currentPattern: BackgroundPattern;
+  onPatternChange: (pattern: BackgroundPattern) => void;
+}) => {
+  const patterns: { name: BackgroundPattern; label: string }[] = [
+    { name: 'none', label: 'None' },
+    { name: 'dots', label: 'Dots' },
+    { name: 'grid', label: 'Grid' },
+    { name: 'lines', label: 'Lines' },
+  ];
+
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button variant="outline" size="icon">
+          <AppWindow />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-40 p-1">
+        <div className="flex flex-col gap-1">
+          {patterns.map((p) => (
+            <Button
+              key={p.name}
+              variant={currentPattern === p.name ? 'secondary' : 'ghost'}
+              size="sm"
+              onClick={() => onPatternChange(p.name)}
+              className="justify-start"
+            >
+              {p.label}
+            </Button>
+          ))}
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+};
+
+
+const Controls = ({ 
+  onToggleFullscreen, 
+  isFullscreen,
+  viewSettings,
+  onUpdateViewSettings,
+}: { 
+  onToggleFullscreen: () => void; 
+  isFullscreen: boolean;
+  viewSettings: ViewSettings;
+  onUpdateViewSettings: (settings: Partial<ViewSettings>) => void;
+}) => {
   const { zoomIn, zoomOut, resetTransform } = useControls();
   return (
     <div className="absolute bottom-4 left-4 z-20 flex items-center gap-2">
       <Button variant="outline" size="icon" onClick={() => zoomIn()}><Plus /></Button>
       <Button variant="outline" size="icon" onClick={() => zoomOut()}><Minus /></Button>
       <Button variant="outline" size="icon" onClick={() => resetTransform()}><RefreshCcw /></Button>
+      <PatternSelector 
+        currentPattern={viewSettings.backgroundPattern || 'dots'}
+        onPatternChange={(pattern) => onUpdateViewSettings({ backgroundPattern: pattern })}
+      />
       <Button variant="outline" size="icon" onClick={onToggleFullscreen}>
         {isFullscreen ? <Minimize /> : <Expand />}
       </Button>
@@ -225,7 +282,15 @@ const Controls = ({ onToggleFullscreen, isFullscreen }: { onToggleFullscreen: ()
 };
 
 
-export default function FreedomGrid({ images, onImageSelect, onUpdateImage, isFullscreen, onToggleFullscreen }: FreedomGridProps) {
+export default function FreedomGrid({ 
+  images, 
+  onImageSelect, 
+  onUpdateImage, 
+  isFullscreen, 
+  onToggleFullscreen,
+  viewSettings,
+  onUpdateViewSettings
+}: FreedomGridProps) {
   const [currentScale, setCurrentScale] = useState(1);
   const [selectedImageId, setSelectedImageId] = useState<string | null>(null);
 
@@ -233,8 +298,15 @@ export default function FreedomGrid({ images, onImageSelect, onUpdateImage, isFu
     setSelectedImageId(null);
   }
 
+  const backgroundClass = {
+    'dots': 'bg-dots',
+    'grid': 'bg-grid',
+    'lines': 'bg-lines',
+    'none': '',
+  }[viewSettings.backgroundPattern || 'dots'];
+
   return (
-    <div className={cn("relative w-full border rounded-md bg-card/50 overflow-hidden touch-none flex-grow", isFullscreen && "h-full")}>
+    <div className={cn("relative w-full border rounded-md bg-card/50 overflow-hidden touch-none flex-grow", isFullscreen && "h-full", backgroundClass)}>
        <TransformWrapper
         minScale={0.1}
         maxScale={8}
@@ -249,7 +321,12 @@ export default function FreedomGrid({ images, onImageSelect, onUpdateImage, isFu
             disabled: true,
         }}
        >
-        <Controls onToggleFullscreen={onToggleFullscreen} isFullscreen={isFullscreen} />
+        <Controls 
+          onToggleFullscreen={onToggleFullscreen} 
+          isFullscreen={isFullscreen} 
+          viewSettings={viewSettings}
+          onUpdateViewSettings={onUpdateViewSettings}
+        />
         <TransformComponent
             wrapperClass="!w-full !h-full"
             contentClass="relative"

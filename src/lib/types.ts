@@ -1,4 +1,6 @@
 
+export type BackgroundPattern = 'none' | 'dots' | 'grid' | 'lines';
+
 export interface ImageItem {
   id:string;
   url: string;
@@ -22,6 +24,7 @@ export interface ViewSettings {
   listShowNotes: boolean;
   listShowTags: boolean;
   listCoverPosition: 'left' | 'right';
+  backgroundPattern?: BackgroundPattern;
 }
 
 export interface Board {
