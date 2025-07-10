@@ -1,3 +1,4 @@
+
 "use client";
 
 import type { Board } from '@/lib/types';
@@ -18,7 +19,7 @@ import {
   DropdownMenuRadioItem,
 } from "@/components/ui/dropdown-menu"
 import { Button } from './ui/button';
-import { Menu, Plus, Upload, Download, Trash2, Check, CopyPlus, Trash } from 'lucide-react';
+import { Menu, Plus, Upload, Download, Trash2, Check, CopyPlus, Trash, LayoutGrid } from 'lucide-react';
 
 
 interface AppHeaderProps {
@@ -31,6 +32,7 @@ interface AppHeaderProps {
   onNewBoard: () => void;
   onSwitchBoard: (boardId: string) => void;
   onDeleteBoard: () => void;
+  isAllBoardsView: boolean;
 }
 
 export default function AppHeader({ 
@@ -43,6 +45,7 @@ export default function AppHeader({
   onNewBoard,
   onSwitchBoard,
   onDeleteBoard,
+  isAllBoardsView
 }: AppHeaderProps) {
   return (
     <header className="sticky top-0 z-10 w-full bg-background/80 backdrop-blur-sm">
@@ -61,7 +64,7 @@ export default function AppHeader({
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
                <DropdownMenuLabel>File</DropdownMenuLabel>
-              <DropdownMenuItem onClick={onAddImageClick}>
+              <DropdownMenuItem onClick={onAddImageClick} disabled={isAllBoardsView}>
                 <Plus className="mr-2" />
                 <span>New Image</span>
                 <DropdownMenuShortcut>⌘N</DropdownMenuShortcut>
@@ -73,6 +76,11 @@ export default function AppHeader({
                 <DropdownMenuSubTrigger>Switch Board</DropdownMenuSubTrigger>
                 <DropdownMenuSubContent>
                   <DropdownMenuRadioGroup value={activeBoardId || ''} onValueChange={onSwitchBoard}>
+                    <DropdownMenuRadioItem value="all">
+                      <LayoutGrid className="mr-2 h-4 w-4" />
+                      All Boards
+                    </DropdownMenuRadioItem>
+                    <DropdownMenuSeparator />
                     {boards.map(board => (
                       <DropdownMenuRadioItem key={board.id} value={board.id}>
                         {board.name}
@@ -86,7 +94,7 @@ export default function AppHeader({
                 <CopyPlus className="mr-2" />
                 <span>New Board</span>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={onDeleteBoard} className="text-destructive focus:text-destructive focus:bg-destructive/10">
+              <DropdownMenuItem onClick={onDeleteBoard} className="text-destructive focus:text-destructive focus:bg-destructive/10" disabled={isAllBoardsView}>
                 <Trash className="mr-2" />
                 <span>Delete Current Board...</span>
               </DropdownMenuItem>

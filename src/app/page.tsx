@@ -8,7 +8,7 @@ import ImageGrid from '@/components/image-grid';
 import ImageDetailDialog from '@/components/image-detail-dialog';
 import FilterToolbar from '@/components/filter-toolbar';
 import { useToast } from '@/hooks/use-toast';
-import { ImagePlus, AlertTriangle, Edit, Check, X } from 'lucide-react';
+import { ImagePlus, AlertTriangle, Edit, Check, X, LayoutGrid } from 'lucide-react';
 import AddLinkDialog from '@/components/add-link-dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
@@ -39,9 +39,24 @@ export default function Home() {
   const activeBoard = useMemo(() => {
     return boards.find(b => b.id === activeBoardId) || null;
   }, [boards, activeBoardId]);
+  
+  const isAllBoardsView = activeBoardId === 'all';
 
-  const images = useMemo(() => activeBoard?.images || [], [activeBoard]);
-  const viewSettings = useMemo(() => activeBoard?.viewSettings, [activeBoard]);
+  const images = useMemo(() => {
+    if (isAllBoardsView) {
+      return boards.flatMap(b => b.images);
+    }
+    return activeBoard?.images || [];
+  }, [activeBoard, boards, isAllBoardsView]);
+  
+  const viewSettings = useMemo(() => {
+    // In "All Boards" view, use the settings from the first board as a default
+    // This could be made more sophisticated later if needed
+    if (isAllBoardsView) {
+      return boards[0]?.viewSettings;
+    }
+    return activeBoard?.viewSettings;
+  }, [activeBoard, boards, isAllBoardsView]);
 
   // Load data from localStorage on initial render
   useEffect(() => {
@@ -160,15 +175,27 @@ export default function Home() {
   }, [images]);
 
   const updateActiveBoard = (updater: (board: Board) => Board) => {
-    if (!activeBoardId) return;
+    if (!activeBoardId || isAllBoardsView) return;
     setBoards(currentBoards => 
       currentBoards.map(board => 
         board.id === activeBoardId ? updater(board) : board
       )
     );
   };
+  
+  const updateBoards = (updater: (board: Board[]) => Board[]) => {
+    setBoards(updater);
+  };
 
   const handleAddImage = (newImage: Omit<ImageItem, 'id'>) => {
+    if (isAllBoardsView) {
+      toast({
+        title: "Cannot Add Image",
+        description: "Please select a specific board to add an image.",
+        variant: 'destructive',
+      });
+      return;
+    }
     const fullImage: ImageItem = {
       ...newImage,
       id: `img-${Date.now()}`,
@@ -185,10 +212,13 @@ export default function Home() {
   };
 
   const handleDeleteImage = (imageId: string) => {
-    updateActiveBoard(board => ({
-      ...board,
-      images: board.images.filter(img => img.id !== imageId)
-    }));
+    // This will delete the image from whichever board it belongs to
+    updateBoards(currentBoards => 
+        currentBoards.map(board => ({
+            ...board,
+            images: board.images.filter(img => img.id !== imageId)
+        }))
+    );
     setSelectedImage(null);
     toast({
       title: "Image deleted",
@@ -198,10 +228,13 @@ export default function Home() {
   };
 
   const handleUpdateImage = (updatedImage: ImageItem) => {
-    updateActiveBoard(board => ({
-      ...board,
-      images: board.images.map(img => (img.id === updatedImage.id ? updatedImage : img))
-    }));
+    // This will update the image on whichever board it belongs to
+    updateBoards(currentBoards => 
+      currentBoards.map(board => ({
+        ...board,
+        images: board.images.map(img => (img.id === updatedImage.id ? updatedImage : img))
+      }))
+    );
     setSelectedImage(updatedImage);
      toast({
       title: "Image updated!",
@@ -229,20 +262,29 @@ export default function Home() {
   };
 
   const handleUpdateViewSettings = (newSettings: Partial<ViewSettings>) => {
-    updateActiveBoard(board => ({
-      ...board,
-      viewSettings: { ...board.viewSettings, ...newSettings }
-    }));
+    if (isAllBoardsView) {
+        // Apply view settings to all boards
+        updateBoards(boards => boards.map(b => ({
+            ...b,
+            viewSettings: { ...b.viewSettings, ...newSettings }
+        })));
+    } else {
+        updateActiveBoard(board => ({
+            ...board,
+            viewSettings: { ...board.viewSettings, ...newSettings }
+        }));
+    }
   };
 
   const handleExport = () => {
-    if (!activeBoard) return;
+    const boardToExport = isAllBoardsView ? { name: 'All_Boards' } : activeBoard;
+    if (!boardToExport) return;
     const dataStr = JSON.stringify({ boards, activeBoardId }, null, 2);
     const dataBlob = new Blob([dataStr], { type: 'application/json' });
     const url = URL.createObjectURL(dataBlob);
     const link = document.createElement('a');
     link.href = url;
-    const safeBoardName = activeBoard.name.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+    const safeBoardName = boardToExport.name.replace(/[^a-z0-9]/gi, '_').toLowerCase();
     link.download = `${safeBoardName}-backup-${new Date().toISOString().split('T')[0]}.json`;
     document.body.appendChild(link);
     link.click();
@@ -325,20 +367,30 @@ export default function Home() {
   
   const handleSwitchBoard = (boardId: string) => {
     setActiveBoardId(boardId);
-    const board = boards.find(b => b.id === boardId);
-    if (board) {
-      toast({ title: 'Switched Board', description: `Now viewing "${board.name}".`});
+    if (boardId === 'all') {
+      toast({ title: 'Switched View', description: `Now viewing "All Boards".`});
+    } else {
+      const board = boards.find(b => b.id === boardId);
+      if (board) {
+        toast({ title: 'Switched Board', description: `Now viewing "${board.name}".`});
+      }
     }
   };
 
   const handleDeleteBoard = () => {
+    if (isAllBoardsView) {
+        toast({ title: 'Cannot Delete', description: 'Switch to a specific board to delete it.', variant: 'destructive' });
+        setDeleteBoardAlertOpen(false);
+        return;
+    }
     if (boards.length <= 1) {
         toast({ title: 'Cannot Delete', description: 'You cannot delete the last board.', variant: 'destructive' });
         setDeleteBoardAlertOpen(false);
         return;
     }
     setBoards(prev => prev.filter(b => b.id !== activeBoardId));
-    const newActiveBoardId = boards.find(b => b.id !== activeBoardId)?.id || null;
+    // Switch to 'All Boards' view after deleting one
+    const newActiveBoardId = 'all';
     setActiveBoardId(newActiveBoardId);
     setDeleteBoardAlertOpen(false);
     toast({ title: 'Board Deleted', variant: 'destructive'});
@@ -398,10 +450,18 @@ export default function Home() {
         onNewBoard={handleNewBoard}
         onSwitchBoard={handleSwitchBoard}
         onDeleteBoard={() => setDeleteBoardAlertOpen(true)}
+        isAllBoardsView={isAllBoardsView}
       />
       <main className="flex-grow">
         <div className="container mx-auto px-4 md:px-6 py-8">
-            {activeBoard && (
+            {isAllBoardsView ? (
+                <div className="mb-8">
+                    <div className="flex items-center gap-4">
+                        <LayoutGrid className="w-10 h-10 text-muted-foreground" />
+                        <h1 className="text-4xl font-bold tracking-tighter">All Boards</h1>
+                    </div>
+                </div>
+            ) : activeBoard && (
                 <div className="mb-8">
                     {isEditingBoardName ? (
                         <div className="space-y-4 max-w-xl">
@@ -446,13 +506,14 @@ export default function Home() {
                 itemCount={filteredImages.length}
                 viewSettings={viewSettings}
                 onViewSettingsChange={handleUpdateViewSettings}
+                isAddDisabled={isAllBoardsView}
             />
             {isDataLoaded && (
               images.length === 0 && !searchTerm ? (
                 <div className="flex flex-col items-center justify-center text-center h-full mt-20 text-muted-foreground">
                   <ImagePlus size={64} className="mb-4 text-muted-foreground/50" />
-                  <h2 className="text-2xl font-semibold">Your board is empty</h2>
-                  <p className="mt-2">Click "Add Image" to save your first inspiration.</p>
+                  <h2 className="text-2xl font-semibold">{isAllBoardsView ? "No images on any board" : "Your board is empty"}</h2>
+                  <p className="mt-2">{isAllBoardsView ? "Add an image to one of your boards to see it here." : "Click \"Add Image\" to save your first inspiration."}</p>
                 </div>
               ) : filteredImages.length > 0 ? (
                 <ImageGrid 
@@ -523,14 +584,17 @@ export default function Home() {
               <div className="flex-grow">
                 <AlertDialogTitle>Delete this board?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  Are you sure you want to delete the board "{activeBoard?.name}"? This action cannot be undone.
+                  {isAllBoardsView 
+                    ? "You cannot delete from this view. Please switch to a specific board to delete it."
+                    : `Are you sure you want to delete the board "${activeBoard?.name}"? This action cannot be undone.`
+                  }
                 </AlertDialogDescription>
               </div>
             </div>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteBoard}>Yes, delete board</AlertDialogAction>
+            <AlertDialogAction onClick={handleDeleteBoard} disabled={isAllBoardsView}>Yes, delete board</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

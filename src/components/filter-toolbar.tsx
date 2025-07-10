@@ -15,6 +15,12 @@ import { Separator } from './ui/separator';
 import { Badge } from './ui/badge';
 import { Input } from '@/components/ui/input';
 import { cn, basicColorMap } from '@/lib/utils';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 
 interface FilterToolbarProps {
   allTags: string[];
@@ -30,6 +36,7 @@ interface FilterToolbarProps {
   onSearchChange: (term: string) => void;
   onAddImageClick: () => void;
   itemCount: number;
+  isAddDisabled?: boolean;
 }
 
 export default function FilterToolbar({
@@ -46,6 +53,7 @@ export default function FilterToolbar({
   onSearchChange,
   onAddImageClick,
   itemCount,
+  isAddDisabled = false,
 }: FilterToolbarProps) {
   const activeFilterCount = selectedTags.length + selectedColors.length;
 
@@ -57,6 +65,13 @@ export default function FilterToolbar({
   if (!viewSettings) {
     return null; // or a loading state
   }
+
+  const AddButton = (
+    <Button variant="default" onClick={onAddImageClick} disabled={isAddDisabled}>
+        <ImagePlus className="mr-2 h-5 w-5" />
+        Add Image
+    </Button>
+  );
 
   return (
     <div className="mb-6 flex flex-col gap-4">
@@ -73,10 +88,20 @@ export default function FilterToolbar({
               onChange={(e) => onSearchChange(e.target.value)}
             />
           </div>
-          <Button variant="default" onClick={onAddImageClick}>
-            <ImagePlus className="mr-2 h-5 w-5" />
-            Add Image
-          </Button>
+          {isAddDisabled ? (
+             <TooltipProvider>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <span>{AddButton}</span>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        <p>Select a specific board to add an image.</p>
+                    </TooltipContent>
+                </Tooltip>
+            </TooltipProvider>
+          ) : (
+            AddButton
+          )}
         </div>
       </div>
 
