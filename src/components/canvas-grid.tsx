@@ -326,15 +326,17 @@ const Controls = ({
         <Button variant="outline" size="icon" onClick={() => zoomIn()}><Plus /></Button>
         <Button variant="outline" size="icon" onClick={() => zoomOut()}><Minus /></Button>
         <Button variant="outline" size="icon" onClick={() => resetTransform()}><RefreshCcw /></Button>
-        <PatternSelector 
-          currentPattern={viewSettings.backgroundPattern || 'dots'}
-          onPatternChange={(pattern) => onUpdateViewSettings({ backgroundPattern: pattern })}
-        />
       </div>
        <div className="absolute top-4 right-4 z-20">
         <Button variant="outline" size="icon" onClick={onToggleFullscreen}>
           {isFullscreen ? <Minimize /> : <Expand />}
         </Button>
+      </div>
+      <div className="absolute bottom-4 right-4 z-20">
+        <PatternSelector 
+          currentPattern={viewSettings.backgroundPattern || 'none'}
+          onPatternChange={(pattern) => onUpdateViewSettings({ backgroundPattern: pattern })}
+        />
       </div>
     </>
   );
@@ -362,7 +364,7 @@ export default function CanvasGrid({
     'grid': 'bg-grid',
     'lines': 'bg-lines',
     'none': '',
-  }[viewSettings.backgroundPattern || 'dots'];
+  }[viewSettings.backgroundPattern || 'none'];
 
   return (
     <div className={cn("relative w-full border rounded-md bg-card/50 overflow-hidden touch-none flex-grow", isFullscreen && "h-full")}>

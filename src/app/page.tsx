@@ -26,7 +26,7 @@ const defaultViewSettings: ViewSettings = {
   listShowNotes: true,
   listShowTags: true,
   listCoverPosition: 'left',
-  backgroundPattern: 'dots',
+  backgroundPattern: 'none',
 };
 
 
