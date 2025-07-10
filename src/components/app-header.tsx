@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Button } from './ui/button';
 import { Menu, Plus, Upload, Download, Trash2, CopyPlus, Trash, LayoutGrid, ChevronsUpDown, Pencil } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 
 interface AppHeaderProps {
@@ -63,23 +64,36 @@ export default function AppHeader({
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-[200px]" align="end">
-                <DropdownMenuItem onSelect={() => onSwitchBoard('all')} className="justify-between">
+                <DropdownMenuItem 
+                  onSelect={() => onSwitchBoard('all')} 
+                  className={cn("justify-between", activeBoardId === 'all' && "bg-primary text-primary-foreground focus:bg-primary focus:text-primary-foreground")}
+                >
                     <div className="flex items-center">
                       <LayoutGrid className="mr-2 h-4 w-4" />
                       <span>All Boards</span>
                     </div>
-                    {activeBoardId === 'all' && <div className="w-2 h-2 rounded-full bg-primary" />}
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuLabel>Your Boards</DropdownMenuLabel>
                 {boards.map(board => (
-                  <DropdownMenuItem key={board.id} onSelect={() => onSwitchBoard(board.id)} className="group justify-between">
+                  <DropdownMenuItem 
+                    key={board.id} 
+                    onSelect={() => onSwitchBoard(board.id)} 
+                    className={cn(
+                      "group justify-between",
+                       activeBoardId === board.id && "bg-primary text-primary-foreground focus:bg-primary focus:text-primary-foreground"
+                    )}
+                  >
                     <span className="truncate pr-2">{board.name}</span>
-                    <div className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className={cn(
+                        "flex items-center opacity-0 group-hover:opacity-100 transition-opacity",
+                        activeBoardId === board.id && "opacity-100"
+                      )}
+                    >
                         <Button 
                             variant="ghost" 
                             size="icon" 
-                            className="h-6 w-6" 
+                            className="h-6 w-6 hover:bg-primary-foreground/20" 
                             onClick={(e) => { e.stopPropagation(); onRenameBoard(board.id); }}
                         >
                             <Pencil className="h-3 w-3" />
@@ -87,13 +101,12 @@ export default function AppHeader({
                         <Button 
                             variant="ghost" 
                             size="icon" 
-                            className="h-6 w-6 hover:bg-destructive/10 text-destructive" 
+                            className="h-6 w-6 hover:bg-destructive/10 text-destructive data-[active=true]:hover:text-destructive-foreground"
                             onClick={(e) => { e.stopPropagation(); onDeleteBoard(board.id); }}
                         >
                             <Trash className="h-3 w-3" />
                         </Button>
                     </div>
-                    {activeBoardId === board.id && <div className="w-2 h-2 rounded-full bg-primary opacity-100 group-hover:opacity-0" />}
                   </DropdownMenuItem>
                 ))}
                 <DropdownMenuSeparator />
