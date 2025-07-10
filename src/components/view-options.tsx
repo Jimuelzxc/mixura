@@ -50,13 +50,13 @@ export function ViewOptions({ settings, onChange }: ViewOptionsProps) {
           <RadioGroup
             value={settings.viewMode}
             onValueChange={(value: string) => onChange({ viewMode: value as ViewMode })}
-            className="grid grid-cols-2 gap-2"
+            className="flex items-center gap-2"
           >
             {viewOptions.map((option) => (
                 <Label
                     key={option.value}
                     htmlFor={`view-${option.value}`}
-                    className={`flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground ${settings.viewMode === option.value ? 'border-primary' : ''}`}
+                    className={`flex flex-1 flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground ${settings.viewMode === option.value ? 'border-primary' : ''}`}
                 >
                     <RadioGroupItem value={option.value} id={`view-${option.value}`} className="sr-only" />
                     <option.icon className="mb-3 h-6 w-6" />
