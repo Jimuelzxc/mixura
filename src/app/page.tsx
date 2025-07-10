@@ -9,7 +9,7 @@ import ImageGrid from '@/components/image-grid';
 import ImageDetailDialog from '@/components/image-detail-dialog';
 import FilterToolbar from '@/components/filter-toolbar';
 import { useToast } from '@/hooks/use-toast';
-import { ImagePlus, AlertTriangle, Edit, Check, X, LayoutGrid, Pencil } from 'lucide-react';
+import { ImagePlus, AlertTriangle, Edit, Check, X, LayoutGrid, Pencil, UploadCloud } from 'lucide-react';
 import AddLinkDialog from '@/components/add-link-dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
@@ -36,6 +36,7 @@ export default function Home() {
   const [isDataLoaded, setIsDataLoaded] = useState(false);
   
   const [isAddLinkDialogOpen, setAddLinkDialogOpen] = useState(false);
+  const [addLinkInitialUrl, setAddLinkInitialUrl] = useState<string | undefined>(undefined);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedImage, setSelectedImage] = useState<ImageItem | null>(null);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
@@ -53,6 +54,8 @@ export default function Home() {
   const importInputRef = useRef<HTMLInputElement>(null);
   const boardNameInputRef = useRef<HTMLInputElement>(null);
 
+  const [isDragging, setIsDragging] = useState(false);
+
   const activeBoard = useMemo(() => {
     return boards.find(b => b.id === activeBoardId) || null;
   }, [boards, activeBoardId]);
@@ -68,20 +71,17 @@ export default function Home() {
   
   const viewSettings = useMemo(() => {
     if (isAllBoardsView) {
-      // Find the first board to use its settings as a default for "All Boards" view
       return boards[0]?.viewSettings;
     }
     return activeBoard?.viewSettings;
   }, [activeBoard, boards, isAllBoardsView]);
 
-  // Load data from localStorage on initial render
   useEffect(() => {
     try {
       const storedData = window.localStorage.getItem(LOCALSTORAGE_KEY);
       if (storedData) {
         const data = JSON.parse(storedData);
         if (data.boards && data.activeBoardId) {
-          // ensure all boards have viewsettings
           const sanitizedBoards = data.boards.map((board: Board) => ({
             ...board,
             viewSettings: {
@@ -92,7 +92,6 @@ export default function Home() {
           setBoards(sanitizedBoards);
           setActiveBoardId(data.activeBoardId);
         } else {
-          // Migration for old data structure
           const oldImages = window.localStorage.getItem('tarsus-images');
           const oldSettings = window.localStorage.getItem('tarsus-view-settings');
           
@@ -109,7 +108,6 @@ export default function Home() {
           setActiveBoardId(defaultBoard.id);
         }
       } else {
-        // Create a new default board if no data exists
         const newBoard: Board = {
           id: `board-${Date.now()}`,
           name: 'My First Board',
@@ -131,7 +129,6 @@ export default function Home() {
     }
   }, [toast]);
 
-  // Save data to localStorage whenever it changes
   useEffect(() => {
     if (isDataLoaded) {
       try {
@@ -149,17 +146,16 @@ export default function Home() {
   }, [boards, activeBoardId, isDataLoaded, toast]);
   
   useEffect(() => {
-    // This effect is for editing the *active* board's name inline on the page
     if (editingBoardId && boardNameInputRef.current) {
         boardNameInputRef.current.select();
     }
   }, [editingBoardId]);
 
-  // Keyboard shortcut for adding a new image
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if ((event.metaKey || event.ctrlKey) && event.key === 'n') {
         event.preventDefault();
+        setAddLinkInitialUrl(undefined);
         setAddLinkDialogOpen(true);
       }
       if (event.key === 'Escape' && isCanvasFullscreen) {
@@ -399,7 +395,6 @@ export default function Home() {
     const boardToDelete = boards.find(b => b.id === deletingBoardId);
     setBoards(prev => prev.filter(b => b.id !== deletingBoardId));
 
-    // If the deleted board was the active one, switch to 'All Boards' view
     if (activeBoardId === deletingBoardId) {
         setActiveBoardId('all');
     }
@@ -453,11 +448,78 @@ export default function Home() {
   
   const isCanvasViewActive = viewSettings?.viewMode === 'canvas';
 
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragging(false);
+
+    if (isAllBoardsView) {
+      toast({ title: "Cannot Add Image", description: "Please select a specific board before dropping an image.", variant: "destructive" });
+      return;
+    }
+
+    const html = e.dataTransfer.getData('text/html');
+    if (html) {
+      const doc = new DOMParser().parseFromString(html, 'text/html');
+      const img = doc.querySelector('img');
+      if (img && img.src) {
+        setAddLinkInitialUrl(img.src);
+        setAddLinkDialogOpen(true);
+        return;
+      }
+    }
+    
+    const uri = e.dataTransfer.getData('text/uri-list');
+    if (uri) {
+      setAddLinkInitialUrl(uri);
+      setAddLinkDialogOpen(true);
+      return;
+    }
+
+    const text = e.dataTransfer.getData('text/plain');
+    if (text && (text.startsWith('http://') || text.startsWith('https://'))) {
+      setAddLinkInitialUrl(text);
+      setAddLinkDialogOpen(true);
+      return;
+    }
+
+    toast({
+      title: 'Could not add image',
+      description: 'The dragged item does not contain a valid image URL.',
+      variant: 'destructive',
+    });
+  };
+
+  const handleOpenAddDialog = () => {
+    setAddLinkInitialUrl(undefined);
+    setAddLinkDialogOpen(true);
+  }
+
   return (
-    <div className={cn("flex flex-col h-screen bg-background", isCanvasFullscreen && "overflow-hidden")}>
+    <div 
+      className={cn("flex flex-col h-screen bg-background relative", isCanvasFullscreen && "overflow-hidden")}
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+    >
+      {isDragging && !isAllBoardsView && (
+        <div className="absolute inset-0 bg-primary/20 z-50 flex flex-col items-center justify-center pointer-events-none border-4 border-dashed border-primary">
+          <UploadCloud className="w-24 h-24 text-primary" />
+          <p className="mt-4 text-2xl font-bold text-primary">Drop image to add</p>
+        </div>
+      )}
       <div className={cn(isCanvasFullscreen && "hidden")}>
         <AppHeader
-          onAddImageClick={() => setAddLinkDialogOpen(true)}
+          onAddImageClick={handleOpenAddDialog}
           onImportClick={handleImportClick}
           onExportClick={handleExport}
           onDeleteAllClick={() => setDeleteAllAlertOpen(true)}
@@ -487,7 +549,7 @@ export default function Home() {
               <FilterToolbar
                   searchTerm={searchTerm}
                   onSearchChange={setSearchTerm}
-                  onAddImageClick={() => setAddLinkDialogOpen(true)}
+                  onAddImageClick={handleOpenAddDialog}
                   allTags={allTags}
                   selectedTags={selectedTags}
                   onTagSelect={handleTagSelect}
@@ -538,6 +600,7 @@ export default function Home() {
         onOpenChange={setAddLinkDialogOpen}
         onAddImage={handleAddImage}
         allTags={allTags}
+        initialUrl={addLinkInitialUrl}
       />
       
       {selectedImage && (
@@ -551,7 +614,6 @@ export default function Home() {
         />
       )}
 
-      {/* Rename Board Dialog */}
        <AlertDialog open={!!editingBoardId} onOpenChange={(open) => !open && handleCancelEditingBoardName()}>
         <AlertDialogContent>
           <AlertDialogHeader>

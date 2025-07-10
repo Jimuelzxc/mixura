@@ -52,9 +52,10 @@ interface AddLinkDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   children?: React.ReactNode;
+  initialUrl?: string;
 }
 
-export default function AddLinkDialog({ onAddImage, allTags, isOpen, onOpenChange, children }: AddLinkDialogProps) {
+export default function AddLinkDialog({ onAddImage, allTags, isOpen, onOpenChange, children, initialUrl }: AddLinkDialogProps) {
   const [tagInput, setTagInput] = useState('');
   const [isSuggestionsOpen, setSuggestionsOpen] = useState(false);
   const [isPreviewLarge, setIsPreviewLarge] = useState(false);
@@ -64,7 +65,7 @@ export default function AddLinkDialog({ onAddImage, allTags, isOpen, onOpenChang
   const form = useForm<ImageFormValues>({
     resolver: zodResolver(imageSchema),
     defaultValues: {
-      url: '',
+      url: initialUrl || '',
       title: '',
       notes: '',
       tags: [],
@@ -75,7 +76,7 @@ export default function AddLinkDialog({ onAddImage, allTags, isOpen, onOpenChang
   useEffect(() => {
     if (isOpen) {
       form.reset({
-        url: '',
+        url: initialUrl || '',
         title: '',
         notes: '',
         tags: [],
@@ -86,7 +87,7 @@ export default function AddLinkDialog({ onAddImage, allTags, isOpen, onOpenChang
     } else {
       setSuggestionsOpen(false);
     }
-  }, [isOpen, form]);
+  }, [isOpen, form, initialUrl]);
 
   const suggestedTags = useMemo(() => {
     if (!tagInput) return [];
