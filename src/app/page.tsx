@@ -381,10 +381,6 @@ export default function Home() {
   };
 
   const handleOpenDeleteBoardDialog = (boardId: string) => {
-    if (isAllBoardsView) {
-        toast({ title: 'Cannot Delete', description: 'Switch to a specific board to delete it.', variant: 'destructive' });
-        return;
-    }
     setDeletingBoardId(boardId);
   };
   
@@ -642,6 +638,8 @@ export default function Home() {
     </div>
   );
 }
+
+    
 
     
 
