@@ -67,13 +67,6 @@ export default function ImageCard({ image, onSelect, onTagClick, viewMode }: Ima
                             ))}
                         </div>
                     )}
-                    {image.colors && image.colors.length > 0 && (
-                        <div className="flex flex-wrap items-center gap-2">
-                            {image.colors.map((color) => (
-                                <div key={color} className="w-3 h-3 border border-white/50" style={{ backgroundColor: basicColorMap[color] || '#000000' }} title={color} />
-                            ))}
-                        </div>
-                    )}
                 </div>
             </div>
         </div>
