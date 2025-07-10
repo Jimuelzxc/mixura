@@ -142,16 +142,21 @@ const DraggableImage: React.FC<DraggableImageProps> = ({ image, onSelect, onUpda
     <div
       ref={dragRef}
       className={cn(
-        "absolute cursor-grab transition-shadow duration-200",
-        isDragging ? 'shadow-2xl z-10 !cursor-grabbing' : 'shadow-md hover:shadow-lg',
-        isSelected && !isDragging && 'ring-2 ring-primary ring-offset-2 z-10'
+        "absolute cursor-grab",
+        isDragging && 'z-10 !cursor-grabbing'
       )}
       style={{ left: position.x, top: position.y, width: size.width, height: size.height }}
       onMouseDown={handleMouseDown}
       onClick={handleClick}
       onDoubleClick={handleDoubleClick}
     >
-      <div className="w-full h-full relative overflow-hidden rounded-md bg-transparent">
+      <div 
+        className={cn(
+          "w-full h-full relative transition-shadow duration-200",
+          isDragging ? 'shadow-2xl' : 'shadow-md hover:shadow-lg',
+          isSelected && !isDragging && 'ring-2 ring-primary ring-offset-background ring-offset-2 z-10'
+        )}
+      >
         <Image
             src={image.url}
             alt={image.title}
@@ -161,12 +166,10 @@ const DraggableImage: React.FC<DraggableImageProps> = ({ image, onSelect, onUpda
             unoptimized
         />
         {isSelected && (
-          <>
-            <div 
-              className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-primary border-2 border-background cursor-se-resize"
-              onMouseDown={handleResizeMouseDown}
-            />
-          </>
+          <div 
+            className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-primary border-2 border-background cursor-se-resize z-20"
+            onMouseDown={handleResizeMouseDown}
+          />
         )}
       </div>
     </div>
