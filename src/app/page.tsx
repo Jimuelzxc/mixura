@@ -468,7 +468,7 @@ export default function Home() {
         <div className="container mx-auto px-4 md:px-6 py-8">
             {isAllBoardsView ? (
                 <div className="mb-8">
-                    <h1 className="text-4xl font-bold tracking-tighter">All Boards</h1>
+                    <h1 className="text-[5rem] font-bold tracking-tighter leading-none">All Boards</h1>
                 </div>
             ) : activeBoard && (
                 <div className="mb-8">
@@ -482,7 +482,7 @@ export default function Home() {
                                     if (e.key === 'Enter') handleSaveBoardName();
                                     if (e.key === 'Escape') handleCancelEditingBoardName();
                                 }}
-                                className="text-4xl font-bold tracking-tighter h-auto"
+                                className="text-[5rem] font-bold tracking-tighter h-auto leading-none"
                                 placeholder="Board name..."
                             />
                             <div className="flex items-center gap-2">
@@ -492,7 +492,7 @@ export default function Home() {
                         </div>
                     ) : (
                          <div className="flex items-center gap-4">
-                            <h1 className="text-4xl font-bold tracking-tighter">{activeBoard.name}</h1>
+                            <h1 className="text-[5rem] font-bold tracking-tighter leading-none">{activeBoard.name}</h1>
                             <Button size="sm" variant="outline" onClick={() => handleStartEditingBoardName(activeBoard.id)}>
                                 Edit Name
                             </Button>
