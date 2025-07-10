@@ -4,7 +4,7 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { PlusCircle, X, Sparkles, Loader2 } from 'lucide-react';
+import { PlusCircle, X, Sparkles, Loader2, ImagePlus } from 'lucide-react';
 import Image from 'next/image';
 import { useEffect, useState, useMemo } from 'react';
 
@@ -49,10 +49,12 @@ type ImageFormValues = z.infer<typeof imageSchema>;
 interface AddLinkDialogProps {
   onAddImage: (image: Omit<ImageItem, 'id'>) => void;
   allTags: string[];
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
+  children?: React.ReactNode;
 }
 
-export default function AddLinkDialog({ onAddImage, allTags }: AddLinkDialogProps) {
-  const [isOpen, setIsOpen] = useState(false);
+export default function AddLinkDialog({ onAddImage, allTags, isOpen, onOpenChange, children }: AddLinkDialogProps) {
   const [tagInput, setTagInput] = useState('');
   const [isSuggestionsOpen, setSuggestionsOpen] = useState(false);
   const [isPreviewLarge, setIsPreviewLarge] = useState(false);
@@ -109,7 +111,7 @@ export default function AddLinkDialog({ onAddImage, allTags }: AddLinkDialogProp
 
     onAddImage(imagePartial);
 
-    setIsOpen(false);
+    onOpenChange(false);
   };
 
   const handleAddTag = (tag: string, field: any) => {
@@ -187,15 +189,10 @@ export default function AddLinkDialog({ onAddImage, allTags }: AddLinkDialogProp
   return (
     <>
       <Dialog open={isOpen} onOpenChange={(open) => {
-        setIsOpen(open)
+        onOpenChange(open)
         if (!open) setIsPreviewLarge(false);
       }}>
-        <DialogTrigger asChild>
-          <Button variant="default">
-            <PlusCircle className="mr-2 h-5 w-5" />
-            Add Image
-          </Button>
-        </DialogTrigger>
+        {children && <DialogTrigger asChild>{children}</DialogTrigger>}
         <DialogContent className="sm:max-w-[425px] flex flex-col max-h-[90vh] p-0">
           <DialogHeader className="p-6 pb-4 flex-shrink-0">
             <DialogTitle>Add a new image</DialogTitle>

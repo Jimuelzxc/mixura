@@ -33,7 +33,7 @@ export default function ImageCard({ image, onSelect, onTagClick, viewMode }: Ima
                 alt=""
                 fill
                 aria-hidden
-                className="object-cover blur-xl opacity-50"
+                className="object-cover blur-[1000px] opacity-50"
                 data-ai-hint="abstract texture"
             />
         </div>

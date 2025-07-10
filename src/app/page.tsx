@@ -8,10 +8,12 @@ import ImageDetailDialog from '@/components/image-detail-dialog';
 import FilterToolbar from '@/components/filter-toolbar';
 import { useToast } from '@/hooks/use-toast';
 import { ImagePlus } from 'lucide-react';
+import AddLinkDialog from '@/components/add-link-dialog';
 
 export default function Home() {
   const [images, setImages] = useState<ImageItem[]>([]);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
+  const [isAddLinkDialogOpen, setAddLinkDialogOpen] = useState(false);
   
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedImage, setSelectedImage] = useState<ImageItem | null>(null);
@@ -171,13 +173,13 @@ export default function Home() {
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
-      <AppHeader />
+      <AppHeader onAddImageClick={() => setAddLinkDialogOpen(true)} />
       <main className="flex-grow">
         <div className="container mx-auto px-4 md:px-6 py-8">
             <FilterToolbar
                 searchTerm={searchTerm}
                 onSearchChange={setSearchTerm}
-                onAddImage={handleAddImage}
+                onAddImageClick={() => setAddLinkDialogOpen(true)}
                 allTags={allTags}
                 selectedTags={selectedTags}
                 onTagSelect={handleTagSelect}
@@ -212,6 +214,14 @@ export default function Home() {
             )}
         </div>
       </main>
+
+      <AddLinkDialog
+        isOpen={isAddLinkDialogOpen}
+        onOpenChange={setAddLinkDialogOpen}
+        onAddImage={handleAddImage}
+        allTags={allTags}
+      />
+      
       {selectedImage && (
         <ImageDetailDialog
           image={selectedImage}

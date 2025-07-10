@@ -1,6 +1,6 @@
 "use client";
 
-import { SlidersHorizontal, Hash, Search, Palette } from 'lucide-react';
+import { SlidersHorizontal, Hash, Search, Palette, ImagePlus } from 'lucide-react';
 import React from 'react';
 import type { ViewSettings, ImageItem } from '@/lib/types';
 import { Button } from '@/components/ui/button';
@@ -13,7 +13,6 @@ import {
 import { Separator } from './ui/separator';
 import { Badge } from './ui/badge';
 import { Input } from '@/components/ui/input';
-import AddLinkDialog from './add-link-dialog';
 import { cn, basicColorMap } from '@/lib/utils';
 
 interface FilterToolbarProps {
@@ -28,7 +27,7 @@ interface FilterToolbarProps {
   onClearFilters: () => void;
   searchTerm: string;
   onSearchChange: (term: string) => void;
-  onAddImage: (image: Omit<ImageItem, 'id'>) => void;
+  onAddImageClick: () => void;
   itemCount: number;
 }
 
@@ -44,7 +43,7 @@ export default function FilterToolbar({
   onClearFilters,
   searchTerm,
   onSearchChange,
-  onAddImage,
+  onAddImageClick,
   itemCount,
 }: FilterToolbarProps) {
   const activeFilterCount = selectedTags.length + selectedColors.length;
@@ -69,7 +68,10 @@ export default function FilterToolbar({
               onChange={(e) => onSearchChange(e.target.value)}
             />
           </div>
-          <AddLinkDialog onAddImage={onAddImage} allTags={allTags} />
+          <Button variant="default" onClick={onAddImageClick}>
+            <ImagePlus className="mr-2 h-5 w-5" />
+            Add Image
+          </Button>
         </div>
       </div>
 
