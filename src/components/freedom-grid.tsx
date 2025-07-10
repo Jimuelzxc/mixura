@@ -49,12 +49,11 @@ const DraggableImage: React.FC<DraggableImageProps> = ({ image, onSelect, onUpda
     setAspectRatio(imgAspectRatio);
 
     if (!image.width || !image.height) {
-        // If no width/height is set, initialize it based on aspect ratio
         const initialWidth = 256;
         const initialHeight = initialWidth / imgAspectRatio;
         setSize({ width: initialWidth, height: initialHeight });
     } else {
-        // If width/height is set, ensure it respects the aspect ratio
+        // If width/height is set, ensure it respects the aspect ratio on first load
         setSize(prevSize => {
             const newHeight = prevSize.width / imgAspectRatio;
             if (Math.abs(newHeight - prevSize.height) > 1) { // allow for small floating point differences
@@ -101,7 +100,6 @@ const DraggableImage: React.FC<DraggableImageProps> = ({ image, onSelect, onUpda
   
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      // Dispatch a synthetic event to keep the custom cursor in sync
       const customEvent = new MouseEvent('mousemove', {
         clientX: e.clientX,
         clientY: e.clientY,
@@ -274,5 +272,3 @@ export default function FreedomGrid({ images, onImageSelect, onUpdateImage, isFu
     </div>
   );
 }
-
-    
