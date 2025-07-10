@@ -496,9 +496,9 @@ export default function Home() {
                     ) : (
                          <div className="flex items-center gap-4">
                             <h1 className="text-[5rem] font-bold tracking-tighter leading-none">{activeBoard.name}</h1>
-                            <Button size="sm" variant="outline" onClick={() => handleStartEditingBoardName(activeBoard.id)}>
-                                <Edit className="w-4 h-4 mr-2"/>
-                                Edit Name
+                            <Button size="icon" variant="outline" className="rounded-full" onClick={() => handleStartEditingBoardName(activeBoard.id)}>
+                                <Edit className="w-4 h-4"/>
+                                <span className="sr-only">Edit Name</span>
                             </Button>
                          </div>
                     )}
