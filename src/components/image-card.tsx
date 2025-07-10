@@ -26,18 +26,6 @@ export default function ImageCard({ image, onSelect, onTagClick, viewMode }: Ima
       tabIndex={0}
       onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && onSelect()}
     >
-        {/* Shadow layer */}
-        <div className="absolute inset-0">
-            <Image
-                src={image.url}
-                alt=""
-                fill
-                aria-hidden
-                className="object-cover blur-[1000px] opacity-50"
-                data-ai-hint="abstract texture"
-            />
-        </div>
-
         {/* Content Layer */}
         <div className="relative overflow-hidden">
             <div className={cn(
