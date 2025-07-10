@@ -62,6 +62,15 @@ const DraggableImage: React.FC<DraggableImageProps> = ({ image, onSelect, onUpda
         let newY = (e.clientY - parentRect.top) / scale - offsetRef.current.y;
         
         setPosition({ x: newX, y: newY });
+        
+        // Dispatch a new mousemove event on the window to update the custom cursor
+        const customEvent = new MouseEvent('mousemove', {
+          bubbles: true,
+          cancelable: true,
+          clientX: e.clientX,
+          clientY: e.clientY,
+        });
+        window.dispatchEvent(customEvent);
       }
     };
 
