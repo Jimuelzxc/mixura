@@ -52,14 +52,14 @@ export function ViewOptions({ settings, onChange }: ViewOptionsProps) {
             <RadioGroup
               value={settings.viewMode}
               onValueChange={(value: string) => onChange({ viewMode: value as ViewMode })}
-              className="grid grid-cols-3 gap-4"
+              className="grid grid-cols-3 gap-2"
             >
               {viewOptions.map((option) => (
                   <Label
                       key={option.value}
                       htmlFor={`view-${option.value}`}
                       className={cn(
-                          "flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground cursor-pointer w-24 h-24",
+                          "flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground cursor-pointer",
                           settings.viewMode === option.value ? 'border-primary' : ''
                       )}
                   >
