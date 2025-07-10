@@ -43,31 +43,13 @@ export default function ImageGrid({
     5: 'columns-5',
   };
 
-  const gridClasses: { [key: number]: string } = {
-    1: 'grid-cols-1',
-    2: 'grid-cols-2',
-    3: 'grid-cols-3',
-    4: 'grid-cols-4',
-    5: 'grid-cols-5',
-  };
-
   if (viewMode === 'moodboard') {
     return (
       <div className={cn("gap-4", columnClasses[gridColumns] || 'columns-3')}>
         {images.map((image) => (
-          <ImageCard key={image.id} image={image} onSelect={() => onImageSelect(image)} onTagClick={onTagClick} viewMode="moodboard" />
+          <ImageCard key={image.id} image={image} onSelect={() => onImageSelect(image)} onTagClick={onTagClick} />
         ))}
       </div>
-    );
-  }
-
-  if (viewMode === 'cards') {
-    return (
-        <div className={cn("grid gap-4", gridClasses[gridColumns] || 'grid-cols-3')}>
-            {images.map((image) => (
-                <ImageCard key={image.id} image={image} onSelect={() => onImageSelect(image)} onTagClick={onTagClick} viewMode="cards" />
-            ))}
-        </div>
     );
   }
 

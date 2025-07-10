@@ -23,14 +23,13 @@ interface ViewOptionsProps {
 
 const viewOptions: { value: ViewMode, label: string, icon: React.ElementType }[] = [
     { value: 'moodboard', label: 'Moodboard', icon: Grid3x3 },
-    { value: 'cards', label: 'Cards', icon: LayoutGrid },
     { value: 'list', label: 'List', icon: List },
     { value: 'canvas', label: 'Canvas', icon: Move },
 ]
 
 export function ViewOptions({ settings, onChange }: ViewOptionsProps) {
   const isListMode = settings.viewMode === 'list';
-  const showSlider = settings.viewMode === 'moodboard' || settings.viewMode === 'cards';
+  const showSlider = settings.viewMode === 'moodboard';
   
   return (
     <Popover>

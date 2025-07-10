@@ -4,25 +4,20 @@
 import Image from 'next/image';
 import type { ImageItem } from '@/lib/types';
 import { Badge } from '@/components/ui/badge';
-import { cn, basicColorMap } from '@/lib/utils';
+import { cn } from '@/lib/utils';
 
 interface ImageCardProps {
   image: ImageItem;
   onSelect: () => void;
   onTagClick: (tag: string) => void;
-  viewMode: 'moodboard' | 'cards';
 }
 
-export default function ImageCard({ image, onSelect, onTagClick, viewMode }: ImageCardProps) {
+export default function ImageCard({ image, onSelect, onTagClick }: ImageCardProps) {
   const isGif = image.url.toLowerCase().endsWith('.gif');
   
   return (
     <div
-      className={cn(
-        "group relative break-inside-avoid cursor-pointer",
-        viewMode === 'cards' && 'mb-4',
-        viewMode === 'moodboard' && 'mb-4'
-      )}
+      className="group relative break-inside-avoid cursor-pointer mb-4"
       onClick={onSelect}
       role="button"
       tabIndex={0}
@@ -30,15 +25,12 @@ export default function ImageCard({ image, onSelect, onTagClick, viewMode }: Ima
     >
         {/* Content Layer */}
         <div className="relative overflow-hidden">
-            <div className={cn(
-                "w-full",
-                viewMode === 'cards' && "aspect-[4/3]"
-            )}>
+            <div className="w-full">
                 <Image
                 src={image.url}
                 alt={image.title}
                 width={500}
-                height={viewMode === 'cards' ? 375 : 500}
+                height={500}
                 className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                 data-ai-hint="abstract texture"
                 unoptimized={isGif}
@@ -76,5 +68,3 @@ export default function ImageCard({ image, onSelect, onTagClick, viewMode }: Ima
     </div>
   );
 }
-
-    
