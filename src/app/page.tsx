@@ -506,13 +506,13 @@ export default function Home() {
 
   return (
     <div 
-      className={cn("flex flex-col h-screen bg-background relative", isCanvasFullscreen && "overflow-hidden")}
+      className={cn("flex flex-col h-screen bg-background", isCanvasFullscreen && "overflow-hidden")}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
     >
       {isDragging && !isAllBoardsView && (
-        <div className="absolute inset-0 bg-primary/20 z-50 flex flex-col items-center justify-center pointer-events-none border-4 border-dashed border-primary">
+        <div className="fixed inset-0 bg-primary/20 z-50 flex flex-col items-center justify-center pointer-events-none border-4 border-dashed border-primary">
           <UploadCloud className="w-24 h-24 text-primary" />
           <p className="mt-4 text-2xl font-bold text-primary">Drop image to add</p>
         </div>
