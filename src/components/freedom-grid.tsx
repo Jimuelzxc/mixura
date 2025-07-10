@@ -31,13 +31,16 @@ const DraggableImage: React.FC<DraggableImageProps> = ({ image, onSelect, onUpda
   const [isResizing, setIsResizing] = useState(false);
   const [position, setPosition] = useState({ x: image.x || 100, y: image.y || 100 });
   const [size, setSize] = useState({ width: image.width || 256, height: image.height || 256 });
+  
   const dragRef = useRef<HTMLDivElement>(null);
   const offsetRef = useRef({ x: 0, y: 0 });
+  const resizeStartRef = useRef({ x: 0, y: 0, width: 0, height: 0, aspectRatio: 1 });
   const wasDraggedRef = useRef(false);
 
   useEffect(() => {
+    setPosition({ x: image.x || 100, y: image.y || 100 });
     setSize({ width: image.width || 256, height: image.height || 256 });
-  }, [image.width, image.height]);
+  }, [image.x, image.y, image.width, image.height]);
 
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.button !== 0 || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
@@ -62,6 +65,13 @@ const DraggableImage: React.FC<DraggableImageProps> = ({ image, onSelect, onUpda
     e.preventDefault();
     e.stopPropagation();
     setIsResizing(true);
+    resizeStartRef.current = {
+      x: e.clientX,
+      y: e.clientY,
+      width: size.width,
+      height: size.height,
+      aspectRatio: size.width / size.height
+    };
   };
   
   useEffect(() => {
@@ -85,11 +95,11 @@ const DraggableImage: React.FC<DraggableImageProps> = ({ image, onSelect, onUpda
       } else if (isResizing && dragRef.current) {
         wasDraggedRef.current = true;
         e.stopPropagation();
-        const parentRect = dragRef.current.parentElement?.getBoundingClientRect();
-        if (!parentRect) return;
+
+        const dx = (e.clientX - resizeStartRef.current.x) / scale;
         
-        const newWidth = ((e.clientX - (parentRect.left + position.x * scale))) / scale;
-        const newHeight = ((e.clientY - (parentRect.top + position.y * scale))) / scale;
+        const newWidth = resizeStartRef.current.width + dx;
+        const newHeight = newWidth / resizeStartRef.current.aspectRatio;
 
         setSize({
             width: Math.max(50, newWidth),
@@ -110,7 +120,7 @@ const DraggableImage: React.FC<DraggableImageProps> = ({ image, onSelect, onUpda
         e.stopPropagation();
         setIsResizing(false);
         if (wasDraggedRef.current) {
-            onUpdate({ ...image, width: size.width, height: size.height }, false);
+            onUpdate({ ...image, x: position.x, y: position.y, width: size.width, height: size.height }, false);
         }
       }
     };
@@ -142,27 +152,29 @@ const DraggableImage: React.FC<DraggableImageProps> = ({ image, onSelect, onUpda
     <div
       ref={dragRef}
       className={cn(
-        "absolute cursor-grab",
+        "absolute cursor-grab group/image",
         isDragging && 'z-10 !cursor-grabbing'
       )}
-      style={{ left: position.x, top: position.y, width: size.width, height: size.height }}
+      style={{
+        left: position.x,
+        top: position.y,
+        width: size.width,
+        height: size.height
+      }}
       onMouseDown={handleMouseDown}
       onClick={handleClick}
       onDoubleClick={handleDoubleClick}
     >
-      <div 
-        className={cn(
-          "w-full h-full relative transition-shadow duration-200",
-          isDragging ? 'shadow-2xl' : 'shadow-md hover:shadow-lg',
-          isSelected && !isDragging && 'ring-2 ring-primary ring-offset-background ring-offset-2 z-10'
-        )}
-      >
         <Image
             src={image.url}
             alt={image.title}
             width={size.width}
             height={size.height}
-            className="object-contain pointer-events-none w-full h-full"
+            className={cn(
+                "object-cover pointer-events-none w-full h-full transition-shadow duration-200",
+                isDragging ? 'shadow-2xl' : 'shadow-md group-hover/image:shadow-lg',
+                isSelected && 'ring-2 ring-primary ring-offset-background ring-offset-2 z-10'
+            )}
             unoptimized
         />
         {isSelected && (
@@ -171,7 +183,6 @@ const DraggableImage: React.FC<DraggableImageProps> = ({ image, onSelect, onUpda
             onMouseDown={handleResizeMouseDown}
           />
         )}
-      </div>
     </div>
   );
 };
