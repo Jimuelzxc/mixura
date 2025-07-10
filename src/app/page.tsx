@@ -236,12 +236,14 @@ export default function Home() {
   };
 
   const handleExport = () => {
+    if (!activeBoard) return;
     const dataStr = JSON.stringify({ boards, activeBoardId }, null, 2);
     const dataBlob = new Blob([dataStr], { type: 'application/json' });
     const url = URL.createObjectURL(dataBlob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `mixura-backup-${new Date().toISOString().split('T')[0]}.json`;
+    const safeBoardName = activeBoard.name.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+    link.download = `${safeBoardName}-backup-${new Date().toISOString().split('T')[0]}.json`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
