@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview An AI flow to suggest details for an image.
@@ -43,7 +44,7 @@ Based on your analysis:
 1.  Generate a concise and descriptive title (max 10 words).
 2.  Write brief, insightful notes about the image (1-2 sentences).
 3.  Suggest 3-5 relevant, lowercase, single-word tags.
-4.  Identify the 1-3 most dominant colors in the image. From the following list of basic colors, choose the ones that best represent the dominant colors in the image: Red, Orange, Yellow, Green, Teal, Blue, Purple, Pink, Brown, Black, Gray, White. Return only the names of the colors.
+4.  Identify the 1-3 most dominant colors in the image. You MUST choose from the following list of basic colors, and only return the names of the colors: Red, Orange, Yellow, Green, Teal, Blue, Purple, Pink, Brown, Black, Gray, White.
 
 The image to analyze is here:
 {{media url=photoDataUri}}`,
