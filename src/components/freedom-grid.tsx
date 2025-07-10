@@ -306,7 +306,7 @@ export default function FreedomGrid({
   }[viewSettings.backgroundPattern || 'dots'];
 
   return (
-    <div className={cn("relative w-full border rounded-md bg-card/50 overflow-hidden touch-none flex-grow", isFullscreen && "h-full", backgroundClass)}>
+    <div className={cn("relative w-full border rounded-md bg-card/50 overflow-hidden touch-none flex-grow", isFullscreen && "h-full")}>
        <TransformWrapper
         minScale={0.1}
         maxScale={8}
@@ -329,9 +329,9 @@ export default function FreedomGrid({
         />
         <TransformComponent
             wrapperClass="!w-full !h-full"
-            contentClass="relative"
+            contentClass="!w-[500vw] !h-[500vh]"
         >
-            <div className="w-full h-full" onClick={handleCanvasClick}>
+            <div className={cn("w-full h-full relative", backgroundClass)} onClick={handleCanvasClick}>
                 {images.map(image => (
                     <DraggableImage 
                         key={image.id}
