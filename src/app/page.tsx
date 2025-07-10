@@ -418,7 +418,7 @@ export default function Home() {
                         </div>
                     ) : (
                          <div className="flex items-center gap-4">
-                            <h1 className="text-8xl font-bold truncate">{activeBoard.name}</h1>
+                            <h1 className="text-8xl font-bold">{activeBoard.name}</h1>
                             <Button size="icon" variant="ghost" className="opacity-0 group-hover:opacity-100 transition-opacity" onClick={handleStartEditingBoardName}>
                                 <Edit className="w-6 h-6"/>
                             </Button>
