@@ -411,14 +411,14 @@ export default function Home() {
                                     if (e.key === 'Enter') handleSaveBoardName();
                                     if (e.key === 'Escape') handleCancelEditingBoardName();
                                 }}
-                                className="text-4xl font-bold h-auto p-0 border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+                                className="text-8xl font-bold h-auto p-0 border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
                             />
                             <Button size="icon" variant="ghost" onClick={handleSaveBoardName}><Check className="w-6 h-6"/></Button>
                             <Button size="icon" variant="ghost" onClick={handleCancelEditingBoardName}><X className="w-6 h-6"/></Button>
                         </div>
                     ) : (
                          <div className="flex items-center gap-4">
-                            <h1 className="text-4xl font-bold truncate">{activeBoard.name}</h1>
+                            <h1 className="text-8xl font-bold truncate">{activeBoard.name}</h1>
                             <Button size="icon" variant="ghost" className="opacity-0 group-hover:opacity-100 transition-opacity" onClick={handleStartEditingBoardName}>
                                 <Edit className="w-6 h-6"/>
                             </Button>
