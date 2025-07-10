@@ -1,14 +1,17 @@
+
 "use client";
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import type { ImageItem, ViewSettings } from '@/lib/types';
 import AppHeader from '@/components/app-header';
 import ImageGrid from '@/components/image-grid';
 import ImageDetailDialog from '@/components/image-detail-dialog';
 import FilterToolbar from '@/components/filter-toolbar';
 import { useToast } from '@/hooks/use-toast';
-import { ImagePlus } from 'lucide-react';
+import { ImagePlus, AlertTriangle } from 'lucide-react';
 import AddLinkDialog from '@/components/add-link-dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { Button } from '@/components/ui/button';
 
 export default function Home() {
   const [images, setImages] = useState<ImageItem[]>([]);
@@ -29,6 +32,9 @@ export default function Home() {
     listShowTags: true,
     listCoverPosition: 'left',
   });
+  
+  const [isDeleteAllAlertOpen, setDeleteAllAlertOpen] = useState(false);
+  const importInputRef = useRef<HTMLInputElement>(null);
 
   // Load data from localStorage on initial render
   useEffect(() => {
@@ -51,7 +57,7 @@ export default function Home() {
     } finally {
       setIsDataLoaded(true);
     }
-  }, []); // Empty dependency array ensures this runs only once
+  }, []);
 
   // Save data to localStorage whenever it changes
   useEffect(() => {
@@ -141,6 +147,60 @@ export default function Home() {
     setViewSettings(prev => ({ ...prev, ...newSettings }));
   };
 
+  const handleExport = () => {
+    const dataStr = JSON.stringify({ images, viewSettings }, null, 2);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `linkboard-backup-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    toast({ title: 'Exported!', description: 'Your data has been exported to a JSON file.' });
+  };
+
+  const handleImportClick = () => {
+    importInputRef.current?.click();
+  };
+
+  const handleFileImport = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const text = e.target?.result as string;
+        const data = JSON.parse(text);
+        if (Array.isArray(data.images) && data.viewSettings) {
+          // Basic validation
+          const newImages = data.images.filter((img: any) => img.id && img.url && img.title);
+          setImages(newImages);
+          setViewSettings(data.viewSettings);
+          toast({ title: 'Import successful!', description: 'Your data has been imported.' });
+        } else {
+          throw new Error('Invalid JSON format.');
+        }
+      } catch (error) {
+        console.error('Import failed', error);
+        toast({ title: 'Import Failed', description: 'The selected file is not a valid JSON backup.', variant: 'destructive' });
+      }
+    };
+    reader.readAsText(file);
+    // Reset file input
+    if (importInputRef.current) {
+      importInputRef.current.value = '';
+    }
+  };
+
+  const handleDeleteAll = () => {
+    setImages([]);
+    setDeleteAllAlertOpen(false);
+    toast({ title: 'All data deleted', description: 'Your collection has been cleared.', variant: 'destructive' });
+  };
+
   const filteredImages = useMemo(() => {
     return images.filter(image => {
       // Search term filter (searches across title, notes, and tags)
@@ -173,7 +233,12 @@ export default function Home() {
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
-      <AppHeader onAddImageClick={() => setAddLinkDialogOpen(true)} />
+      <AppHeader
+        onAddImageClick={() => setAddLinkDialogOpen(true)}
+        onImportClick={handleImportClick}
+        onExportClick={handleExport}
+        onDeleteAllClick={() => setDeleteAllAlertOpen(true)}
+      />
       <main className="flex-grow">
         <div className="container mx-auto px-4 md:px-6 py-8">
             <FilterToolbar
@@ -214,6 +279,8 @@ export default function Home() {
             )}
         </div>
       </main>
+      
+      <input type="file" ref={importInputRef} onChange={handleFileImport} accept="application/json" className="hidden" />
 
       <AddLinkDialog
         isOpen={isAddLinkDialogOpen}
@@ -232,6 +299,29 @@ export default function Home() {
           onUpdate={handleUpdateImage}
         />
       )}
+
+      <AlertDialog open={isDeleteAllAlertOpen} onOpenChange={setDeleteAllAlertOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-full bg-destructive/10 flex items-center justify-center">
+                  <AlertTriangle className="w-6 h-6 text-destructive" />
+              </div>
+              <div className="flex-grow">
+                <AlertDialogTitle>Are you sure you want to delete all data?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This will permanently delete all your images and settings. This action cannot be undone.
+                </AlertDialogDescription>
+              </div>
+            </div>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteAll}>Yes, delete all</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
     </div>
   );
 }
