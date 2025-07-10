@@ -393,15 +393,15 @@ export default function ImageDetailDialog({ image, allTags, isOpen, onOpenChange
                 <DialogTitle className="text-2xl font-bold">{image.title || 'Untitled'}</DialogTitle>
               </DialogHeader>
               <div className="mt-4 space-y-4 text-sm">
-                 <div className="flex items-start gap-3">
-                  <Link className="h-4 w-4 mt-1 text-muted-foreground flex-shrink-0"/>
-                  <div>
-                    <h4 className="font-semibold text-muted-foreground">URL</h4>
-                    <a href={image.url} target="_blank" rel="noopener noreferrer" className="break-all text-primary hover:underline">
-                        {image.url}
-                    </a>
+                {image.notes && (
+                  <div className="flex items-start gap-3">
+                    <Notebook className="h-4 w-4 mt-1 text-muted-foreground flex-shrink-0"/>
+                     <div>
+                      <h4 className="font-semibold text-muted-foreground">Notes</h4>
+                      <p className="whitespace-pre-wrap">{image.notes}</p>
+                    </div>
                   </div>
-                </div>
+                )}
                 {image.tags.length > 0 && (
                   <div className="flex items-start gap-3">
                     <Tag className="h-4 w-4 mt-1 text-muted-foreground flex-shrink-0"/>
@@ -429,15 +429,15 @@ export default function ImageDetailDialog({ image, allTags, isOpen, onOpenChange
                     </div>
                   </div>
                 )}
-                {image.notes && (
-                  <div className="flex items-start gap-3">
-                    <Notebook className="h-4 w-4 mt-1 text-muted-foreground flex-shrink-0"/>
-                     <div>
-                      <h4 className="font-semibold text-muted-foreground">Notes</h4>
-                      <p className="whitespace-pre-wrap">{image.notes}</p>
-                    </div>
+                 <div className="flex items-start gap-3">
+                  <Link className="h-4 w-4 mt-1 text-muted-foreground flex-shrink-0"/>
+                  <div>
+                    <h4 className="font-semibold text-muted-foreground">URL</h4>
+                    <a href={image.url} target="_blank" rel="noopener noreferrer" className="break-all text-primary hover:underline">
+                        {image.url}
+                    </a>
                   </div>
-                )}
+                </div>
               </div>
             </>
             )}
