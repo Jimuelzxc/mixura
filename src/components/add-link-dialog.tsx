@@ -233,7 +233,7 @@ export default function AddLinkDialog({ onAddImage, allTags, isOpen, onOpenChang
           </DialogHeader>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="flex-grow overflow-hidden flex flex-col">
-              <div className="flex-grow overflow-y-auto px-6 space-y-4">
+              <div className="flex-grow overflow-y-auto px-6 pb-6 space-y-4">
                 <FormField
                   control={form.control}
                   name="url"
