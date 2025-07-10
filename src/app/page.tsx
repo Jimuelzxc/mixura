@@ -8,7 +8,7 @@ import ImageGrid from '@/components/image-grid';
 import ImageDetailDialog from '@/components/image-detail-dialog';
 import FilterToolbar from '@/components/filter-toolbar';
 import { useToast } from '@/hooks/use-toast';
-import { ImagePlus, AlertTriangle, Edit, Check, X, LayoutGrid } from 'lucide-react';
+import { ImagePlus, AlertTriangle, Edit, Check, X, LayoutGrid, Pencil } from 'lucide-react';
 import AddLinkDialog from '@/components/add-link-dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
@@ -493,8 +493,9 @@ export default function Home() {
                     ) : (
                          <div className="flex items-center gap-4">
                             <h1 className="text-[5rem] font-bold tracking-tighter leading-none">{activeBoard.name}</h1>
-                            <Button size="sm" variant="outline" onClick={() => handleStartEditingBoardName(activeBoard.id)}>
-                                Edit Name
+                            <Button size="icon" variant="ghost" className="rounded-full" onClick={() => handleStartEditingBoardName(activeBoard.id)}>
+                                <Pencil className="w-6 h-6" />
+                                <span className="sr-only">Edit Name</span>
                             </Button>
                          </div>
                     )}
