@@ -206,6 +206,10 @@ const DraggableImage: React.FC<DraggableImageProps> = ({ image, onSelect, onUpda
           <div 
             className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-primary border-2 border-background cursor-se-resize z-20"
             onMouseDown={handleResizeMouseDown}
+            style={{
+              transform: `scale(${1 / scale})`,
+              transformOrigin: 'bottom right',
+            }}
           />
         )}
     </div>
