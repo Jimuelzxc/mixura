@@ -8,6 +8,8 @@ export interface ImageItem {
   colors?: string[];
   x?: number;
   y?: number;
+  width?: number;
+  height?: number;
 }
 
 export type ViewMode = 'moodboard' | 'list' | 'cards' | 'freedom';
