@@ -129,7 +129,6 @@ export default function AppHeader({
               <DropdownMenuItem onClick={onAddImageClick} disabled={isAllBoardsView}>
                 <Plus className="mr-2 h-4 w-4" />
                 <span>New Image</span>
-                <DropdownMenuShortcut>⌘N</DropdownMenuShortcut>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuLabel>Data</DropdownMenuLabel>
