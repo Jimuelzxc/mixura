@@ -52,7 +52,7 @@ export function ViewOptions({ settings, onChange }: ViewOptionsProps) {
             <RadioGroup
               value={settings.viewMode}
               onValueChange={(value: string) => onChange({ viewMode: value as ViewMode })}
-              className="grid grid-cols-3 gap-2"
+              className="grid grid-cols-3 gap-4"
             >
               {viewOptions.map((option) => (
                   <Label
