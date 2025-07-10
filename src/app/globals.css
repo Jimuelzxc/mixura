@@ -70,8 +70,8 @@ body {
   position: fixed;
   top: 0;
   left: 0;
-  width: 32px;
-  height: 32px;
+  width: 16px;
+  height: 16px;
   background-color: white;
   border-radius: 50%;
   pointer-events: none;
@@ -85,6 +85,6 @@ body {
 }
 
 .custom-cursor.hovered {
-    width: 64px;
-    height: 64px;
+    width: 30px;
+    height: 30px;
 }
