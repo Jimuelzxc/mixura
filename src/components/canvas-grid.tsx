@@ -400,16 +400,18 @@ export default function CanvasGrid({
     setSelectedImageId(null);
   }
 
-  const handleResetView = () => {
+  const handleResetView = useCallback(() => {
     if (!transformWrapperRef.current || images.length === 0) return;
 
     const { setTransform } = transformWrapperRef.current;
     
-    // Calculate bounding box
-    const minX = Math.min(...images.map(img => img.x || 0));
-    const minY = Math.min(...images.map(img => img.y || 0));
-    const maxX = Math.max(...images.map(img => (img.x || 0) + (img.width || 256)));
-    const maxY = Math.max(...images.map(img => (img.y || 0) + (img.height || 256)));
+    const imagePositions = images.filter(img => typeof img.x === 'number' && typeof img.y === 'number');
+    if (imagePositions.length === 0) return;
+
+    const minX = Math.min(...imagePositions.map(img => img.x!));
+    const minY = Math.min(...imagePositions.map(img => img.y!));
+    const maxX = Math.max(...imagePositions.map(img => (img.x! + (img.width || 256))));
+    const maxY = Math.max(...imagePositions.map(img => (img.y! + (img.height || 256))));
 
     const contentWidth = maxX - minX;
     const contentHeight = maxY - minY;
@@ -422,14 +424,12 @@ export default function CanvasGrid({
     const canvasWidth = canvas.clientWidth;
     const canvasHeight = canvas.clientHeight;
     
-    const padding = 50; // pixels
+    const padding = 50; 
 
-    // Calculate scale to fit content
     const scaleX = (canvasWidth - padding * 2) / contentWidth;
     const scaleY = (canvasHeight - padding * 2) / contentHeight;
-    const newScale = Math.min(scaleX, scaleY, 1); // Do not zoom in more than 100%
+    const newScale = Math.min(scaleX, scaleY, 1);
 
-    // Calculate position to center content
     const centerX = minX + contentWidth / 2;
     const centerY = minY + contentHeight / 2;
 
@@ -437,7 +437,15 @@ export default function CanvasGrid({
     const newPositionY = (canvasHeight / 2) - (centerY * newScale);
     
     setTransform(newPositionX, newPositionY, newScale, 300, 'easeOut');
-  }
+  }, [images]);
+
+  useEffect(() => {
+    // Timeout to allow the canvas to render before we try to center it
+    const timer = setTimeout(() => {
+        handleResetView();
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [handleResetView]);
 
   const backgroundClass = {
     'dots': 'bg-dots',
@@ -492,6 +500,3 @@ export default function CanvasGrid({
     </div>
   );
 }
-
-    
-    
