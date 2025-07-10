@@ -4,7 +4,7 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { PlusCircle, X, Sparkles, Loader2, ImagePlus } from 'lucide-react';
+import { PlusCircle, X, Sparkles, Loader2, ImagePlus, Palette } from 'lucide-react';
 import Image from 'next/image';
 import { useEffect, useState, useMemo } from 'react';
 
@@ -35,6 +35,7 @@ import { Popover, PopoverContent, PopoverAnchor } from '@/components/ui/popover'
 import { useToast } from '@/hooks/use-toast';
 import { suggestDetails } from '@/ai/flows/suggest-details';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
+import { cn, basicColorMap } from '@/lib/utils';
 
 
 const imageSchema = z.object({
@@ -140,6 +141,15 @@ export default function AddLinkDialog({ onAddImage, allTags, isOpen, onOpenChang
     form.setValue('tags', newTags);
   };
 
+  const handleColorToggle = (color: string) => {
+    const currentColors = form.getValues('colors') || [];
+    if (currentColors.includes(color)) {
+      form.setValue('colors', currentColors.filter(c => c !== color));
+    } else {
+      form.setValue('colors', [...currentColors, color]);
+    }
+  };
+
   const handleAiFill = async () => {
       const url = form.getValues('url');
       if (!url) return;
@@ -188,6 +198,7 @@ export default function AddLinkDialog({ onAddImage, allTags, isOpen, onOpenChang
   const imageUrl = form.watch('url');
   const isUrlValid = z.string().url().safeParse(imageUrl).success;
   const isGif = isUrlValid && imageUrl.toLowerCase().endsWith('.gif');
+  const selectedColors = form.watch('colors') || [];
 
   const aiButton = (
     <Button
@@ -345,6 +356,44 @@ export default function AddLinkDialog({ onAddImage, allTags, isOpen, onOpenChang
                     </FormItem>
                   )}
                 />
+                
+                <FormField
+                  control={form.control}
+                  name="colors"
+                  render={() => (
+                    <FormItem>
+                      <FormLabel>Colors</FormLabel>
+                      <FormControl>
+                        <div className="flex flex-wrap gap-2">
+                            {Object.entries(basicColorMap).map(([name, hex]) => (
+                                <TooltipProvider key={name}>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <button
+                                            type="button"
+                                            onClick={() => handleColorToggle(name)}
+                                            className={cn(
+                                                "w-6 h-6 rounded-full border-2 transition-all",
+                                                selectedColors.includes(name) ? 'border-primary ring-2 ring-primary ring-offset-2' : 'border-card hover:border-muted-foreground',
+                                                'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2'
+                                            )}
+                                            style={{ backgroundColor: hex }}
+                                            aria-label={`Select color ${name}`}
+                                        />
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p>{name}</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                                </TooltipProvider>
+                            ))}
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
 
                 <FormField
                   control={form.control}
