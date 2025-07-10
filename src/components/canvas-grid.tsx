@@ -321,18 +321,22 @@ const Controls = ({
 }) => {
   const { zoomIn, zoomOut, resetTransform } = useControls();
   return (
-    <div className="absolute bottom-4 left-4 z-20 flex items-center gap-2">
-      <Button variant="outline" size="icon" onClick={() => zoomIn()}><Plus /></Button>
-      <Button variant="outline" size="icon" onClick={() => zoomOut()}><Minus /></Button>
-      <Button variant="outline" size="icon" onClick={() => resetTransform()}><RefreshCcw /></Button>
-      <PatternSelector 
-        currentPattern={viewSettings.backgroundPattern || 'dots'}
-        onPatternChange={(pattern) => onUpdateViewSettings({ backgroundPattern: pattern })}
-      />
-      <Button variant="outline" size="icon" onClick={onToggleFullscreen}>
-        {isFullscreen ? <Minimize /> : <Expand />}
-      </Button>
-    </div>
+    <>
+      <div className="absolute bottom-4 left-4 z-20 flex items-center gap-2">
+        <Button variant="outline" size="icon" onClick={() => zoomIn()}><Plus /></Button>
+        <Button variant="outline" size="icon" onClick={() => zoomOut()}><Minus /></Button>
+        <Button variant="outline" size="icon" onClick={() => resetTransform()}><RefreshCcw /></Button>
+        <PatternSelector 
+          currentPattern={viewSettings.backgroundPattern || 'dots'}
+          onPatternChange={(pattern) => onUpdateViewSettings({ backgroundPattern: pattern })}
+        />
+      </div>
+       <div className="absolute top-4 right-4 z-20">
+        <Button variant="outline" size="icon" onClick={onToggleFullscreen}>
+          {isFullscreen ? <Minimize /> : <Expand />}
+        </Button>
+      </div>
+    </>
   );
 };
 
