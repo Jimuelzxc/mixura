@@ -251,7 +251,7 @@ export default function ImageDetailDialog({ image, allTags, isOpen, onOpenChange
                     <TooltipProvider>
                     <Tooltip>
                         <TooltipTrigger asChild>
-                            <div className="w-full">{aiButton}</div>
+                            <span className="w-full inline-block">{aiButton}</span>
                         </TooltipTrigger>
                         <TooltipContent>
                             <p>AI suggestions are not available for GIFs.</p>
@@ -475,5 +475,3 @@ export default function ImageDetailDialog({ image, allTags, isOpen, onOpenChange
     </Dialog>
   );
 }
-
-    
