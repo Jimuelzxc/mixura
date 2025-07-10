@@ -9,6 +9,7 @@ import { TransformWrapper, TransformComponent, useControls } from "react-zoom-pa
 import { Plus, Minus, RefreshCcw, Expand, Minimize, AppWindow } from 'lucide-react';
 import { Button } from './ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 
 interface CanvasGridProps {
   images: ImageItem[];
@@ -321,24 +322,61 @@ const Controls = ({
 }) => {
   const { zoomIn, zoomOut, resetTransform } = useControls();
   return (
-    <>
+    <TooltipProvider>
       <div className="absolute bottom-4 left-4 z-20 flex items-center gap-2">
-        <Button variant="outline" size="icon" onClick={() => zoomIn()}><Plus /></Button>
-        <Button variant="outline" size="icon" onClick={() => zoomOut()}><Minus /></Button>
-        <Button variant="outline" size="icon" onClick={() => resetTransform()}><RefreshCcw /></Button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button variant="outline" size="icon" onClick={() => zoomIn()}><Plus /></Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Zoom In</p>
+          </TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button variant="outline" size="icon" onClick={() => zoomOut()}><Minus /></Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Zoom Out</p>
+          </TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button variant="outline" size="icon" onClick={() => resetTransform()}><RefreshCcw /></Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Reset View</p>
+          </TooltipContent>
+        </Tooltip>
       </div>
        <div className="absolute top-4 right-4 z-20">
-        <Button variant="outline" size="icon" onClick={onToggleFullscreen}>
-          {isFullscreen ? <Minimize /> : <Expand />}
-        </Button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button variant="outline" size="icon" onClick={onToggleFullscreen}>
+              {isFullscreen ? <Minimize /> : <Expand />}
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>{isFullscreen ? "Exit Fullscreen" : "Fullscreen"}</p>
+          </TooltipContent>
+        </Tooltip>
       </div>
       <div className="absolute bottom-4 right-4 z-20">
-        <PatternSelector 
-          currentPattern={viewSettings.backgroundPattern || 'none'}
-          onPatternChange={(pattern) => onUpdateViewSettings({ backgroundPattern: pattern })}
-        />
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div tabIndex={0}>
+              <PatternSelector 
+                currentPattern={viewSettings.backgroundPattern || 'none'}
+                onPatternChange={(pattern) => onUpdateViewSettings({ backgroundPattern: pattern })}
+              />
+            </div>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Change Background</p>
+          </TooltipContent>
+        </Tooltip>
       </div>
-    </>
+    </TooltipProvider>
   );
 };
 
@@ -410,3 +448,5 @@ export default function CanvasGrid({
     </div>
   );
 }
+
+    
