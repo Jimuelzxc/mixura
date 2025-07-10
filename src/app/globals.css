@@ -59,5 +59,32 @@ body {
   }
   body {
     @apply bg-background text-foreground;
+    cursor: none;
   }
+  a, button, [role="button"], input, textarea, [tabindex="0"] {
+    cursor: none;
+  }
+}
+
+.custom-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 32px;
+  height: 32px;
+  background-color: white;
+  border-radius: 50%;
+  pointer-events: none;
+  mix-blend-mode: difference;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  transition:
+    transform 0.2s ease-out,
+    width 0.2s ease-out,
+    height 0.2s ease-out;
+}
+
+.custom-cursor.hovered {
+    width: 64px;
+    height: 64px;
 }
