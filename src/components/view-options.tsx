@@ -15,6 +15,7 @@ import type { ViewSettings, ViewMode } from '@/lib/types';
 import { Separator } from './ui/separator';
 import { Checkbox } from './ui/checkbox';
 import { Slider } from './ui/slider';
+import { cn } from '@/lib/utils';
 
 interface ViewOptionsProps {
   settings: ViewSettings;
@@ -56,10 +57,13 @@ export function ViewOptions({ settings, onChange }: ViewOptionsProps) {
                 <Label
                     key={option.value}
                     htmlFor={`view-${option.value}`}
-                    className={`flex flex-1 flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground ${settings.viewMode === option.value ? 'border-primary' : ''}`}
+                    className={cn(
+                        "flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-2 hover:bg-accent hover:text-accent-foreground cursor-pointer w-24 h-24",
+                        settings.viewMode === option.value ? 'border-primary' : ''
+                    )}
                 >
                     <RadioGroupItem value={option.value} id={`view-${option.value}`} className="sr-only" />
-                    <option.icon className="mb-3 h-6 w-6" />
+                    <option.icon className="mb-2 h-6 w-6" />
                     {option.label}
                 </Label>
             ))}
