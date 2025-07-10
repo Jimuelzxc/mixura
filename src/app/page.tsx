@@ -402,9 +402,9 @@ export default function Home() {
       <main className="flex-grow">
         <div className="container mx-auto px-4 md:px-6 py-8">
             {activeBoard && (
-                <div className="mb-8 group">
+                <div className="mb-8">
                     {isEditingBoardName ? (
-                        <div className="flex items-center gap-2 max-w-xl">
+                        <div className="space-y-4 max-w-xl">
                             <Input
                                 ref={boardNameInputRef}
                                 value={editingBoardName}
@@ -413,16 +413,20 @@ export default function Home() {
                                     if (e.key === 'Enter') handleSaveBoardName();
                                     if (e.key === 'Escape') handleCancelEditingBoardName();
                                 }}
-                                className="text-8xl font-bold tracking-tighter h-auto p-0 border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+                                className="text-4xl font-bold tracking-tighter h-auto"
+                                placeholder="Board name..."
                             />
-                            <Button size="icon" variant="ghost" onClick={handleSaveBoardName}><Check className="w-6 h-6"/></Button>
-                            <Button size="icon" variant="ghost" onClick={handleCancelEditingBoardName}><X className="w-6 h-6"/></Button>
+                            <div className="flex items-center gap-2">
+                                <Button onClick={handleSaveBoardName}><Check className="w-4 h-4 mr-2"/> Save</Button>
+                                <Button variant="ghost" onClick={handleCancelEditingBoardName}>Cancel</Button>
+                            </div>
                         </div>
                     ) : (
                          <div className="flex items-center gap-4">
-                            <h1 className="text-8xl font-bold tracking-tighter">{activeBoard.name}</h1>
-                            <Button size="icon" variant="ghost" className="opacity-0 group-hover:opacity-100 transition-opacity" onClick={handleStartEditingBoardName}>
-                                <Edit className="w-6 h-6"/>
+                            <h1 className="text-4xl font-bold tracking-tighter">{activeBoard.name}</h1>
+                            <Button size="sm" variant="outline" onClick={handleStartEditingBoardName}>
+                                <Edit className="w-4 h-4 mr-2"/>
+                                Edit Name
                             </Button>
                          </div>
                     )}
