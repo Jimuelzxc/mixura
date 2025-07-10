@@ -234,18 +234,22 @@ export default function Home() {
     });
   };
 
-  const handleUpdateImage = (updatedImage: ImageItem) => {
+  const handleUpdateImage = (updatedImage: ImageItem, showToast: boolean = true) => {
     updateBoards(currentBoards => 
       currentBoards.map(board => ({
         ...board,
         images: board.images.map(img => (img.id === updatedImage.id ? updatedImage : img))
       }))
     );
-    setSelectedImage(updatedImage);
-     toast({
-      title: "Image updated!",
-      description: "Your changes have been saved.",
-    });
+    if (selectedImage?.id === updatedImage.id) {
+        setSelectedImage(updatedImage);
+    }
+    if (showToast) {
+         toast({
+          title: "Image updated!",
+          description: "Your changes have been saved.",
+        });
+    }
   }
 
   const handleTagSelect = (tag: string) => {
@@ -474,10 +478,6 @@ export default function Home() {
                 <div className="mb-8">
                     <div className="flex items-center gap-4">
                         <h1 className="text-[5rem] font-bold tracking-tighter leading-none">{activeBoard.name}</h1>
-                        <Button size="icon" variant="ghost" className="rounded-full" onClick={() => handleStartEditingBoardName(activeBoard.id)}>
-                            <Pencil className="w-6 h-6" />
-                            <span className="sr-only">Edit Name</span>
-                        </Button>
                     </div>
                 </div>
             )}

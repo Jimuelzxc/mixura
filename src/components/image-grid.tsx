@@ -13,7 +13,7 @@ interface ImageGridProps {
   onImageSelect: (image: ImageItem) => void;
   onTagClick: (tag: string) => void;
   viewSettings: ViewSettings | undefined;
-  onUpdateImage: (image: ImageItem) => void;
+  onUpdateImage: (image: ImageItem, showToast?: boolean) => void;
 }
 
 export default function ImageGrid({ images, onImageSelect, onTagClick, viewSettings, onUpdateImage }: ImageGridProps) {

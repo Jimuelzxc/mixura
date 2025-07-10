@@ -9,13 +9,13 @@ import { cn } from '@/lib/utils';
 interface FreedomGridProps {
   images: ImageItem[];
   onImageSelect: (image: ImageItem) => void;
-  onUpdateImage: (image: ImageItem) => void;
+  onUpdateImage: (image: ImageItem, showToast?: boolean) => void;
 }
 
 interface DraggableImageProps {
   image: ImageItem;
   onSelect: (image: ImageItem) => void;
-  onUpdate: (image: ImageItem) => void;
+  onUpdate: (image: ImageItem, showToast?: boolean) => void;
   boundsRef: React.RefObject<HTMLDivElement>;
 }
 
@@ -24,8 +24,12 @@ const DraggableImage: React.FC<DraggableImageProps> = ({ image, onSelect, onUpda
   const [position, setPosition] = useState({ x: image.x || 100, y: image.y || 100 });
   const dragRef = useRef<HTMLDivElement>(null);
   const offsetRef = useRef({ x: 0, y: 0 });
+  const wasDraggedRef = useRef(false);
 
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    // Left click only
+    if (e.button !== 0) return;
+    
     e.preventDefault();
     if (dragRef.current) {
       const rect = dragRef.current.getBoundingClientRect();
@@ -34,11 +38,13 @@ const DraggableImage: React.FC<DraggableImageProps> = ({ image, onSelect, onUpda
         y: e.clientY - rect.top,
       };
       setIsDragging(true);
+      wasDraggedRef.current = false;
     }
   };
 
   const handleMouseMove = (e: MouseEvent) => {
     if (isDragging && dragRef.current && boundsRef.current) {
+      wasDraggedRef.current = true;
       const boundsRect = boundsRef.current.getBoundingClientRect();
       let newX = e.clientX - boundsRect.left - offsetRef.current.x;
       let newY = e.clientY - boundsRect.top - offsetRef.current.y;
@@ -53,18 +59,27 @@ const DraggableImage: React.FC<DraggableImageProps> = ({ image, onSelect, onUpda
 
   const handleMouseUp = () => {
     if (isDragging) {
-      onUpdate({ ...image, x: position.x, y: position.y });
       setIsDragging(false);
+      // Only call update if the position actually changed during the drag
+      if (wasDraggedRef.current) {
+        onUpdate({ ...image, x: position.x, y: position.y }, false); // Pass false to not show toast
+      }
     }
   };
+  
+  const handleClick = () => {
+      // Only treat as a click if it wasn't dragged
+      if (!wasDraggedRef.current) {
+          onSelect(image);
+      }
+  }
 
   useEffect(() => {
     if (isDragging) {
       document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
+      document.addEventListener('mouseup', handleMouseUp, { once: true });
     } else {
       document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
     }
 
     return () => {
@@ -82,9 +97,7 @@ const DraggableImage: React.FC<DraggableImageProps> = ({ image, onSelect, onUpda
       )}
       style={{ left: position.x, top: position.y }}
       onMouseDown={handleMouseDown}
-      onClick={() => {
-        if(!isDragging) onSelect(image);
-      }}
+      onClick={handleClick}
     >
       <div className="w-full h-auto relative overflow-hidden rounded-md">
         <Image
