@@ -471,7 +471,7 @@ export default function Home() {
         />
       </div>
       <main className={cn("flex-grow flex flex-col min-h-0", isFreedomFullscreen && "h-screen")}>
-        <div className={cn("container mx-auto px-4 md:px-6 py-8 flex flex-col flex-grow min-h-0", isFreedomFullscreen && "p-0 max-w-full h-full")}>
+        <div className={cn("container mx-auto px-4 md:px-6 py-8 flex flex-col flex-grow min-h-0", isFreedomFullscreen && "p-4 md:p-8 max-w-full h-full")}>
             <div className={cn(isFreedomFullscreen && "hidden")}>
               {isAllBoardsView ? (
                   <div className="mb-8">
