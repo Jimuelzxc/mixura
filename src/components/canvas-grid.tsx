@@ -29,16 +29,19 @@ interface DraggableImageProps {
   onSelectForResize: (id: string | null) => void;
 }
 
+type ResizeHandle = 'tl' | 'tr' | 'bl' | 'br';
+
+
 const DraggableImage: React.FC<DraggableImageProps> = ({ image, onSelect, onUpdate, scale, isSelected, onSelectForResize }) => {
   const [isDragging, setIsDragging] = useState(false);
-  const [isResizing, setIsResizing] = useState(false);
+  const [activeResizeHandle, setActiveResizeHandle] = useState<ResizeHandle | null>(null);
   const [position, setPosition] = useState({ x: image.x || 100, y: image.y || 100 });
   const [size, setSize] = useState({ width: image.width || 256, height: image.height || 256 });
   const [aspectRatio, setAspectRatio] = useState<number | null>(null);
 
   const dragRef = useRef<HTMLDivElement>(null);
   const offsetRef = useRef({ x: 0, y: 0 });
-  const resizeStartRef = useRef({ x: 0, y: 0, width: 0, height: 0 });
+  const resizeStartRef = useRef({ x: 0, y: 0, width: 0, height: 0, posX: 0, posY: 0 });
   const wasDraggedRef = useRef(false);
 
   useEffect(() => {
@@ -86,17 +89,19 @@ const DraggableImage: React.FC<DraggableImageProps> = ({ image, onSelect, onUpda
     }
   };
 
-  const handleResizeMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleResizeMouseDown = (e: React.MouseEvent<HTMLDivElement>, handle: ResizeHandle) => {
     e.preventDefault();
     e.stopPropagation();
     if (!aspectRatio) return;
 
-    setIsResizing(true);
+    setActiveResizeHandle(handle);
     resizeStartRef.current = {
       x: e.clientX,
       y: e.clientY,
       width: size.width,
       height: size.height,
+      posX: position.x,
+      posY: position.y,
     };
   };
   
@@ -117,23 +122,50 @@ const DraggableImage: React.FC<DraggableImageProps> = ({ image, onSelect, onUpda
         let newX = (e.clientX - parentRect.left) / scale - offsetRef.current.x;
         let newY = (e.clientY - parentRect.top) / scale - offsetRef.current.y;
         setPosition({ x: newX, y: newY });
-      } else if (isResizing && dragRef.current && aspectRatio) {
+      } else if (activeResizeHandle && dragRef.current && aspectRatio) {
         wasDraggedRef.current = true;
         e.stopPropagation();
 
         const dx = (e.clientX - resizeStartRef.current.x) / scale;
+        const dy = (e.clientY - resizeStartRef.current.y) / scale;
         
-        const newWidth = resizeStartRef.current.width + dx;
-        const newHeight = newWidth / aspectRatio;
+        let newWidth = resizeStartRef.current.width;
+        let newHeight = resizeStartRef.current.height;
+        let newX = resizeStartRef.current.posX;
+        let newY = resizeStartRef.current.posY;
 
-        setSize({
-            width: Math.max(50, newWidth),
-            height: Math.max(50 / aspectRatio, newHeight)
-        });
+        switch (activeResizeHandle) {
+          case 'br':
+            newWidth = resizeStartRef.current.width + dx;
+            newHeight = newWidth / aspectRatio;
+            break;
+          case 'bl':
+            newWidth = resizeStartRef.current.width - dx;
+            newHeight = newWidth / aspectRatio;
+            newX = resizeStartRef.current.posX + dx;
+            break;
+          case 'tr':
+            newWidth = resizeStartRef.current.width + dx;
+            newHeight = newWidth / aspectRatio;
+            newY = resizeStartRef.current.posY - (newHeight - resizeStartRef.current.height);
+            break;
+          case 'tl':
+            newWidth = resizeStartRef.current.width - dx;
+            newHeight = newWidth / aspectRatio;
+            newX = resizeStartRef.current.posX + dx;
+            newY = resizeStartRef.current.posY + (resizeStartRef.current.height - newHeight);
+            break;
+        }
+
+        if (newWidth >= 50 && newHeight >= 50 / aspectRatio) {
+          setSize({ width: newWidth, height: newHeight });
+          setPosition({ x: newX, y: newY });
+        }
       }
     };
 
     const handleMouseUp = (e: MouseEvent) => {
+      const wasResizing = !!activeResizeHandle;
       if (isDragging) {
         e.stopPropagation();
         setIsDragging(false);
@@ -141,16 +173,16 @@ const DraggableImage: React.FC<DraggableImageProps> = ({ image, onSelect, onUpda
           onUpdate({ ...image, x: position.x, y: position.y }, false);
         }
       }
-      if (isResizing) {
+      if (wasResizing) {
         e.stopPropagation();
-        setIsResizing(false);
+        setActiveResizeHandle(null);
         if (wasDraggedRef.current) {
             onUpdate({ ...image, x: position.x, y: position.y, width: size.width, height: size.height }, false);
         }
       }
     };
     
-    if (isDragging || isResizing) {
+    if (isDragging || activeResizeHandle) {
       document.addEventListener('mousemove', handleMouseMove);
       document.addEventListener('mouseup', handleMouseUp);
     }
@@ -159,7 +191,7 @@ const DraggableImage: React.FC<DraggableImageProps> = ({ image, onSelect, onUpda
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [isDragging, isResizing, scale, image, onUpdate, position, size, aspectRatio]);
+  }, [isDragging, activeResizeHandle, scale, image, onUpdate, position, size, aspectRatio]);
 
   const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
       e.stopPropagation();
@@ -179,6 +211,11 @@ const DraggableImage: React.FC<DraggableImageProps> = ({ image, onSelect, onUpda
     width: size.width,
     height: size.height,
     aspectRatio: aspectRatio ? `${aspectRatio}` : undefined,
+  };
+
+  const handleBaseClasses = "absolute w-4 h-4 rounded-full bg-primary border-2 border-background z-20";
+  const handleScaleStyle = {
+    transform: `scale(${1 / scale})`,
   };
 
   return (
@@ -203,14 +240,28 @@ const DraggableImage: React.FC<DraggableImageProps> = ({ image, onSelect, onUpda
             onLoad={handleImageLoad}
         />
         {isSelected && (
-          <div 
-            className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-primary border-2 border-background cursor-se-resize z-20"
-            onMouseDown={handleResizeMouseDown}
-            style={{
-              transform: `scale(${1 / scale})`,
-              transformOrigin: 'bottom right',
-            }}
-          />
+          <>
+            <div 
+              className={cn(handleBaseClasses, "-top-1 -left-1 cursor-nwse-resize")}
+              style={{ ...handleScaleStyle, transformOrigin: 'top left' }}
+              onMouseDown={(e) => handleResizeMouseDown(e, 'tl')}
+            />
+            <div 
+              className={cn(handleBaseClasses, "-top-1 -right-1 cursor-nesw-resize")}
+              style={{ ...handleScaleStyle, transformOrigin: 'top right' }}
+              onMouseDown={(e) => handleResizeMouseDown(e, 'tr')}
+            />
+            <div 
+              className={cn(handleBaseClasses, "-bottom-1 -left-1 cursor-nesw-resize")}
+              style={{ ...handleScaleStyle, transformOrigin: 'bottom left' }}
+              onMouseDown={(e) => handleResizeMouseDown(e, 'bl')}
+            />
+            <div 
+              className={cn(handleBaseClasses, "-bottom-1 -right-1 cursor-nwse-resize")}
+              style={{ ...handleScaleStyle, transformOrigin: 'bottom right' }}
+              onMouseDown={(e) => handleResizeMouseDown(e, 'br')}
+            />
+          </>
         )}
     </div>
   );
