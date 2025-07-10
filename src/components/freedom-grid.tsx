@@ -66,6 +66,14 @@ const DraggableImage: React.FC<DraggableImageProps> = ({ image, onSelect, onUpda
   
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
+      // Dispatch a synthetic event to keep the custom cursor in sync
+      const customEvent = new MouseEvent('mousemove', {
+        clientX: e.clientX,
+        clientY: e.clientY,
+        bubbles: true,
+      });
+      window.dispatchEvent(customEvent);
+
       if (isDragging && dragRef.current) {
         wasDraggedRef.current = true;
         e.stopPropagation();
@@ -143,13 +151,13 @@ const DraggableImage: React.FC<DraggableImageProps> = ({ image, onSelect, onUpda
       onClick={handleClick}
       onDoubleClick={handleDoubleClick}
     >
-      <div className="w-full h-full relative overflow-hidden rounded-md">
+      <div className="w-full h-full relative overflow-hidden rounded-md bg-transparent">
         <Image
             src={image.url}
             alt={image.title}
             width={size.width}
             height={size.height}
-            className="object-cover pointer-events-none w-full h-full"
+            className="object-contain pointer-events-none w-full h-full"
             unoptimized
         />
         {isSelected && (
