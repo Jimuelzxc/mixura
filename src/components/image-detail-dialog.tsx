@@ -418,7 +418,7 @@ export default function ImageDetailDialog({ image, allTags, isOpen, onOpenChange
                     <Palette className="h-4 w-4 mt-1 text-muted-foreground flex-shrink-0"/>
                      <div>
                       <h4 className="font-semibold text-muted-foreground">Colors</h4>
-                      <div className="flex flex-wrap gap-2 mt-1">
+                      <div className="flex flex-wrap items-center gap-4">
                         {image.colors.map(color => 
                           <Badge key={color} variant="secondary" className="pl-2">
                             <span className="w-3 h-3 rounded-full mr-2 border" style={{ backgroundColor: basicColorMap[color] || '#000000' }} />

@@ -40,7 +40,7 @@ export function ViewOptions({ settings, onChange }: ViewOptionsProps) {
             View
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-80">
+      <PopoverContent className="w-85 relative translate-x-[-20%]">
         <div className="grid gap-4">
           <div className="space-y-2">
             <h4 className="font-medium leading-none">View</h4>
@@ -59,7 +59,7 @@ export function ViewOptions({ settings, onChange }: ViewOptionsProps) {
                       key={option.value}
                       htmlFor={`view-${option.value}`}
                       className={cn(
-                          "flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground cursor-pointer",
+                          "flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-4 px-5 hover:bg-accent hover:text-accent-foreground cursor-pointer",
                           settings.viewMode === option.value ? 'border-primary' : ''
                       )}
                   >
