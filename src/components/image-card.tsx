@@ -56,7 +56,7 @@ export default function ImageCard({ image, onSelect, onTagClick, viewMode }: Ima
                                 <Badge
                                 key={tag}
                                 variant="outline"
-                                className="border-white/40 bg-white/20 text-white backdrop-blur-sm cursor-pointer px-2 py-0.5 text-xs font-normal transition-colors hover:bg-white/30"
+                                className="border-white/40 bg-white/20 text-white backdrop-blur-sm cursor-pointer px-3 py-1 text-xs font-normal transition-colors hover:bg-white/30"
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     onTagClick(tag);
