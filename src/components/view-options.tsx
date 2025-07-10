@@ -48,43 +48,47 @@ export function ViewOptions({ settings, onChange }: ViewOptionsProps) {
               Choose a layout for your content.
             </p>
           </div>
-          <RadioGroup
-            value={settings.viewMode}
-            onValueChange={(value: string) => onChange({ viewMode: value as ViewMode })}
-            className="flex items-center gap-2"
-          >
-            {viewOptions.map((option) => (
-                <Label
-                    key={option.value}
-                    htmlFor={`view-${option.value}`}
-                    className={cn(
-                        "flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-2 hover:bg-accent hover:text-accent-foreground cursor-pointer w-24 h-24",
-                        settings.viewMode === option.value ? 'border-primary' : ''
-                    )}
-                >
-                    <RadioGroupItem value={option.value} id={`view-${option.value}`} className="sr-only" />
-                    <option.icon className="mb-2 h-6 w-6" />
-                    {option.label}
-                </Label>
-            ))}
-          </RadioGroup>
+          <div className="grid gap-2">
+            <RadioGroup
+              value={settings.viewMode}
+              onValueChange={(value: string) => onChange({ viewMode: value as ViewMode })}
+              className="flex items-center gap-2"
+            >
+              {viewOptions.map((option) => (
+                  <Label
+                      key={option.value}
+                      htmlFor={`view-${option.value}`}
+                      className={cn(
+                          "flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-2 hover:bg-accent hover:text-accent-foreground cursor-pointer w-24 h-24",
+                          settings.viewMode === option.value ? 'border-primary' : ''
+                      )}
+                  >
+                      <RadioGroupItem value={option.value} id={`view-${option.value}`} className="sr-only" />
+                      <option.icon className="mb-2 h-6 w-6" />
+                      {option.label}
+                  </Label>
+              ))}
+            </RadioGroup>
+          </div>
           
           {showSlider && (
             <>
             <Separator />
-            <div className="space-y-2">
-                <Label htmlFor="columns">Columns</Label>
-                 <div className="flex items-center gap-4">
-                    <Slider
-                        id="columns"
-                        value={[settings.gridColumns]}
-                        onValueChange={(value) => onChange({ gridColumns: value[0] })}
-                        min={1}
-                        max={5}
-                        step={1}
-                        className="w-full"
-                    />
-                    <span className="text-sm font-medium text-muted-foreground w-4 text-center">{settings.gridColumns}</span>
+            <div className="grid gap-4">
+                <div className="space-y-2">
+                    <Label htmlFor="columns">Columns</Label>
+                    <div className="flex items-center gap-4">
+                        <Slider
+                            id="columns"
+                            value={[settings.gridColumns]}
+                            onValueChange={(value) => onChange({ gridColumns: value[0] })}
+                            min={1}
+                            max={5}
+                            step={1}
+                            className="w-full"
+                        />
+                        <span className="text-sm font-medium text-muted-foreground w-4 text-center">{settings.gridColumns}</span>
+                    </div>
                 </div>
             </div>
             </>
