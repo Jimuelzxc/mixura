@@ -131,7 +131,7 @@ const Controls = () => {
 export default function FreedomGrid({ images, onImageSelect, onUpdateImage }: FreedomGridProps) {
   const [currentScale, setCurrentScale] = useState(1);
   return (
-    <div className="relative w-full h-[calc(100vh-280px)] border rounded-md bg-card/50 overflow-hidden touch-none">
+    <div className="relative w-full h-full border rounded-md bg-card/50 overflow-hidden touch-none">
        <TransformWrapper
         minScale={0.1}
         maxScale={8}

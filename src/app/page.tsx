@@ -454,7 +454,7 @@ export default function Home() {
   }, [images, searchTerm, selectedTags, selectedColors]);
 
   return (
-    <div className="flex flex-col min-h-screen bg-background">
+    <div className="flex flex-col h-screen bg-background">
       <AppHeader
         onAddImageClick={() => setAddLinkDialogOpen(true)}
         onImportClick={handleImportClick}
@@ -468,8 +468,8 @@ export default function Home() {
         onRenameBoard={handleStartEditingBoardName}
         isAllBoardsView={isAllBoardsView}
       />
-      <main className="flex-grow">
-        <div className="container mx-auto px-4 md:px-6 py-8">
+      <main className="flex-grow flex flex-col min-h-0">
+        <div className="container mx-auto px-4 md:px-6 py-8 flex flex-col flex-grow min-h-0">
             {isAllBoardsView ? (
                 <div className="mb-8">
                     <h1 className="text-[5rem] font-bold tracking-tighter leading-none">All Boards</h1>
@@ -497,28 +497,30 @@ export default function Home() {
                 onViewSettingsChange={handleUpdateViewSettings}
                 isAddDisabled={isAllBoardsView}
             />
-            {isDataLoaded && (
-              images.length === 0 && !searchTerm ? (
-                <div className="flex flex-col items-center justify-center text-center h-full mt-20 text-muted-foreground">
-                  <ImagePlus size={64} className="mb-4 text-muted-foreground/50" />
-                  <h2 className="text-2xl font-semibold">{isAllBoardsView ? "No images on any board" : "Your board is empty"}</h2>
-                  <p className="mt-2">{isAllBoardsView ? "Add an image to one of your boards to see it here." : "Click \"Add Image\" to save your first inspiration."}</p>
-                </div>
-              ) : filteredImages.length > 0 ? (
-                <ImageGrid 
-                  images={filteredImages} 
-                  onImageSelect={setSelectedImage} 
-                  onTagClick={handleTagSelect} 
-                  viewSettings={viewSettings}
-                  onUpdateImage={handleUpdateImage}
-                />
-              ) : (
-                <div className="flex flex-col items-center justify-center text-center h-full mt-20 text-muted-foreground">
-                  <h2 className="text-2xl font-semibold">No Images Found</h2>
-                  <p className="mt-2">Try adjusting your filters or add a new image.</p>
-                </div>
-              )
-            )}
+            <div className="flex-grow min-h-0">
+                {isDataLoaded && (
+                  images.length === 0 && !searchTerm ? (
+                    <div className="flex flex-col items-center justify-center text-center h-full mt-20 text-muted-foreground">
+                      <ImagePlus size={64} className="mb-4 text-muted-foreground/50" />
+                      <h2 className="text-2xl font-semibold">{isAllBoardsView ? "No images on any board" : "Your board is empty"}</h2>
+                      <p className="mt-2">{isAllBoardsView ? "Add an image to one of your boards to see it here." : "Click \"Add Image\" to save your first inspiration."}</p>
+                    </div>
+                  ) : filteredImages.length > 0 ? (
+                    <ImageGrid 
+                      images={filteredImages} 
+                      onImageSelect={setSelectedImage} 
+                      onTagClick={handleTagSelect} 
+                      viewSettings={viewSettings}
+                      onUpdateImage={handleUpdateImage}
+                    />
+                  ) : (
+                    <div className="flex flex-col items-center justify-center text-center h-full mt-20 text-muted-foreground">
+                      <h2 className="text-2xl font-semibold">No Images Found</h2>
+                      <p className="mt-2">Try adjusting your filters or add a new image.</p>
+                    </div>
+                  )
+                )}
+            </div>
         </div>
       </main>
       
