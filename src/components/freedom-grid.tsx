@@ -43,7 +43,6 @@ const DraggableImage: React.FC<DraggableImageProps> = ({ image, onSelect, onUpda
       let newX = e.clientX - boundsRect.left - offsetRef.current.x;
       let newY = e.clientY - boundsRect.top - offsetRef.current.y;
       
-      // Constrain within bounds
       const itemRect = dragRef.current.getBoundingClientRect();
       newX = Math.max(0, Math.min(newX, boundsRect.width - itemRect.width));
       newY = Math.max(0, Math.min(newY, boundsRect.height - itemRect.height));
@@ -78,7 +77,7 @@ const DraggableImage: React.FC<DraggableImageProps> = ({ image, onSelect, onUpda
     <div
       ref={dragRef}
       className={cn(
-        "absolute w-64 h-48 cursor-grab transition-shadow duration-200",
+        "absolute w-64 cursor-grab transition-shadow duration-200",
         isDragging ? 'shadow-2xl z-10 cursor-grabbing' : 'shadow-md hover:shadow-lg'
       )}
       style={{ left: position.x, top: position.y }}
@@ -87,12 +86,13 @@ const DraggableImage: React.FC<DraggableImageProps> = ({ image, onSelect, onUpda
         if(!isDragging) onSelect(image);
       }}
     >
-      <div className="w-full h-full relative overflow-hidden rounded-md">
+      <div className="w-full h-auto relative overflow-hidden rounded-md">
         <Image
             src={image.url}
             alt={image.title}
-            fill
-            className="object-cover pointer-events-none"
+            width={256}
+            height={256}
+            className="object-cover pointer-events-none w-full h-auto"
         />
       </div>
     </div>
