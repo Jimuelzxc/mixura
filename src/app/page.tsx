@@ -76,6 +76,21 @@ export default function Home() {
     }
   }, [images, viewSettings, isDataLoaded]);
 
+  // Keyboard shortcut for adding a new image
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if ((event.metaKey || event.ctrlKey) && event.key === 'n') {
+        event.preventDefault();
+        setAddLinkDialogOpen(true);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
   const allTags = useMemo(() => {
     const tags = new Set<string>();
     images.forEach(image => {
