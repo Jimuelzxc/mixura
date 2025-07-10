@@ -15,6 +15,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 const LOCALSTORAGE_KEY = 'mixura-data';
 
@@ -540,9 +541,26 @@ export default function Home() {
                       <h1 className="text-[5rem] font-bold tracking-tighter leading-none">All Boards</h1>
                   </div>
               ) : activeBoard && (
-                  <div className="mb-8">
+                  <div className="mb-8 group">
                       <div className="flex items-center gap-4">
                           <h1 className="text-[5rem] font-bold tracking-tighter leading-none">{activeBoard.name}</h1>
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                  <Button 
+                                    variant="ghost" 
+                                    size="icon" 
+                                    onClick={() => handleStartEditingBoardName(activeBoard.id)}
+                                    className="opacity-0 group-hover:opacity-100 transition-opacity"
+                                  >
+                                      <Pencil className="w-10 h-10" />
+                                  </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Rename board</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
                       </div>
                   </div>
               )}
