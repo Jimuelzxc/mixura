@@ -135,11 +135,11 @@ export default function AppHeader({
               <DropdownMenuLabel>Data</DropdownMenuLabel>
                <DropdownMenuItem onClick={onImportClick}>
                 <Upload className="mr-2 h-4 w-4" />
-                <span>Import from JSON...</span>
+                <span>Import</span>
               </DropdownMenuItem>
               <DropdownMenuItem onClick={onExportClick}>
                 <Download className="mr-2 h-4 w-4" />
-                <span>Export to JSON...</span>
+                <span>Export</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={onDeleteAllClick} className="text-destructive focus:text-destructive focus:bg-destructive/10">
