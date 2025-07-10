@@ -470,9 +470,9 @@ export default function Home() {
         <div className="container mx-auto px-4 md:px-6 py-8">
             {isAllBoardsView ? (
                 <div className="mb-8">
-                    <div className="flex items-center gap-4">
-                        <LayoutGrid className="w-10 h-10 text-muted-foreground" />
-                        <h1 className="text-4xl font-bold tracking-tighter">All Boards</h1>
+                    <div className="flex items-center gap-6">
+                        <LayoutGrid className="w-16 h-16 text-muted-foreground" />
+                        <h1 className="text-[5rem] font-bold tracking-tighter leading-none">All Boards</h1>
                     </div>
                 </div>
             ) : activeBoard && (
@@ -487,7 +487,7 @@ export default function Home() {
                                     if (e.key === 'Enter') handleSaveBoardName();
                                     if (e.key === 'Escape') handleCancelEditingBoardName();
                                 }}
-                                className="text-4xl font-bold tracking-tighter h-auto"
+                                className="text-[5rem] font-bold tracking-tighter h-auto leading-none"
                                 placeholder="Board name..."
                             />
                             <div className="flex items-center gap-2">
@@ -497,7 +497,7 @@ export default function Home() {
                         </div>
                     ) : (
                          <div className="flex items-center gap-4">
-                            <h1 className="text-4xl font-bold tracking-tighter">{activeBoard.name}</h1>
+                            <h1 className="text-[5rem] font-bold tracking-tighter leading-none">{activeBoard.name}</h1>
                             <Button size="sm" variant="outline" onClick={() => handleStartEditingBoardName(activeBoard.id)}>
                                 <Edit className="w-4 h-4 mr-2"/>
                                 Edit Name
