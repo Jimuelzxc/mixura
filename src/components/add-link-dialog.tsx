@@ -364,7 +364,7 @@ export default function AddLinkDialog({ onAddImage, allTags, isOpen, onOpenChang
                     <FormItem>
                       <FormLabel>Colors</FormLabel>
                       <FormControl>
-                        <div className="flex flex-wrap gap-2">
+                        <div className="grid grid-cols-12 gap-2">
                             {Object.entries(basicColorMap).map(([name, hex]) => (
                                 <TooltipProvider key={name}>
                                 <Tooltip>

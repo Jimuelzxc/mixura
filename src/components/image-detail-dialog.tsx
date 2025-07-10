@@ -340,7 +340,7 @@ export default function ImageDetailDialog({ image, allTags, isOpen, onOpenChange
                     <FormItem>
                       <FormLabel>Colors</FormLabel>
                       <FormControl>
-                        <div className="flex flex-wrap gap-2">
+                        <div className="grid grid-cols-12 gap-2">
                             {Object.entries(basicColorMap).map(([name, hex]) => (
                                 <TooltipProvider key={name}>
                                 <Tooltip>
