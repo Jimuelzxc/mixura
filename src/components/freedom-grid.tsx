@@ -30,7 +30,6 @@ const DraggableImage: React.FC<DraggableImageProps> = ({ image, onSelect, onUpda
   const wasDraggedRef = useRef(false);
 
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
-    // Only drag with left mouse button and no modifier keys
     if (e.button !== 0 || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
     
     e.preventDefault();
@@ -52,7 +51,6 @@ const DraggableImage: React.FC<DraggableImageProps> = ({ image, onSelect, onUpda
       if (isDragging && dragRef.current) {
         wasDraggedRef.current = true;
         
-        // This stops the pan-zoom library from panning while we drag an image
         e.stopPropagation();
 
         const parentRect = dragRef.current.parentElement?.getBoundingClientRect();
@@ -84,7 +82,7 @@ const DraggableImage: React.FC<DraggableImageProps> = ({ image, onSelect, onUpda
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [isDragging, scale, image, onUpdate]);
+  }, [isDragging, scale, image, onUpdate, position.x, position.y]);
 
   const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
       e.stopPropagation();
@@ -133,7 +131,7 @@ const Controls = () => {
 export default function FreedomGrid({ images, onImageSelect, onUpdateImage }: FreedomGridProps) {
   const [currentScale, setCurrentScale] = useState(1);
   return (
-    <div className="relative w-full h-[150vh] border rounded-md bg-card/50 overflow-hidden touch-none">
+    <div className="relative w-full h-[calc(100vh-280px)] border rounded-md bg-card/50 overflow-hidden touch-none">
        <TransformWrapper
         minScale={0.1}
         maxScale={8}
