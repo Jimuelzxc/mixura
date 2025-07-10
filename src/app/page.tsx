@@ -2,50 +2,96 @@
 "use client";
 
 import { useState, useMemo, useEffect, useRef } from 'react';
-import type { ImageItem, ViewSettings } from '@/lib/types';
+import type { ImageItem, ViewSettings, Board } from '@/lib/types';
 import AppHeader from '@/components/app-header';
 import ImageGrid from '@/components/image-grid';
 import ImageDetailDialog from '@/components/image-detail-dialog';
 import FilterToolbar from '@/components/filter-toolbar';
 import { useToast } from '@/hooks/use-toast';
-import { ImagePlus, AlertTriangle } from 'lucide-react';
+import { ImagePlus, AlertTriangle, Edit, Check, X } from 'lucide-react';
 import AddLinkDialog from '@/components/add-link-dialog';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+
+const LOCALSTORAGE_KEY = 'mixura-data';
 
 export default function Home() {
-  const [images, setImages] = useState<ImageItem[]>([]);
+  const [boards, setBoards] = useState<Board[]>([]);
+  const [activeBoardId, setActiveBoardId] = useState<string | null>(null);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
-  const [isAddLinkDialogOpen, setAddLinkDialogOpen] = useState(false);
   
+  const [isAddLinkDialogOpen, setAddLinkDialogOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedImage, setSelectedImage] = useState<ImageItem | null>(null);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
+  const [isEditingBoardName, setIsEditingBoardName] = useState(false);
+  const [editingBoardName, setEditingBoardName] = useState('');
+  
   const { toast } = useToast();
-  const [viewSettings, setViewSettings] = useState<ViewSettings>({
-    viewMode: 'moodboard',
-    gridColumns: 3,
-    listShowCover: true,
-    listShowTitle: true,
-    listShowNotes: true,
-    listShowTags: true,
-    listCoverPosition: 'left',
-  });
   
   const [isDeleteAllAlertOpen, setDeleteAllAlertOpen] = useState(false);
+  const [isDeleteBoardAlertOpen, setDeleteBoardAlertOpen] = useState(false);
   const importInputRef = useRef<HTMLInputElement>(null);
+  const boardNameInputRef = useRef<HTMLInputElement>(null);
+
+  const activeBoard = useMemo(() => {
+    return boards.find(b => b.id === activeBoardId) || null;
+  }, [boards, activeBoardId]);
+
+  const images = useMemo(() => activeBoard?.images || [], [activeBoard]);
+  const viewSettings = useMemo(() => activeBoard?.viewSettings, [activeBoard]);
 
   // Load data from localStorage on initial render
   useEffect(() => {
     try {
-      const storedImages = window.localStorage.getItem('tarsus-images');
-      if (storedImages) {
-        setImages(JSON.parse(storedImages));
-      }
-      const storedSettings = window.localStorage.getItem('tarsus-view-settings');
-      if (storedSettings) {
-        setViewSettings(JSON.parse(storedSettings));
+      const storedData = window.localStorage.getItem(LOCALSTORAGE_KEY);
+      if (storedData) {
+        const data = JSON.parse(storedData);
+        if (data.boards && data.activeBoardId) {
+          setBoards(data.boards);
+          setActiveBoardId(data.activeBoardId);
+        } else {
+          // Migration for old data structure
+          const oldImages = window.localStorage.getItem('tarsus-images');
+          const oldSettings = window.localStorage.getItem('tarsus-view-settings');
+          
+          const defaultBoard: Board = {
+            id: `board-${Date.now()}`,
+            name: 'My Board',
+            images: oldImages ? JSON.parse(oldImages) : [],
+            viewSettings: oldSettings ? JSON.parse(oldSettings) : {
+              viewMode: 'moodboard',
+              gridColumns: 3,
+              listShowCover: true,
+              listShowTitle: true,
+              listShowNotes: true,
+              listShowTags: true,
+              listCoverPosition: 'left',
+            },
+          };
+          setBoards([defaultBoard]);
+          setActiveBoardId(defaultBoard.id);
+        }
+      } else {
+        // Create a new default board if no data exists
+        const newBoard: Board = {
+          id: `board-${Date.now()}`,
+          name: 'My First Board',
+          images: [],
+          viewSettings: {
+            viewMode: 'moodboard',
+            gridColumns: 3,
+            listShowCover: true,
+            listShowTitle: true,
+            listShowNotes: true,
+            listShowTags: true,
+            listCoverPosition: 'left',
+          },
+        };
+        setBoards([newBoard]);
+        setActiveBoardId(newBoard.id);
       }
     } catch (error) {
       console.error('Failed to load from localStorage', error);
@@ -57,14 +103,14 @@ export default function Home() {
     } finally {
       setIsDataLoaded(true);
     }
-  }, []);
+  }, [toast]);
 
   // Save data to localStorage whenever it changes
   useEffect(() => {
     if (isDataLoaded) {
       try {
-        window.localStorage.setItem('tarsus-images', JSON.stringify(images));
-        window.localStorage.setItem('tarsus-view-settings', JSON.stringify(viewSettings));
+        const dataToStore = JSON.stringify({ boards, activeBoardId });
+        window.localStorage.setItem(LOCALSTORAGE_KEY, dataToStore);
       } catch (error) {
         console.error('Failed to save to localStorage', error);
           toast({
@@ -74,7 +120,13 @@ export default function Home() {
         });
       }
     }
-  }, [images, viewSettings, isDataLoaded]);
+  }, [boards, activeBoardId, isDataLoaded, toast]);
+  
+  useEffect(() => {
+    if (isEditingBoardName && boardNameInputRef.current) {
+        boardNameInputRef.current.select();
+    }
+  }, [isEditingBoardName]);
 
   // Keyboard shortcut for adding a new image
   useEffect(() => {
@@ -107,21 +159,36 @@ export default function Home() {
     return Array.from(colors).sort();
   }, [images]);
 
+  const updateActiveBoard = (updater: (board: Board) => Board) => {
+    if (!activeBoardId) return;
+    setBoards(currentBoards => 
+      currentBoards.map(board => 
+        board.id === activeBoardId ? updater(board) : board
+      )
+    );
+  };
+
   const handleAddImage = (newImage: Omit<ImageItem, 'id'>) => {
     const fullImage: ImageItem = {
       ...newImage,
       id: `img-${Date.now()}`,
       colors: newImage.colors || [],
     };
-    setImages(prevImages => [fullImage, ...prevImages]);
+    updateActiveBoard(board => ({
+      ...board,
+      images: [fullImage, ...board.images]
+    }));
     toast({
       title: "Image saved!",
-      description: "Your new image has been added to your collection.",
+      description: "Your new image has been added to the current board.",
     });
   };
 
   const handleDeleteImage = (imageId: string) => {
-    setImages(prevImages => prevImages.filter(img => img.id !== imageId));
+    updateActiveBoard(board => ({
+      ...board,
+      images: board.images.filter(img => img.id !== imageId)
+    }));
     setSelectedImage(null);
     toast({
       title: "Image deleted",
@@ -131,7 +198,10 @@ export default function Home() {
   };
 
   const handleUpdateImage = (updatedImage: ImageItem) => {
-    setImages(prevImages => prevImages.map(img => (img.id === updatedImage.id ? updatedImage : img)));
+    updateActiveBoard(board => ({
+      ...board,
+      images: board.images.map(img => (img.id === updatedImage.id ? updatedImage : img))
+    }));
     setSelectedImage(updatedImage);
      toast({
       title: "Image updated!",
@@ -159,21 +229,24 @@ export default function Home() {
   };
 
   const handleUpdateViewSettings = (newSettings: Partial<ViewSettings>) => {
-    setViewSettings(prev => ({ ...prev, ...newSettings }));
+    updateActiveBoard(board => ({
+      ...board,
+      viewSettings: { ...board.viewSettings, ...newSettings }
+    }));
   };
 
   const handleExport = () => {
-    const dataStr = JSON.stringify({ images, viewSettings }, null, 2);
+    const dataStr = JSON.stringify({ boards, activeBoardId }, null, 2);
     const dataBlob = new Blob([dataStr], { type: 'application/json' });
     const url = URL.createObjectURL(dataBlob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `linkboard-backup-${new Date().toISOString().split('T')[0]}.json`;
+    link.download = `mixura-backup-${new Date().toISOString().split('T')[0]}.json`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
-    toast({ title: 'Exported!', description: 'Your data has been exported to a JSON file.' });
+    toast({ title: 'Exported!', description: 'All your boards have been exported.' });
   };
 
   const handleImportClick = () => {
@@ -189,36 +262,110 @@ export default function Home() {
       try {
         const text = e.target?.result as string;
         const data = JSON.parse(text);
-        if (Array.isArray(data.images) && data.viewSettings) {
-          // Basic validation
-          const newImages = data.images.filter((img: any) => img.id && img.url && img.title);
-          setImages(newImages);
-          setViewSettings(data.viewSettings);
+        if (Array.isArray(data.boards) && data.activeBoardId) {
+          setBoards(data.boards);
+          setActiveBoardId(data.activeBoardId);
           toast({ title: 'Import successful!', description: 'Your data has been imported.' });
         } else {
-          throw new Error('Invalid JSON format.');
+          throw new Error('Invalid JSON format for multi-board data.');
         }
       } catch (error) {
         console.error('Import failed', error);
-        toast({ title: 'Import Failed', description: 'The selected file is not a valid JSON backup.', variant: 'destructive' });
+        toast({ title: 'Import Failed', description: 'The selected file is not a valid backup.', variant: 'destructive' });
       }
     };
     reader.readAsText(file);
-    // Reset file input
     if (importInputRef.current) {
       importInputRef.current.value = '';
     }
   };
 
   const handleDeleteAll = () => {
-    setImages([]);
+    const newBoard: Board = {
+        id: `board-${Date.now()}`,
+        name: 'My First Board',
+        images: [],
+        viewSettings: {
+            viewMode: 'moodboard',
+            gridColumns: 3,
+            listShowCover: true,
+            listShowTitle: true,
+            listShowNotes: true,
+            listShowTags: true,
+            listCoverPosition: 'left',
+        },
+    };
+    setBoards([newBoard]);
+    setActiveBoardId(newBoard.id);
     setDeleteAllAlertOpen(false);
-    toast({ title: 'All data deleted', description: 'Your collection has been cleared.', variant: 'destructive' });
+    toast({ title: 'All data deleted', description: 'Your collection has been cleared and a new empty board was created.', variant: 'destructive' });
+  };
+  
+  const handleNewBoard = () => {
+    const newBoard: Board = {
+      id: `board-${Date.now()}`,
+      name: `Board ${boards.length + 1}`,
+      images: [],
+      viewSettings: {
+        viewMode: 'moodboard',
+        gridColumns: 3,
+        listShowCover: true,
+        listShowTitle: true,
+        listShowNotes: true,
+        listShowTags: true,
+        listCoverPosition: 'left',
+      },
+    };
+    setBoards(prev => [...prev, newBoard]);
+    setActiveBoardId(newBoard.id);
+    toast({ title: 'New Board Created!', description: `Switched to "${newBoard.name}".`});
+  };
+  
+  const handleSwitchBoard = (boardId: string) => {
+    setActiveBoardId(boardId);
+    const board = boards.find(b => b.id === boardId);
+    if (board) {
+      toast({ title: 'Switched Board', description: `Now viewing "${board.name}".`});
+    }
+  };
+
+  const handleDeleteBoard = () => {
+    if (boards.length <= 1) {
+        toast({ title: 'Cannot Delete', description: 'You cannot delete the last board.', variant: 'destructive' });
+        setDeleteBoardAlertOpen(false);
+        return;
+    }
+    setBoards(prev => prev.filter(b => b.id !== activeBoardId));
+    const newActiveBoardId = boards.find(b => b.id !== activeBoardId)?.id || null;
+    setActiveBoardId(newActiveBoardId);
+    setDeleteBoardAlertOpen(false);
+    toast({ title: 'Board Deleted', variant: 'destructive'});
+  };
+
+  const handleStartEditingBoardName = () => {
+    if (activeBoard) {
+        setEditingBoardName(activeBoard.name);
+        setIsEditingBoardName(true);
+    }
+  };
+
+  const handleCancelEditingBoardName = () => {
+    setIsEditingBoardName(false);
+    setEditingBoardName('');
+  };
+  
+  const handleSaveBoardName = () => {
+    if (editingBoardName.trim() && activeBoard) {
+        updateActiveBoard(board => ({ ...board, name: editingBoardName.trim() }));
+        setIsEditingBoardName(false);
+        toast({ title: 'Board Renamed', description: `The board is now named "${editingBoardName.trim()}".`});
+    } else {
+        setIsEditingBoardName(false);
+    }
   };
 
   const filteredImages = useMemo(() => {
     return images.filter(image => {
-      // Search term filter (searches across title, notes, and tags)
       if (searchTerm) {
         const lowercasedFilter = searchTerm.toLowerCase();
         const searchMatch =
@@ -228,20 +375,11 @@ export default function Home() {
           (image.colors || []).some(color => color.toLowerCase().includes(lowercasedFilter));
         if (!searchMatch) return false;
       }
-
-      // Selected tags filter (AND logic)
-      if (selectedTags.length > 0 && !selectedTags.every(tag => image.tags.includes(tag))) {
-        return false;
-      }
-
-      // Selected colors filter (OR logic for multiple colors)
+      if (selectedTags.length > 0 && !selectedTags.every(tag => image.tags.includes(tag))) return false;
       if (selectedColors.length > 0) {
         const imageColors = image.colors || [];
-        if (!selectedColors.some(selectedColor => imageColors.includes(selectedColor))) {
-            return false;
-        }
+        if (!selectedColors.some(selectedColor => imageColors.includes(selectedColor))) return false;
       }
-
       return true;
     });
   }, [images, searchTerm, selectedTags, selectedColors]);
@@ -253,9 +391,41 @@ export default function Home() {
         onImportClick={handleImportClick}
         onExportClick={handleExport}
         onDeleteAllClick={() => setDeleteAllAlertOpen(true)}
+        boards={boards}
+        activeBoardId={activeBoardId}
+        onNewBoard={handleNewBoard}
+        onSwitchBoard={handleSwitchBoard}
+        onDeleteBoard={() => setDeleteBoardAlertOpen(true)}
       />
       <main className="flex-grow">
         <div className="container mx-auto px-4 md:px-6 py-8">
+            {activeBoard && (
+                <div className="mb-8 group">
+                    {isEditingBoardName ? (
+                        <div className="flex items-center gap-2 max-w-xl">
+                            <Input
+                                ref={boardNameInputRef}
+                                value={editingBoardName}
+                                onChange={(e) => setEditingBoardName(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') handleSaveBoardName();
+                                    if (e.key === 'Escape') handleCancelEditingBoardName();
+                                }}
+                                className="text-4xl font-bold h-auto p-0 border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+                            />
+                            <Button size="icon" variant="ghost" onClick={handleSaveBoardName}><Check className="w-6 h-6"/></Button>
+                            <Button size="icon" variant="ghost" onClick={handleCancelEditingBoardName}><X className="w-6 h-6"/></Button>
+                        </div>
+                    ) : (
+                         <div className="flex items-center gap-4">
+                            <h1 className="text-4xl font-bold truncate">{activeBoard.name}</h1>
+                            <Button size="icon" variant="ghost" className="opacity-0 group-hover:opacity-100 transition-opacity" onClick={handleStartEditingBoardName}>
+                                <Edit className="w-6 h-6"/>
+                            </Button>
+                         </div>
+                    )}
+                </div>
+            )}
             <FilterToolbar
                 searchTerm={searchTerm}
                 onSearchChange={setSearchTerm}
@@ -275,7 +445,7 @@ export default function Home() {
               images.length === 0 && !searchTerm ? (
                 <div className="flex flex-col items-center justify-center text-center h-full mt-20 text-muted-foreground">
                   <ImagePlus size={64} className="mb-4 text-muted-foreground/50" />
-                  <h2 className="text-2xl font-semibold">Your collection is empty</h2>
+                  <h2 className="text-2xl font-semibold">Your board is empty</h2>
                   <p className="mt-2">Click "Add Image" to save your first inspiration.</p>
                 </div>
               ) : filteredImages.length > 0 ? (
@@ -325,7 +495,7 @@ export default function Home() {
               <div className="flex-grow">
                 <AlertDialogTitle>Are you sure you want to delete all data?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  This will permanently delete all your images and settings. This action cannot be undone.
+                  This will permanently delete all your boards and images. This action cannot be undone.
                 </AlertDialogDescription>
               </div>
             </div>
@@ -333,6 +503,28 @@ export default function Home() {
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={handleDeleteAll}>Yes, delete all</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={isDeleteBoardAlertOpen} onOpenChange={setDeleteBoardAlertOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-full bg-destructive/10 flex items-center justify-center">
+                  <AlertTriangle className="w-6 h-6 text-destructive" />
+              </div>
+              <div className="flex-grow">
+                <AlertDialogTitle>Delete this board?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Are you sure you want to delete the board "{activeBoard?.name}"? This action cannot be undone.
+                </AlertDialogDescription>
+              </div>
+            </div>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteBoard}>Yes, delete board</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

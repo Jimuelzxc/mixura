@@ -12,10 +12,14 @@ interface ImageGridProps {
   images: ImageItem[];
   onImageSelect: (image: ImageItem) => void;
   onTagClick: (tag: string) => void;
-  viewSettings: ViewSettings;
+  viewSettings: ViewSettings | undefined;
 }
 
 export default function ImageGrid({ images, onImageSelect, onTagClick, viewSettings }: ImageGridProps) {
+  if (!viewSettings) {
+    return null; // Or a loading skeleton
+  }
+  
   const { viewMode, gridColumns } = viewSettings;
 
   const columnClasses: { [key: number]: string } = {

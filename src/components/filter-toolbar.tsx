@@ -1,3 +1,4 @@
+
 "use client";
 
 import { SlidersHorizontal, Hash, Search, Palette, ImagePlus } from 'lucide-react';
@@ -22,7 +23,7 @@ interface FilterToolbarProps {
   onTagSelect: (tag: string) => void;
   selectedColors: string[];
   onColorSelect: (color: string) => void;
-  viewSettings: ViewSettings;
+  viewSettings: ViewSettings | undefined;
   onViewSettingsChange: (settings: Partial<ViewSettings>) => void;
   onClearFilters: () => void;
   searchTerm: string;
@@ -52,6 +53,10 @@ export default function FilterToolbar({
     const colorOrder = Object.keys(basicColorMap);
     return allColors.sort((a, b) => colorOrder.indexOf(a) - colorOrder.indexOf(b));
   }, [allColors]);
+  
+  if (!viewSettings) {
+    return null; // or a loading state
+  }
 
   return (
     <div className="mb-6 flex flex-col gap-4">
