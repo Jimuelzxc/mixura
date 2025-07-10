@@ -14,7 +14,7 @@ export interface ImageItem {
   height?: number;
 }
 
-export type ViewMode = 'moodboard' | 'list' | 'cards' | 'freedom';
+export type ViewMode = 'moodboard' | 'list' | 'cards' | 'canvas';
 
 export interface ViewSettings {
   viewMode: ViewMode;

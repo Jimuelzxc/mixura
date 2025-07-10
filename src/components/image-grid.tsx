@@ -5,7 +5,7 @@ import type { ImageItem, ViewSettings } from '@/lib/types';
 import ImageCard from './image-card';
 import { cn } from '@/lib/utils';
 import ImageListItem from './image-list-item';
-import FreedomGrid from './freedom-grid';
+import CanvasGrid from './canvas-grid';
 
 
 interface ImageGridProps {
@@ -14,7 +14,7 @@ interface ImageGridProps {
   onTagClick: (tag: string) => void;
   viewSettings: ViewSettings | undefined;
   onUpdateImage: (image: ImageItem, showToast?: boolean) => void;
-  isFreedomFullscreen?: boolean;
+  isCanvasFullscreen?: boolean;
   onToggleFullscreen?: () => void;
   onUpdateViewSettings?: (settings: Partial<ViewSettings>) => void;
 }
@@ -25,7 +25,7 @@ export default function ImageGrid({
   onTagClick, 
   viewSettings, 
   onUpdateImage, 
-  isFreedomFullscreen = false, 
+  isCanvasFullscreen = false, 
   onToggleFullscreen = () => {},
   onUpdateViewSettings = () => {}
 }: ImageGridProps) {
@@ -81,13 +81,13 @@ export default function ImageGrid({
     );
   }
   
-  if (viewMode === 'freedom') {
+  if (viewMode === 'canvas') {
     return (
-      <FreedomGrid 
+      <CanvasGrid 
         images={images} 
         onImageSelect={onImageSelect} 
         onUpdateImage={onUpdateImage} 
-        isFullscreen={isFreedomFullscreen}
+        isFullscreen={isCanvasFullscreen}
         onToggleFullscreen={onToggleFullscreen}
         viewSettings={viewSettings}
         onUpdateViewSettings={onUpdateViewSettings}

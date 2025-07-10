@@ -45,7 +45,7 @@ export default function Home() {
   const [editingBoardName, setEditingBoardName] = useState('');
 
   const [deletingBoardId, setDeletingBoardId] = useState<string | null>(null);
-  const [isFreedomFullscreen, setIsFreedomFullscreen] = useState(false);
+  const [isCanvasFullscreen, setIsCanvasFullscreen] = useState(false);
   
   const { toast } = useToast();
   
@@ -162,9 +162,9 @@ export default function Home() {
         event.preventDefault();
         setAddLinkDialogOpen(true);
       }
-      if (event.key === 'Escape' && isFreedomFullscreen) {
+      if (event.key === 'Escape' && isCanvasFullscreen) {
         event.preventDefault();
-        setIsFreedomFullscreen(false);
+        setIsCanvasFullscreen(false);
       }
     };
 
@@ -172,7 +172,7 @@ export default function Home() {
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [isFreedomFullscreen]);
+  }, [isCanvasFullscreen]);
 
   const allTags = useMemo(() => {
     const tags = new Set<string>();
@@ -451,11 +451,11 @@ export default function Home() {
     });
   }, [images, searchTerm, selectedTags, selectedColors]);
   
-  const isFreedomViewActive = viewSettings?.viewMode === 'freedom';
+  const isCanvasViewActive = viewSettings?.viewMode === 'canvas';
 
   return (
-    <div className={cn("flex flex-col h-screen bg-background", isFreedomFullscreen && "overflow-hidden")}>
-      <div className={cn(isFreedomFullscreen && "hidden")}>
+    <div className={cn("flex flex-col h-screen bg-background", isCanvasFullscreen && "overflow-hidden")}>
+      <div className={cn(isCanvasFullscreen && "hidden")}>
         <AppHeader
           onAddImageClick={() => setAddLinkDialogOpen(true)}
           onImportClick={handleImportClick}
@@ -470,9 +470,9 @@ export default function Home() {
           isAllBoardsView={isAllBoardsView}
         />
       </div>
-      <main className={cn("flex-grow flex flex-col min-h-0", isFreedomFullscreen && "h-screen")}>
-        <div className={cn("container mx-auto px-4 md:px-6 py-8 flex flex-col flex-grow min-h-0", isFreedomFullscreen && "p-4 md:p-8 max-w-full h-full")}>
-            <div className={cn(isFreedomFullscreen && "hidden")}>
+      <main className={cn("flex-grow flex flex-col min-h-0", isCanvasFullscreen && "h-screen")}>
+        <div className={cn("container mx-auto px-4 md:px-6 py-8 flex flex-col flex-grow min-h-0", isCanvasFullscreen && "p-4 md:p-8 max-w-full h-full")}>
+            <div className={cn(isCanvasFullscreen && "hidden")}>
               {isAllBoardsView ? (
                   <div className="mb-8">
                       <h1 className="text-[5rem] font-bold tracking-tighter leading-none">All Boards</h1>
@@ -501,7 +501,7 @@ export default function Home() {
                   isAddDisabled={isAllBoardsView}
               />
             </div>
-            <div className={cn("flex-grow min-h-0", isFreedomViewActive && "flex flex-col")}>
+            <div className={cn("flex-grow min-h-0", isCanvasViewActive && "flex flex-col")}>
                 {isDataLoaded && (
                   images.length === 0 && !searchTerm ? (
                     <div className="flex flex-col items-center justify-center text-center h-full mt-20 text-muted-foreground">
@@ -516,8 +516,8 @@ export default function Home() {
                       onTagClick={handleTagSelect} 
                       viewSettings={viewSettings}
                       onUpdateImage={handleUpdateImage}
-                      isFreedomFullscreen={isFreedomFullscreen}
-                      onToggleFullscreen={() => setIsFreedomFullscreen(prev => !prev)}
+                      isCanvasFullscreen={isCanvasFullscreen}
+                      onToggleFullscreen={() => setIsCanvasFullscreen(prev => !prev)}
                       onUpdateViewSettings={handleUpdateViewSettings}
                     />
                   ) : (
