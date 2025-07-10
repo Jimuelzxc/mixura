@@ -34,6 +34,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Popover, PopoverContent, PopoverAnchor } from '@/components/ui/popover';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useToast } from '@/hooks/use-toast';
 import { suggestDetails } from '@/ai/flows/suggest-details';
 import { basicColorMap } from '@/lib/utils';
@@ -129,7 +130,7 @@ export default function ImageDetailDialog({ image, allTags, isOpen, onOpenChange
   };
   
   const handleAddTag = (tag: string, field: any) => {
-    const trimmedTag = tag.trim();
+    const trimmedTag = tag.trim().toLowerCase();
     if (trimmedTag && !field.value.includes(trimmedTag)) {
         form.setValue('tags', [...field.value, trimmedTag]);
     }
@@ -198,6 +199,25 @@ export default function ImageDetailDialog({ image, allTags, isOpen, onOpenChange
 
   if (!image) return null;
 
+  const isGif = image.url.toLowerCase().endsWith('.gif');
+
+  const aiButton = (
+    <Button
+      type="button"
+      variant="outline"
+      onClick={handleAiFill}
+      disabled={isGenerating || isGif}
+      className="w-full"
+    >
+      {isGenerating ? (
+        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+      ) : (
+        <Sparkles className="mr-2 h-5 w-5" />
+      )}
+      Auto-fill with AI
+    </Button>
+  );
+
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col md:flex-row p-0">
@@ -209,6 +229,7 @@ export default function ImageDetailDialog({ image, allTags, isOpen, onOpenChange
             height={1200}
             className="object-contain w-full h-full max-h-[90vh] rounded-l-md bg-background/20"
             data-ai-hint="abstract texture"
+            unoptimized={isGif}
           />
         </div>
         <div className="md:w-1/3 w-full flex flex-col">
@@ -216,20 +237,20 @@ export default function ImageDetailDialog({ image, allTags, isOpen, onOpenChange
           {isEditing ? (
              <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                 <Button
-                    type="button"
-                    variant="outline"
-                    onClick={handleAiFill}
-                    disabled={isGenerating}
-                    className="w-full"
-                  >
-                    {isGenerating ? (
-                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                    ) : (
-                      <Sparkles className="mr-2 h-5 w-5" />
-                    )}
-                    Auto-fill with AI
-                  </Button>
+                 {isGif ? (
+                    <TooltipProvider>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <div className="w-full">{aiButton}</div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <p>AI suggestions are not available for GIFs.</p>
+                        </TooltipContent>
+                    </Tooltip>
+                    </TooltipProvider>
+                  ) : (
+                    aiButton
+                  )}
                 <FormField
                   control={form.control}
                   name="title"
@@ -406,3 +427,5 @@ export default function ImageDetailDialog({ image, allTags, isOpen, onOpenChange
     </Dialog>
   );
 }
+
+    

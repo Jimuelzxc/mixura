@@ -34,6 +34,7 @@ import { Badge } from './ui/badge';
 import { Popover, PopoverContent, PopoverAnchor } from '@/components/ui/popover';
 import { useToast } from '@/hooks/use-toast';
 import { suggestDetails } from '@/ai/flows/suggest-details';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 
 
 const imageSchema = z.object({
@@ -116,7 +117,7 @@ export default function AddLinkDialog({ onAddImage, allTags, isOpen, onOpenChang
   };
 
   const handleAddTag = (tag: string, field: any) => {
-    const trimmedTag = tag.trim();
+    const trimmedTag = tag.trim().toLowerCase();
     if (trimmedTag && !field.value.includes(trimmedTag)) {
         form.setValue('tags', [...field.value, trimmedTag]);
     }
@@ -186,6 +187,24 @@ export default function AddLinkDialog({ onAddImage, allTags, isOpen, onOpenChang
 
   const imageUrl = form.watch('url');
   const isUrlValid = z.string().url().safeParse(imageUrl).success;
+  const isGif = isUrlValid && imageUrl.toLowerCase().endsWith('.gif');
+
+  const aiButton = (
+    <Button
+        type="button"
+        variant="outline"
+        onClick={handleAiFill}
+        disabled={!isUrlValid || isGenerating || isGif}
+        className="w-full"
+    >
+        {isGenerating ? (
+        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+        ) : (
+        <Sparkles className="mr-2 h-5 w-5" />
+        )}
+        Auto-fill with AI
+    </Button>
+  );
 
   return (
     <>
@@ -232,22 +251,23 @@ export default function AddLinkDialog({ onAddImage, allTags, isOpen, onOpenChang
                         fill
                         className="rounded-md object-cover"
                         data-ai-hint="image preview"
+                        unoptimized={isGif}
                       />
                     </div>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={handleAiFill}
-                      disabled={!isUrlValid || isGenerating}
-                      className="w-full"
-                    >
-                      {isGenerating ? (
-                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                      ) : (
-                        <Sparkles className="mr-2 h-5 w-5" />
-                      )}
-                      Auto-fill with AI
-                    </Button>
+                     {isGif ? (
+                       <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <div className="w-full">{aiButton}</div>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>AI suggestions are not available for GIFs.</p>
+                            </TooltipContent>
+                        </Tooltip>
+                       </TooltipProvider>
+                    ) : (
+                       aiButton
+                    )}
                   </div>
                 )}
 
@@ -364,6 +384,7 @@ export default function AddLinkDialog({ onAddImage, allTags, isOpen, onOpenChang
               width={1200}
               height={1200}
               className="object-contain w-full h-full max-h-[90vh] rounded-lg"
+              unoptimized={isGif}
             />
           </DialogContent>
         </Dialog>
@@ -371,3 +392,5 @@ export default function AddLinkDialog({ onAddImage, allTags, isOpen, onOpenChang
     </>
   );
 }
+
+    

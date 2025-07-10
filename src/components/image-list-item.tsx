@@ -16,6 +16,7 @@ interface ImageListItemProps {
 
 export default function ImageListItem({ image, settings, onSelect, onTagClick }: ImageListItemProps) {
   const { listShowCover, listShowTitle, listShowNotes, listShowTags, listCoverPosition } = settings;
+  const isGif = image.url.toLowerCase().endsWith('.gif');
 
   return (
     <div
@@ -37,6 +38,7 @@ export default function ImageListItem({ image, settings, onSelect, onTagClick }:
               fill
               className="object-cover"
               sizes="(max-width: 768px) 128px, 192px"
+              unoptimized={isGif}
             />
           </div>
         </div>
@@ -88,3 +90,5 @@ export default function ImageListItem({ image, settings, onSelect, onTagClick }:
     </div>
   );
 }
+
+    

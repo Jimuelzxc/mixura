@@ -14,6 +14,8 @@ interface ImageCardProps {
 }
 
 export default function ImageCard({ image, onSelect, onTagClick, viewMode }: ImageCardProps) {
+  const isGif = image.url.toLowerCase().endsWith('.gif');
+  
   return (
     <div
       className={cn(
@@ -39,6 +41,7 @@ export default function ImageCard({ image, onSelect, onTagClick, viewMode }: Ima
                 height={viewMode === 'cards' ? 375 : 500}
                 className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                 data-ai-hint="abstract texture"
+                unoptimized={isGif}
                 />
             </div>
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
@@ -73,3 +76,5 @@ export default function ImageCard({ image, onSelect, onTagClick, viewMode }: Ima
     </div>
   );
 }
+
+    
