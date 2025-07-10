@@ -53,6 +53,7 @@ export default function Home() {
   
   const viewSettings = useMemo(() => {
     if (isAllBoardsView) {
+      // Find the first board to use its settings as a default for "All Boards" view
       return boards[0]?.viewSettings;
     }
     return activeBoard?.viewSettings;
@@ -398,6 +399,7 @@ export default function Home() {
     const boardToDelete = boards.find(b => b.id === deletingBoardId);
     setBoards(prev => prev.filter(b => b.id !== deletingBoardId));
 
+    // If the deleted board was the active one, switch to 'All Boards' view
     if (activeBoardId === deletingBoardId) {
         setActiveBoardId('all');
     }
@@ -640,5 +642,7 @@ export default function Home() {
     </div>
   );
 }
+
+    
 
     
