@@ -140,10 +140,10 @@ export default function Home() {
   
   useEffect(() => {
     // This effect is for editing the *active* board's name inline on the page
-    if (editingBoardId === activeBoardId && boardNameInputRef.current) {
+    if (editingBoardId && boardNameInputRef.current) {
         boardNameInputRef.current.select();
     }
-  }, [editingBoardId, activeBoardId]);
+  }, [editingBoardId]);
 
   // Keyboard shortcut for adding a new image
   useEffect(() => {
@@ -447,8 +447,6 @@ export default function Home() {
     });
   }, [images, searchTerm, selectedTags, selectedColors]);
 
-  const isEditingActiveBoard = !isAllBoardsView && editingBoardId === activeBoardId;
-
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <AppHeader
@@ -472,33 +470,13 @@ export default function Home() {
                 </div>
             ) : activeBoard && (
                 <div className="mb-8">
-                    {isEditingActiveBoard ? (
-                        <div className="space-y-4 max-w-xl">
-                            <Input
-                                ref={boardNameInputRef}
-                                value={editingBoardName}
-                                onChange={(e) => setEditingBoardName(e.target.value)}
-                                onKeyDown={(e) => {
-                                    if (e.key === 'Enter') handleSaveBoardName();
-                                    if (e.key === 'Escape') handleCancelEditingBoardName();
-                                }}
-                                className="text-[5rem] font-bold tracking-tighter h-auto leading-none"
-                                placeholder="Board name..."
-                            />
-                            <div className="flex items-center gap-2">
-                                <Button onClick={handleSaveBoardName}><Check className="w-4 h-4 mr-2"/> Save</Button>
-                                <Button variant="ghost" onClick={handleCancelEditingBoardName}>Cancel</Button>
-                            </div>
-                        </div>
-                    ) : (
-                         <div className="flex items-center gap-4">
-                            <h1 className="text-[5rem] font-bold tracking-tighter leading-none">{activeBoard.name}</h1>
-                            <Button size="icon" variant="ghost" className="rounded-full" onClick={() => handleStartEditingBoardName(activeBoard.id)}>
-                                <Pencil className="w-6 h-6" />
-                                <span className="sr-only">Edit Name</span>
-                            </Button>
-                         </div>
-                    )}
+                    <div className="flex items-center gap-4">
+                        <h1 className="text-[5rem] font-bold tracking-tighter leading-none">{activeBoard.name}</h1>
+                        <Button size="icon" variant="ghost" className="rounded-full" onClick={() => handleStartEditingBoardName(activeBoard.id)}>
+                            <Pencil className="w-6 h-6" />
+                            <span className="sr-only">Edit Name</span>
+                        </Button>
+                    </div>
                 </div>
             )}
             <FilterToolbar
@@ -561,8 +539,8 @@ export default function Home() {
         />
       )}
 
-      {/* Inline edit dialog */}
-       <AlertDialog open={!!editingBoardId && editingBoardId !== activeBoardId} onOpenChange={(open) => !open && handleCancelEditingBoardName()}>
+      {/* Rename Board Dialog */}
+       <AlertDialog open={!!editingBoardId} onOpenChange={(open) => !open && handleCancelEditingBoardName()}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Rename Board</AlertDialogTitle>
