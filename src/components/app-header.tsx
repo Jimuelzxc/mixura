@@ -1,16 +1,22 @@
+
 "use client";
 
 import { ThemeToggle } from './theme-toggle';
 import { Logo } from './assets/logo';
 import {
-  Menubar,
-  MenubarContent,
-  MenubarItem,
-  MenubarMenu,
-  MenubarSeparator,
-  MenubarShortcut,
-  MenubarTrigger,
-} from "@/components/ui/menubar"
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent,
+  DropdownMenuShortcut
+} from "@/components/ui/dropdown-menu"
+import { Button } from './ui/button';
+import { Menu } from 'lucide-react';
 
 
 interface AppHeaderProps {
@@ -23,38 +29,51 @@ export default function AppHeader({ onAddImageClick }: AppHeaderProps) {
       <div className="container mx-auto flex h-24 items-center justify-between px-4 md:px-6">
         <div className="flex items-center gap-4">
             <Logo className="h-8 w-auto" />
-            <Menubar>
-              <MenubarMenu>
-                <MenubarTrigger>File</MenubarTrigger>
-                <MenubarContent>
-                  <MenubarItem onClick={onAddImageClick}>
-                    New Image <MenubarShortcut>⌘N</MenubarShortcut>
-                  </MenubarItem>
-                </MenubarContent>
-              </MenubarMenu>
-              <MenubarMenu>
-                <MenubarTrigger>Edit</MenubarTrigger>
-                <MenubarContent>
-                  <MenubarItem>
-                    Undo <MenubarShortcut>⌘Z</MenubarShortcut>
-                  </MenubarItem>
-                  <MenubarItem>
-                    Redo <MenubarShortcut>⇧⌘Z</MenubarShortcut>
-                  </MenubarItem>
-                </MenubarContent>
-              </MenubarMenu>
-               <MenubarMenu>
-                <MenubarTrigger>View</MenubarTrigger>
-                <MenubarContent>
-                  <MenubarItem>
-                    Toggle Fullscreen
-                  </MenubarItem>
-                </MenubarContent>
-              </MenubarMenu>
-            </Menubar>
         </div>
         <div className="flex items-center gap-2">
           <ThemeToggle />
+           <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <Menu />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger>
+                  File
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent>
+                   <DropdownMenuItem onClick={onAddImageClick}>
+                    New Image <DropdownMenuShortcut>⌘N</DropdownMenuShortcut>
+                  </DropdownMenuItem>
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
+               <DropdownMenuSub>
+                <DropdownMenuSubTrigger>
+                  Edit
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent>
+                  <DropdownMenuItem>
+                    Undo <DropdownMenuShortcut>⌘Z</DropdownMenuShortcut>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    Redo <DropdownMenuShortcut>⇧⌘Z</DropdownMenuShortcut>
+                  </DropdownMenuItem>
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
+               <DropdownMenuSub>
+                <DropdownMenuSubTrigger>
+                  View
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent>
+                  <DropdownMenuItem>
+                    Toggle Fullscreen
+                  </DropdownMenuItem>
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     </header>
