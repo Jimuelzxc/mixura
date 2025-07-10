@@ -5,7 +5,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import type { ImageItem, ViewSettings, BackgroundPattern } from '@/lib/types';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
-import { TransformWrapper, TransformComponent, useControls } from "react-zoom-pan-pinch";
+import { TransformWrapper, TransformComponent, useControls, ReactZoomPanPinchRef } from "react-zoom-pan-pinch";
 import { Plus, Minus, RefreshCcw, Expand, Minimize, AppWindow } from 'lucide-react';
 import { Button } from './ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
@@ -314,13 +314,15 @@ const Controls = ({
   isFullscreen,
   viewSettings,
   onUpdateViewSettings,
+  onResetView
 }: { 
   onToggleFullscreen: () => void; 
   isFullscreen: boolean;
   viewSettings: ViewSettings;
   onUpdateViewSettings: (settings: Partial<ViewSettings>) => void;
+  onResetView: () => void;
 }) => {
-  const { zoomIn, zoomOut, resetTransform } = useControls();
+  const { zoomIn, zoomOut } = useControls();
   return (
     <TooltipProvider>
       <div className="absolute bottom-4 left-4 z-20 flex items-center gap-2">
@@ -342,7 +344,7 @@ const Controls = ({
         </Tooltip>
         <Tooltip>
           <TooltipTrigger asChild>
-            <Button variant="outline" size="icon" onClick={() => resetTransform()}><RefreshCcw /></Button>
+            <Button variant="outline" size="icon" onClick={onResetView}><RefreshCcw /></Button>
           </TooltipTrigger>
           <TooltipContent>
             <p>Reset View</p>
@@ -392,9 +394,49 @@ export default function CanvasGrid({
 }: CanvasGridProps) {
   const [currentScale, setCurrentScale] = useState(1);
   const [selectedImageId, setSelectedImageId] = useState<string | null>(null);
+  const transformWrapperRef = useRef<ReactZoomPanPinchRef | null>(null);
 
   const handleCanvasClick = () => {
     setSelectedImageId(null);
+  }
+
+  const handleResetView = () => {
+    if (!transformWrapperRef.current || images.length === 0) return;
+
+    const { setTransform } = transformWrapperRef.current;
+    
+    // Calculate bounding box
+    const minX = Math.min(...images.map(img => img.x || 0));
+    const minY = Math.min(...images.map(img => img.y || 0));
+    const maxX = Math.max(...images.map(img => (img.x || 0) + (img.width || 256)));
+    const maxY = Math.max(...images.map(img => (img.y || 0) + (img.height || 256)));
+
+    const contentWidth = maxX - minX;
+    const contentHeight = maxY - minY;
+
+    if (contentWidth <= 0 || contentHeight <= 0) return;
+
+    const canvas = transformWrapperRef.current.instance.wrapperComponent;
+    if (!canvas) return;
+
+    const canvasWidth = canvas.clientWidth;
+    const canvasHeight = canvas.clientHeight;
+    
+    const padding = 50; // pixels
+
+    // Calculate scale to fit content
+    const scaleX = (canvasWidth - padding * 2) / contentWidth;
+    const scaleY = (canvasHeight - padding * 2) / contentHeight;
+    const newScale = Math.min(scaleX, scaleY, 1); // Do not zoom in more than 100%
+
+    // Calculate position to center content
+    const centerX = minX + contentWidth / 2;
+    const centerY = minY + contentHeight / 2;
+
+    const newPositionX = (canvasWidth / 2) - (centerX * newScale);
+    const newPositionY = (canvasHeight / 2) - (centerY * newScale);
+    
+    setTransform(newPositionX, newPositionY, newScale, 300, 'easeOut');
   }
 
   const backgroundClass = {
@@ -407,6 +449,7 @@ export default function CanvasGrid({
   return (
     <div className={cn("relative w-full border rounded-md bg-card/50 overflow-hidden touch-none flex-grow", isFullscreen && "h-full")}>
        <TransformWrapper
+        ref={transformWrapperRef}
         minScale={0.1}
         maxScale={8}
         initialScale={1}
@@ -425,6 +468,7 @@ export default function CanvasGrid({
           isFullscreen={isFullscreen} 
           viewSettings={viewSettings}
           onUpdateViewSettings={onUpdateViewSettings}
+          onResetView={handleResetView}
         />
         <TransformComponent
             wrapperClass="!w-full !h-full"
@@ -449,4 +493,5 @@ export default function CanvasGrid({
   );
 }
 
+    
     
