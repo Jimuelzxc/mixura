@@ -14,7 +14,7 @@ import {
   DropdownMenuShortcut,
 } from "@/components/ui/dropdown-menu"
 import { Button } from './ui/button';
-import { Menu, Plus, Upload, Download, Trash2, Check, CopyPlus, Trash, LayoutGrid, ChevronsUpDown, Pencil } from 'lucide-react';
+import { Menu, Plus, Upload, Download, Trash2, CopyPlus, Trash, LayoutGrid, ChevronsUpDown, Pencil } from 'lucide-react';
 
 
 interface AppHeaderProps {
@@ -63,10 +63,12 @@ export default function AppHeader({
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-[200px]" align="end">
-                <DropdownMenuItem onSelect={() => onSwitchBoard('all')}>
-                    <LayoutGrid className="mr-2 h-4 w-4" />
-                    <span>All Boards</span>
-                    {activeBoardId === 'all' && <Check className="ml-auto h-4 w-4" />}
+                <DropdownMenuItem onSelect={() => onSwitchBoard('all')} className="justify-between">
+                    <div className="flex items-center">
+                      <LayoutGrid className="mr-2 h-4 w-4" />
+                      <span>All Boards</span>
+                    </div>
+                    {activeBoardId === 'all' && <div className="w-2 h-2 rounded-full bg-primary" />}
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuLabel>Your Boards</DropdownMenuLabel>
@@ -91,12 +93,12 @@ export default function AppHeader({
                             <Trash className="h-3 w-3" />
                         </Button>
                     </div>
-                    {activeBoardId === board.id && <Check className="ml-2 h-4 w-4 opacity-100 group-hover:opacity-0" />}
+                    {activeBoardId === board.id && <div className="w-2 h-2 rounded-full bg-primary opacity-100 group-hover:opacity-0" />}
                   </DropdownMenuItem>
                 ))}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onSelect={onNewBoard}>
-                  <CopyPlus className="mr-2" />
+                  <CopyPlus className="mr-2 h-4 w-4" />
                   <span>New Board</span>
                 </DropdownMenuItem>
             </DropdownMenuContent>
@@ -113,23 +115,23 @@ export default function AppHeader({
             <DropdownMenuContent align="end">
                <DropdownMenuLabel>File</DropdownMenuLabel>
               <DropdownMenuItem onClick={onAddImageClick} disabled={isAllBoardsView}>
-                <Plus className="mr-2" />
+                <Plus className="mr-2 h-4 w-4" />
                 <span>New Image</span>
                 <DropdownMenuShortcut>⌘N</DropdownMenuShortcut>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuLabel>Data</DropdownMenuLabel>
                <DropdownMenuItem onClick={onImportClick}>
-                <Upload className="mr-2" />
+                <Upload className="mr-2 h-4 w-4" />
                 <span>Import from JSON...</span>
               </DropdownMenuItem>
               <DropdownMenuItem onClick={onExportClick}>
-                <Download className="mr-2" />
+                <Download className="mr-2 h-4 w-4" />
                 <span>Export to JSON...</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={onDeleteAllClick} className="text-destructive focus:text-destructive focus:bg-destructive/10">
-                <Trash2 className="mr-2" />
+                <Trash2 className="mr-2 h-4 w-4" />
                 <span>Delete All Data...</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -139,5 +141,3 @@ export default function AppHeader({
     </header>
   );
 }
-
-    
