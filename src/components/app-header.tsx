@@ -3,7 +3,7 @@
 
 import type { Board } from '@/lib/types';
 import { ThemeToggle } from './theme-toggle';
-import { Logo } from './assets/logo';
+import { LogoWithText } from './assets/logo-with-text';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -49,7 +49,7 @@ export default function AppHeader({
     <header className="sticky top-0 z-10 w-full bg-background/80 backdrop-blur-sm">
       <div className="container mx-auto flex h-24 items-center justify-between px-4 md:px-6">
         <div className="flex items-center gap-4">
-            <Logo className="h-6 w-auto" />
+            <LogoWithText className="h-6 w-auto" />
         </div>
         <div className="flex items-center gap-2">
           <ThemeToggle />
