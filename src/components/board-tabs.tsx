@@ -118,21 +118,20 @@ export default function BoardTabs({
                       </div>
                     </div>
                 ))}
+                 <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 ml-1" onClick={onNewBoard}>
+                            <Plus className="h-4 w-4" />
+                            <span className="sr-only">New Board</span>
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent><p>New Board</p></TooltipContent>
+                 </Tooltip>
             </div>
             <ScrollBar orientation="horizontal" className="h-2 p-px" />
         </ScrollArea>
         
         <div className="flex items-center gap-2 pl-2 ml-auto">
-         <Tooltip>
-            <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onNewBoard}>
-                    <Plus className="h-4 w-4" />
-                    <span className="sr-only">New Board</span>
-                </Button>
-            </TooltipTrigger>
-            <TooltipContent><p>New Board</p></TooltipContent>
-         </Tooltip>
-
          <ThemeToggle />
          <DropdownMenu>
           <DropdownMenuTrigger asChild>
