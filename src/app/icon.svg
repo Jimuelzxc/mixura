@@ -1,6 +1,5 @@
 <svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect width="100" height="100" fill="black"/>
-    <g transform="translate(15, 22) scale(0.075)">
+    <g transform="translate(10 17.5) scale(0.08)">
         <path d="M921.01 605L572.435 256.425V605C572.435 605 197.981 -115.058 95.0986 127.664C16.6205 312.811 226.619 605 226.619 605" stroke="white" stroke-width="155"/>
     </g>
 </svg>
