@@ -508,7 +508,7 @@ export default function Home() {
 
   return (
     <div 
-      className={cn("flex flex-col h-screen bg-muted/20", isCanvasFullscreen && "overflow-hidden")}
+      className={cn("flex flex-col min-h-screen bg-muted/20", isCanvasFullscreen && "overflow-hidden")}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
