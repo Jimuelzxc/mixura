@@ -20,6 +20,7 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuSubContent
 } from "@/components/ui/dropdown-menu"
+import { Separator } from './ui/separator';
 
 
 interface BoardTabsProps {
@@ -58,9 +59,10 @@ export default function BoardTabs({
       <div className="flex items-center gap-2 pr-2">
         <Logo className="h-5 w-auto" />
       </div>
+      <Separator orientation="vertical" className="h-6" />
       <TooltipProvider delayDuration={300}>
         <ScrollArea className="w-full whitespace-nowrap">
-            <div className="flex items-center h-10">
+            <div className="flex items-center h-10 pl-2">
                <Tooltip>
                   <TooltipTrigger asChild>
                     <Button 
