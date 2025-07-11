@@ -98,7 +98,7 @@ export default function BoardTabs({
                     </div>
                 ))}
             </div>
-            <ScrollBar orientation="horizontal" className="h-0.5" />
+            <ScrollBar orientation="horizontal" className="h-2 p-px" />
         </ScrollArea>
         
          <Tooltip>
