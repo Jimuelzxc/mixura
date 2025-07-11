@@ -507,7 +507,10 @@ export default function Home() {
 
   return (
     <div 
-      className={cn("flex flex-col min-h-screen bg-muted/20", isCanvasFullscreen && "overflow-hidden")}
+      className={cn(
+        "flex flex-col min-h-screen bg-muted/20", 
+        (isCanvasFullscreen || isCanvasViewActive) && "overflow-hidden"
+      )}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
@@ -534,9 +537,15 @@ export default function Home() {
         isAddDisabled={isAllBoardsView}
       />
 
-      <main className={cn("flex-grow flex flex-col min-h-0 bg-background pt-8", isCanvasFullscreen && "h-screen !pt-0")}>
-        <div className={cn("container mx-auto px-4 md:px-6 flex flex-col flex-grow min-h-0", isCanvasFullscreen && "p-4 md:p-8 max-w-full h-full")}>
-            <div className={cn(isCanvasFullscreen && "hidden")}>
+      <main className={cn(
+        "flex-grow flex flex-col min-h-0 bg-background pt-8", 
+        (isCanvasFullscreen || isCanvasViewActive) && "h-screen !pt-0"
+      )}>
+        <div className={cn(
+            "container mx-auto px-4 md:px-6 flex flex-col flex-grow min-h-0", 
+            (isCanvasFullscreen || isCanvasViewActive) && "p-4 md:p-8 max-w-full h-full"
+        )}>
+            <div className={cn((isCanvasFullscreen || isCanvasViewActive) && "hidden")}>
               {isAllBoardsView ? (
                   <div className="mb-8 py-10">
                       <h1 className="text-[8rem] font-bold tracking-tighter leading-none">All Boards</h1>
