@@ -79,11 +79,11 @@ export default function BoardTabs({
                       key={board.id}
                       onClick={() => onSwitchBoard(board.id)}
                       className={cn(
-                        "group relative h-full flex items-center justify-between gap-4 w-40 pr-2 border-b-2 text-sm font-medium cursor-pointer",
+                        "group relative h-full flex items-center justify-between gap-2 px-3 border-b-2 text-sm font-medium cursor-pointer",
                         activeBoardId === board.id ? 'bg-background text-foreground border-primary' : 'border-transparent text-muted-foreground hover:bg-accent'
                       )}
                     >
-                      <span className="truncate pl-3">{board.name}</span>
+                      <span className="truncate group-hover:max-w-32 transition-all duration-200">{board.name}</span>
                       <div className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
                         <Tooltip>
                           <TooltipTrigger asChild>
