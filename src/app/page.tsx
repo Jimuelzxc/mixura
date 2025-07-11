@@ -538,11 +538,11 @@ export default function Home() {
         <div className={cn("container mx-auto px-4 md:px-6 flex flex-col flex-grow min-h-0", isCanvasFullscreen && "p-4 md:p-8 max-w-full h-full")}>
             <div className={cn(isCanvasFullscreen && "hidden")}>
               {isAllBoardsView ? (
-                  <div className="mb-8">
+                  <div className="mb-8 py-10">
                       <h1 className="text-[5rem] font-bold tracking-tighter leading-none">All Boards</h1>
                   </div>
               ) : activeBoard && (
-                  <div className="mb-8 group">
+                  <div className="mb-8 group py-10">
                       <div className="flex items-center gap-4">
                           <h1 className="text-[5rem] font-bold tracking-tighter leading-none">{activeBoard.name}</h1>
                           <TooltipProvider>
