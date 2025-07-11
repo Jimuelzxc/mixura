@@ -15,6 +15,7 @@ import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import BoardTabs from '@/components/board-tabs';
+import { initialData } from '@/lib/data';
 
 const LOCALSTORAGE_KEY = 'mixura-data';
 
@@ -94,6 +95,7 @@ export default function Home() {
           setBoards(sanitizedBoards);
           setActiveBoardId(data.activeBoardId);
         } else {
+          // Fallback for old data structure (before boards)
           const oldImages = window.localStorage.getItem('tarsus-images');
           const oldSettings = window.localStorage.getItem('tarsus-view-settings');
           
@@ -110,14 +112,9 @@ export default function Home() {
           setActiveBoardId(defaultBoard.id);
         }
       } else {
-        const newBoard: Board = {
-          id: `board-${Date.now()}`,
-          name: 'My First Board',
-          images: [],
-          viewSettings: defaultViewSettings,
-        };
-        setBoards([newBoard]);
-        setActiveBoardId(newBoard.id);
+        // No data found, load initial dummy data
+        setBoards(initialData.boards);
+        setActiveBoardId(initialData.activeBoardId);
       }
     } catch (error) {
       console.error('Failed to load from localStorage', error);
@@ -726,3 +723,5 @@ export default function Home() {
     </div>
   );
 }
+
+    
