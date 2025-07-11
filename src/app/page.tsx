@@ -389,20 +389,27 @@ export default function Home() {
   const handleDeleteBoard = () => {
     if (!deletingBoardId) return;
 
-    if (boards.length <= 1) {
-        toast({ title: 'Cannot Delete', description: 'You cannot delete the last board.', variant: 'destructive' });
-        setDeletingBoardId(null);
-        return;
-    }
     const boardToDelete = boards.find(b => b.id === deletingBoardId);
-    setBoards(prev => prev.filter(b => b.id !== deletingBoardId));
 
-    if (activeBoardId === deletingBoardId) {
-        setActiveBoardId('all');
+    if (boards.length <= 1) {
+        const newBoard: Board = {
+            id: `board-${Date.now()}`,
+            name: 'My First Board',
+            images: [],
+            viewSettings: defaultViewSettings,
+        };
+        setBoards([newBoard]);
+        setActiveBoardId(newBoard.id);
+        toast({ title: `Board "${boardToDelete?.name}" deleted`, description: 'A new empty board has been created.', variant: 'destructive' });
+    } else {
+        setBoards(prev => prev.filter(b => b.id !== deletingBoardId));
+        if (activeBoardId === deletingBoardId) {
+            setActiveBoardId('all');
+        }
+        toast({ title: `Board "${boardToDelete?.name}" Deleted`, variant: 'destructive'});
     }
     
     setDeletingBoardId(null);
-    toast({ title: `Board "${boardToDelete?.name}" Deleted`, variant: 'destructive'});
   };
 
   const handleStartEditingBoardName = (boardId: string) => {
