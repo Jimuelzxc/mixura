@@ -76,6 +76,8 @@ export default function Home() {
     }
     return activeBoard?.viewSettings;
   }, [activeBoard, boards, isAllBoardsView]);
+  
+  const isCanvasViewActive = viewSettings?.viewMode === 'canvas';
 
   useEffect(() => {
     try {
@@ -447,8 +449,6 @@ export default function Home() {
     });
   }, [images, searchTerm, selectedTags, selectedColors]);
   
-  const isCanvasViewActive = viewSettings?.viewMode === 'canvas';
-
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setIsDragging(true);
@@ -508,8 +508,8 @@ export default function Home() {
   return (
     <div 
       className={cn(
-        "flex flex-col min-h-screen bg-muted/20", 
-        (isCanvasFullscreen) && "overflow-hidden"
+        "flex flex-col bg-muted/20", 
+        (isCanvasFullscreen || isCanvasViewActive) ? "h-screen" : "min-h-screen",
       )}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
@@ -538,20 +538,22 @@ export default function Home() {
       />
 
       <main className={cn(
-        "flex-grow flex flex-col min-h-0 bg-background pt-8", 
+        "flex-grow flex flex-col min-h-0",
+        isCanvasViewActive ? "bg-background" : "bg-background pt-8",
         (isCanvasFullscreen) && "h-screen !pt-0"
       )}>
         <div className={cn(
             "container mx-auto px-4 md:px-6 flex flex-col flex-grow min-h-0", 
-            (isCanvasFullscreen) && "p-4 md:p-8 max-w-full h-full"
+            (isCanvasFullscreen) && "p-4 md:p-8 max-w-full h-full",
+            isCanvasViewActive && "bg-background"
         )}>
             <div className={cn(isCanvasFullscreen && "hidden")}>
               {isAllBoardsView ? (
-                  <div className="mb-8 py-10">
+                  <div className="py-10">
                       <h1 className="text-[8rem] font-bold tracking-tighter leading-none">All Boards</h1>
                   </div>
               ) : activeBoard && (
-                  <div className="mb-8 group py-10">
+                  <div className="group py-10">
                       <div className="flex items-center gap-4">
                           <h1 className="text-[8rem] font-bold tracking-tighter leading-none">{activeBoard.name}</h1>
                           <TooltipProvider>
