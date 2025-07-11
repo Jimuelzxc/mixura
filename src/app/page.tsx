@@ -1,5 +1,4 @@
 
-
 "use client";
 
 import { useState, useMemo, useEffect, useRef } from 'react';
@@ -593,7 +592,10 @@ export default function Home() {
                   isAddDisabled={isAllBoardsView}
               />
             </div>
-            <div className={cn("flex-grow min-h-0", isCanvasViewActive && "flex flex-col")}>
+            <div className={cn(
+              "flex-grow min-h-0",
+              isCanvasViewActive && "flex flex-col mb-4",
+            )}>
                 {isDataLoaded && (
                   images.length === 0 && !searchTerm ? (
                     <div className="flex flex-col items-center justify-center text-center h-full mt-20 text-muted-foreground">
