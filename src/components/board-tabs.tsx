@@ -63,24 +63,16 @@ export default function BoardTabs({
       <TooltipProvider delayDuration={300}>
         <ScrollArea className="w-full whitespace-nowrap">
             <div className="flex items-center h-10 pl-2">
-               <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button 
-                        variant={isAllBoardsView ? "ghost" : "ghost"} 
-                        size="sm"
-                        onClick={() => onSwitchBoard('all')}
-                        className={cn(
-                          "flex items-center gap-2 h-full rounded-none px-3 border-b-2",
-                          isAllBoardsView ? "bg-background text-foreground border-primary" : "border-transparent"
-                        )}
-                    >
-                        <LayoutGrid className="h-4 w-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>All Boards View</p>
-                  </TooltipContent>
-                </Tooltip>
+                <div
+                  onClick={() => onSwitchBoard('all')}
+                  className={cn(
+                    "group relative h-full flex items-center gap-2 w-auto px-3 border-b-2 text-sm font-medium cursor-pointer",
+                    isAllBoardsView ? 'bg-background text-foreground border-primary' : 'border-transparent text-muted-foreground hover:bg-accent'
+                  )}
+                >
+                  <LayoutGrid className="h-4 w-4" />
+                  <span className="truncate">All Boards</span>
+                </div>
         
                 {boards.map(board => (
                     <div
