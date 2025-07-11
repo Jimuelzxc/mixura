@@ -1,19 +1,19 @@
-# LinkBoard - Your Visual Inspiration Hub
+# Mixura - Your Idea Organizer
 
-LinkBoard is a sleek, responsive, and highly customizable web application designed for creatives, designers, and anyone who needs a personal space to save and organize visual inspiration. Inspired by Pinterest, it allows you to save image links, categorize them into "boards," and arrange them in various layouts, including a freeform canvas.
+Mixura is a simple, easy-to-use website for saving and organizing pictures you find online. If you're a creative person, a designer, or just someone who likes to save inspiring images, this is for you! It's like Pinterest, but it's your own personal space. You can save image links, put them into "boards," and arrange them in different ways, even on a blank canvas.
 
-## ✨ Core Features
+## ✨ What Mixura Does
 
-*   **Save & Organize**: Easily save image URLs and organize them with titles, notes, tags, and colors.
-*   **Multiple Boards**: Create, rename, and manage multiple boards to keep your inspirations neatly categorized. An "All Boards" view provides a consolidated look at all your saved items.
-*   **AI-Powered Assistance**: Use the "Auto-fill with AI" feature to automatically generate a title, notes, tags, and dominant colors for any image, making organization a breeze.
-*   **Flexible Viewing Modes**:
-    *   **Moodboard**: A classic, responsive masonry grid.
-    *   **List**: A compact, detailed view for easy scanning.
-    *   **Canvas**: A zoomable, pannable, freeform canvas to arrange your images exactly how you want.
-*   **Powerful Filtering**: Instantly search your entire collection by keywords, or filter by specific tags and colors.
-*   **Data Portability**: Your data is saved securely in your browser's local storage. You can easily export your entire collection to a JSON file for backup and import it back anytime.
-*   **Light & Dark Modes**: A beautiful and consistent experience, day or night.
+*   **Save & Sort**: Easily save picture links. Add titles, notes, tags, and even colors to keep them neat.
+*   **Lots of Boards**: Make different "boards" to group your inspirations. There's also an "All Boards" view to see everything at once.
+*   **Smart Help**: Use "Auto-fill with AI" to automatically add a title, notes, tags, and main colors for any picture. It makes organizing super easy!
+*   **Different Ways to View**:
+    *   **Moodboard**: A classic grid view that adjusts to your screen.
+    *   **List**: A compact, detailed list for quick scanning.
+    *   **Canvas**: A flexible, zoomable space where you can arrange pictures exactly how you want.
+*   **Easy Search**: Quickly find anything you've saved by searching words, tags, or colors.
+*   **Your Data, Your Control**: All your saved items are stored on your computer. You can easily save (export) your whole collection to a file and bring it back (import) whenever you need.
+*   **Light & Dark Views**: Looks good day or night.
 
 ## 🚀 Tech Stack
 
@@ -37,8 +37,8 @@ LinkBoard is a sleek, responsive, and highly customizable web application design
 
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/your-username/linkboard.git
-    cd linkboard
+    git clone https://github.com/your-username/mixura.git
+    cd mixura
     ```
 
 2.  **Install dependencies:**
