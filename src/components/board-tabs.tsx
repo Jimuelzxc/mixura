@@ -59,29 +59,29 @@ export default function BoardTabs({
         <Logo className="h-5 w-auto" />
       </div>
       <TooltipProvider delayDuration={300}>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button 
-                variant={isAllBoardsView ? "ghost" : "ghost"} 
-                size="sm"
-                onClick={() => onSwitchBoard('all')}
-                className={cn(
-                  "flex items-center gap-2 h-full rounded-none px-3 border-b-2",
-                  isAllBoardsView ? "bg-background text-foreground border-primary" : "border-transparent"
-                )}
-            >
-                <LayoutGrid className="h-4 w-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>All Boards View</p>
-          </TooltipContent>
-        </Tooltip>
-        
-        <div className="h-6 w-px bg-border mx-1" />
-        
         <ScrollArea className="w-full whitespace-nowrap">
             <div className="flex items-center h-10">
+               <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button 
+                        variant={isAllBoardsView ? "ghost" : "ghost"} 
+                        size="sm"
+                        onClick={() => onSwitchBoard('all')}
+                        className={cn(
+                          "flex items-center gap-2 h-full rounded-none px-3 border-b-2",
+                          isAllBoardsView ? "bg-background text-foreground border-primary" : "border-transparent"
+                        )}
+                    >
+                        <LayoutGrid className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>All Boards View</p>
+                  </TooltipContent>
+                </Tooltip>
+        
+                <div className="h-6 w-px bg-border mx-1" />
+                
                 {boards.map(board => (
                     <div
                       key={board.id}
