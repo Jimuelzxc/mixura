@@ -3,7 +3,7 @@
 
 import type { Board } from '@/lib/types';
 import { Button } from './ui/button';
-import { LayoutGrid, Pencil, Plus, Trash, X, Menu, Upload, Download, Trash2, Sun, Moon } from 'lucide-react';
+import { LayoutGrid, Plus, Trash, X, Menu, Upload, Download, Trash2, Sun, Moon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 import { ScrollArea, ScrollBar } from './ui/scroll-area';
@@ -83,35 +83,20 @@ export default function BoardTabs({
                         activeBoardId === board.id ? 'bg-background text-foreground border-primary' : 'border-transparent text-muted-foreground hover:bg-accent'
                       )}
                     >
-                      <span className="truncate group-hover:max-w-32 transition-all duration-200">{board.name}</span>
-                      <div className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-6 w-6"
-                              onClick={(e) => { e.stopPropagation(); onRenameBoard(board.id); }}
-                            >
-                              <Pencil className="h-3 w-3" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent><p>Rename</p></TooltipContent>
-                        </Tooltip>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-6 w-6 hover:bg-destructive/10 text-muted-foreground hover:text-destructive"
-                              onClick={(e) => { e.stopPropagation(); onDeleteBoard(board.id); }}
-                            >
-                              <X className="h-4 w-4" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent><p>Delete</p></TooltipContent>
-                        </Tooltip>
-                      </div>
+                      <span className="truncate">{board.name}</span>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-destructive/10 text-muted-foreground hover:text-destructive"
+                            onClick={(e) => { e.stopPropagation(); onDeleteBoard(board.id); }}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent><p>Delete</p></TooltipContent>
+                      </Tooltip>
                     </div>
                 ))}
                  <Tooltip>
