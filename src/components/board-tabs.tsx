@@ -56,10 +56,10 @@ export default function BoardTabs({
 
   return (
     <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-sm h-10 flex items-center px-2 border-b">
-      <div className="flex items-center gap-2 pr-2">
+      <div className="flex items-center gap-2 px-2">
         <Logo className="h-5 w-auto" />
       </div>
-      <Separator orientation="vertical" className="h-6" />
+      <div className="h-full border-l"></div>
       <TooltipProvider delayDuration={300}>
         <ScrollArea className="w-full whitespace-nowrap">
             <div className="flex items-center h-10 pl-2">
