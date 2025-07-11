@@ -7,6 +7,7 @@ import { LayoutGrid, Pencil, Plus, Trash, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 import { ScrollArea, ScrollBar } from './ui/scroll-area';
+import { Logo } from './assets/logo';
 
 interface BoardTabsProps {
   boards: Board[];
@@ -30,6 +31,9 @@ export default function BoardTabs({
 
   return (
     <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-sm h-10 flex items-center px-2 border-b">
+      <div className="flex items-center gap-2 pr-2">
+        <Logo className="h-5 w-auto" />
+      </div>
       <TooltipProvider delayDuration={300}>
         <Tooltip>
           <TooltipTrigger asChild>
