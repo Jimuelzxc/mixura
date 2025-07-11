@@ -80,8 +80,6 @@ export default function BoardTabs({
                   </TooltipContent>
                 </Tooltip>
         
-                <div className="h-6 w-px bg-border mx-1" />
-                
                 {boards.map(board => (
                     <div
                       key={board.id}
