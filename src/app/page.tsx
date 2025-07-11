@@ -16,6 +16,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import BoardTabs from '@/components/board-tabs';
 
 const LOCALSTORAGE_KEY = 'mixura-data';
 
@@ -507,7 +508,7 @@ export default function Home() {
 
   return (
     <div 
-      className={cn("flex flex-col h-screen bg-background", isCanvasFullscreen && "overflow-hidden")}
+      className={cn("flex flex-col h-screen bg-muted/20", isCanvasFullscreen && "overflow-hidden")}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
@@ -518,22 +519,27 @@ export default function Home() {
           <p className="mt-4 text-2xl font-bold text-primary">Drop image to add</p>
         </div>
       )}
+
+      <BoardTabs
+        boards={boards}
+        activeBoardId={activeBoardId}
+        onNewBoard={handleNewBoard}
+        onSwitchBoard={handleSwitchBoard}
+        onDeleteBoard={handleOpenDeleteBoardDialog}
+        onRenameBoard={handleStartEditingBoardName}
+        isAllBoardsView={isAllBoardsView}
+      />
+
       <div className={cn(isCanvasFullscreen && "hidden")}>
         <AppHeader
           onAddImageClick={handleOpenAddDialog}
           onImportClick={handleImportClick}
           onExportClick={handleExport}
           onDeleteAllClick={() => setDeleteAllAlertOpen(true)}
-          boards={boards}
-          activeBoardId={activeBoardId}
-          onNewBoard={handleNewBoard}
-          onSwitchBoard={handleSwitchBoard}
-          onDeleteBoard={handleOpenDeleteBoardDialog}
-          onRenameBoard={handleStartEditingBoardName}
-          isAllBoardsView={isAllBoardsView}
+          isAddDisabled={isAllBoardsView}
         />
       </div>
-      <main className={cn("flex-grow flex flex-col min-h-0", isCanvasFullscreen && "h-screen")}>
+      <main className={cn("flex-grow flex flex-col min-h-0 bg-background", isCanvasFullscreen && "h-screen")}>
         <div className={cn("container mx-auto px-4 md:px-6 py-8 flex flex-col flex-grow min-h-0", isCanvasFullscreen && "p-4 md:p-8 max-w-full h-full")}>
             <div className={cn(isCanvasFullscreen && "hidden")}>
               {isAllBoardsView ? (
