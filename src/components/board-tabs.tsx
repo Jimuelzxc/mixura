@@ -89,7 +89,7 @@ export default function BoardTabs({
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-destructive/10 text-muted-foreground hover:text-destructive"
+                            className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive"
                             onClick={(e) => { e.stopPropagation(); onDeleteBoard(board.id); }}
                           >
                             <X className="h-4 w-4" />
