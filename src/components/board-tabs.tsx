@@ -55,46 +55,43 @@ export default function BoardTabs({
         <ScrollArea className="w-full whitespace-nowrap">
             <div className="flex items-center h-10">
                 {boards.map(board => (
-                    <div key={board.id} className="group relative h-full">
-                        <Button 
-                            variant={activeBoardId === board.id ? "ghost" : "ghost"} 
-                            size="sm" 
-                            onClick={() => onSwitchBoard(board.id)}
-                            className={cn(
-                              "h-full rounded-none flex items-center justify-between gap-4 w-40 pr-2 border-b-2",
-                              activeBoardId === board.id ? 'bg-background text-foreground border-primary' : 'border-transparent'
-                            )}
-                        >
-                            <span className="truncate">{board.name}</span>
-                            <div className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <Button 
-                                            variant="ghost" 
-                                            size="icon" 
-                                            className="h-6 w-6" 
-                                            onClick={(e) => { e.stopPropagation(); onRenameBoard(board.id); }}
-                                        >
-                                            <Pencil className="h-3 w-3" />
-                                        </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent><p>Rename</p></TooltipContent>
-                                </Tooltip>
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <Button 
-                                            variant="ghost" 
-                                            size="icon" 
-                                            className="h-6 w-6 hover:bg-destructive/10 text-muted-foreground hover:text-destructive"
-                                            onClick={(e) => { e.stopPropagation(); onDeleteBoard(board.id); }}
-                                        >
-                                            <X className="h-4 w-4" />
-                                        </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent><p>Delete</p></TooltipContent>
-                                </Tooltip>
-                            </div>
-                        </Button>
+                    <div
+                      key={board.id}
+                      onClick={() => onSwitchBoard(board.id)}
+                      className={cn(
+                        "group relative h-full flex items-center justify-between gap-4 w-40 pr-2 border-b-2 text-sm font-medium cursor-pointer",
+                        activeBoardId === board.id ? 'bg-background text-foreground border-primary' : 'border-transparent text-muted-foreground hover:bg-accent'
+                      )}
+                    >
+                      <span className="truncate pl-3">{board.name}</span>
+                      <div className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-6 w-6"
+                              onClick={(e) => { e.stopPropagation(); onRenameBoard(board.id); }}
+                            >
+                              <Pencil className="h-3 w-3" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent><p>Rename</p></TooltipContent>
+                        </Tooltip>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-6 w-6 hover:bg-destructive/10 text-muted-foreground hover:text-destructive"
+                              onClick={(e) => { e.stopPropagation(); onDeleteBoard(board.id); }}
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent><p>Delete</p></TooltipContent>
+                        </Tooltip>
+                      </div>
                     </div>
                 ))}
             </div>
