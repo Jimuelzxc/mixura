@@ -4,7 +4,6 @@
 
 import { useState, useMemo, useEffect, useRef } from 'react';
 import type { ImageItem, ViewSettings, Board } from '@/lib/types';
-import AppHeader from '@/components/app-header';
 import ImageGrid from '@/components/image-grid';
 import ImageDetailDialog from '@/components/image-detail-dialog';
 import FilterToolbar from '@/components/filter-toolbar';
@@ -528,19 +527,15 @@ export default function Home() {
         onDeleteBoard={handleOpenDeleteBoardDialog}
         onRenameBoard={handleStartEditingBoardName}
         isAllBoardsView={isAllBoardsView}
+        onAddImageClick={handleOpenAddDialog}
+        onImportClick={handleImportClick}
+        onExportClick={handleExport}
+        onDeleteAllClick={() => setDeleteAllAlertOpen(true)}
+        isAddDisabled={isAllBoardsView}
       />
 
-      <div className={cn(isCanvasFullscreen && "hidden")}>
-        <AppHeader
-          onAddImageClick={handleOpenAddDialog}
-          onImportClick={handleImportClick}
-          onExportClick={handleExport}
-          onDeleteAllClick={() => setDeleteAllAlertOpen(true)}
-          isAddDisabled={isAllBoardsView}
-        />
-      </div>
-      <main className={cn("flex-grow flex flex-col min-h-0 bg-background", isCanvasFullscreen && "h-screen")}>
-        <div className={cn("container mx-auto px-4 md:px-6 py-8 flex flex-col flex-grow min-h-0", isCanvasFullscreen && "p-4 md:p-8 max-w-full h-full")}>
+      <main className={cn("flex-grow flex flex-col min-h-0 bg-background pt-8", isCanvasFullscreen && "h-screen !pt-0")}>
+        <div className={cn("container mx-auto px-4 md:px-6 flex flex-col flex-grow min-h-0", isCanvasFullscreen && "p-4 md:p-8 max-w-full h-full")}>
             <div className={cn(isCanvasFullscreen && "hidden")}>
               {isAllBoardsView ? (
                   <div className="mb-8">

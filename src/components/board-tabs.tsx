@@ -3,11 +3,21 @@
 
 import type { Board } from '@/lib/types';
 import { Button } from './ui/button';
-import { LayoutGrid, Pencil, Plus, Trash, X } from 'lucide-react';
+import { LayoutGrid, Pencil, Plus, Trash, X, Menu, Upload, Download, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 import { ScrollArea, ScrollBar } from './ui/scroll-area';
 import { Logo } from './assets/logo';
+import { ThemeToggle } from './theme-toggle';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+
 
 interface BoardTabsProps {
   boards: Board[];
@@ -17,6 +27,11 @@ interface BoardTabsProps {
   onDeleteBoard: (boardId: string) => void;
   onRenameBoard: (boardId: string) => void;
   isAllBoardsView: boolean;
+  onAddImageClick: () => void;
+  onImportClick: () => void;
+  onExportClick: () => void;
+  onDeleteAllClick: () => void;
+  isAddDisabled: boolean;
 }
 
 export default function BoardTabs({ 
@@ -26,7 +41,12 @@ export default function BoardTabs({
   onSwitchBoard,
   onDeleteBoard,
   onRenameBoard,
-  isAllBoardsView
+  isAllBoardsView,
+  onAddImageClick, 
+  onImportClick, 
+  onExportClick, 
+  onDeleteAllClick,
+  isAddDisabled
 }: BoardTabsProps) {
 
   return (
@@ -102,15 +122,49 @@ export default function BoardTabs({
             <ScrollBar orientation="horizontal" className="h-2 p-px" />
         </ScrollArea>
         
+        <div className="flex items-center gap-2 pl-2 ml-auto">
          <Tooltip>
             <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-8 w-8 ml-2" onClick={onNewBoard}>
+                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onNewBoard}>
                     <Plus className="h-4 w-4" />
                     <span className="sr-only">New Board</span>
                 </Button>
             </TooltipTrigger>
             <TooltipContent><p>New Board</p></TooltipContent>
          </Tooltip>
+
+         <ThemeToggle />
+         <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon" className="h-8 w-8">
+              <Menu />
+              <span className="sr-only">Open menu</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+             <DropdownMenuLabel>File</DropdownMenuLabel>
+            <DropdownMenuItem onClick={onAddImageClick} disabled={isAddDisabled}>
+              <Plus className="mr-2 h-4 w-4" />
+              <span>New Image</span>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuLabel>Data</DropdownMenuLabel>
+             <DropdownMenuItem onClick={onImportClick}>
+              <Upload className="mr-2 h-4 w-4" />
+              <span>Import</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={onExportClick}>
+              <Download className="mr-2 h-4 w-4" />
+              <span>Export</span>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={onDeleteAllClick} className="text-destructive focus:text-destructive focus:bg-destructive/10">
+              <Trash2 className="mr-2 h-4 w-4" />
+              <span>Delete All Data...</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+        </div>
       </TooltipProvider>
     </div>
   );
