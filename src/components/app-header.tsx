@@ -11,10 +11,9 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  DropdownMenuShortcut,
 } from "@/components/ui/dropdown-menu"
 import { Button } from './ui/button';
-import { Menu, Plus, Upload, Download, Trash2, CopyPlus, Trash, LayoutGrid, ChevronsUpDown, Pencil } from 'lucide-react';
+import { Menu, Plus, Upload, Download, Trash2, CopyPlus, Trash, LayoutGrid, Pencil } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 
@@ -45,8 +44,6 @@ export default function AppHeader({
   onRenameBoard,
   isAllBoardsView
 }: AppHeaderProps) {
-  const activeBoard = boards.find(b => b.id === activeBoardId);
-  const activeBoardName = isAllBoardsView ? "All Boards" : (activeBoard?.name || "Select Board");
 
   return (
     <header className="sticky top-0 z-10 w-full bg-background/80 backdrop-blur-sm">
@@ -54,68 +51,57 @@ export default function AppHeader({
         <div className="flex items-center gap-4">
             <LogoWithText className="h-[120px] w-auto translate-x-[-15px]" />
         </div>
-        <div className="flex items-center gap-2">
-          
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="w-[200px] justify-between">
-                    <span className="truncate">{activeBoardName}</span>
-                    <ChevronsUpDown className="h-4 w-4 opacity-50"/>
-                </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-[200px]" align="end">
-                <DropdownMenuItem 
-                  onSelect={() => onSwitchBoard('all')} 
-                  className={cn("justify-between", activeBoardId === 'all' && "bg-primary text-primary-foreground focus:bg-primary focus:text-primary-foreground")}
+        
+        <div className="flex items-center gap-4">
+           <div className="flex items-center gap-2 p-1 rounded-lg bg-muted">
+                <Button 
+                    variant={isAllBoardsView ? "secondary" : "ghost"} 
+                    size="sm"
+                    onClick={() => onSwitchBoard('all')}
+                    className="flex items-center gap-2"
                 >
-                    <div className="flex items-center">
-                      <LayoutGrid className="mr-2 h-4 w-4" />
-                      <span>All Boards</span>
-                    </div>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuLabel>Your Boards</DropdownMenuLabel>
+                    <LayoutGrid className="h-4 w-4" />
+                    <span>All Boards</span>
+                </Button>
+                <div className="h-6 w-px bg-border" />
                 {boards.map(board => (
-                  <DropdownMenuItem 
-                    key={board.id} 
-                    onSelect={() => onSwitchBoard(board.id)} 
-                    className={cn(
-                      "group justify-between",
-                       activeBoardId === board.id && "bg-primary text-primary-foreground focus:bg-primary focus:text-primary-foreground"
-                    )}
-                  >
-                    <span className="truncate pr-2">{board.name}</span>
-                    <div className={cn(
-                        "flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                      )}
-                    >
+                    <div key={board.id} className="group relative">
                         <Button 
-                            variant="ghost" 
-                            size="icon" 
-                            className="h-6 w-6 hover:bg-primary-foreground/20" 
-                            onClick={(e) => { e.stopPropagation(); onRenameBoard(board.id); }}
+                            variant={activeBoardId === board.id ? "secondary" : "ghost"} 
+                            size="sm" 
+                            onClick={() => onSwitchBoard(board.id)}
+                            className="pr-8"
                         >
-                            <Pencil className="h-3 w-3" />
+                            {board.name}
                         </Button>
-                        <Button 
-                            variant="ghost" 
-                            size="icon" 
-                            className="h-6 w-6 hover:bg-destructive/10 text-destructive data-[active=true]:hover:text-destructive-foreground"
-                            onClick={(e) => { e.stopPropagation(); onDeleteBoard(board.id); }}
-                        >
-                            <Trash className="h-3 w-3" />
-                        </Button>
+                        <div className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
+                            <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                className="h-6 w-6" 
+                                onClick={(e) => { e.stopPropagation(); onRenameBoard(board.id); }}
+                            >
+                                <Pencil className="h-3 w-3" />
+                            </Button>
+                            <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                className="h-6 w-6 hover:bg-destructive/10 text-destructive"
+                                onClick={(e) => { e.stopPropagation(); onDeleteBoard(board.id); }}
+                            >
+                                <Trash className="h-3 w-3" />
+                            </Button>
+                        </div>
                     </div>
-                  </DropdownMenuItem>
                 ))}
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onSelect={onNewBoard}>
-                  <CopyPlus className="mr-2 h-4 w-4" />
-                  <span>New Board</span>
-                </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+                 <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onNewBoard}>
+                    <CopyPlus className="h-4 w-4" />
+                    <span className="sr-only">New Board</span>
+                </Button>
+           </div>
+        </div>
 
+        <div className="flex items-center gap-2">
           <ThemeToggle />
            <DropdownMenu>
             <DropdownMenuTrigger asChild>
