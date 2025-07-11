@@ -29,7 +29,7 @@ export default function BoardTabs({
 }: BoardTabsProps) {
 
   return (
-    <div className="bg-muted/40 h-10 flex items-center px-2 border-b">
+    <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-sm h-10 flex items-center px-2 border-b">
       <TooltipProvider delayDuration={300}>
         <Tooltip>
           <TooltipTrigger asChild>
