@@ -214,7 +214,7 @@ const DraggableImage: React.FC<DraggableImageProps> = ({ image, onSelect, onUpda
     aspectRatio: aspectRatio ? `${aspectRatio}` : undefined,
   };
 
-  const handleBaseClasses = "absolute w-4 h-4 rounded-sm bg-primary border-2 border-background z-20";
+  const handleBaseClasses = "absolute w-4 h-4 bg-primary border-2 border-background z-20";
   const handleScaleStyle = {
     transform: `scale(${1 / scale})`,
   };
