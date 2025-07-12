@@ -40,7 +40,7 @@ export function ViewOptions({ settings, onChange }: ViewOptionsProps) {
             View
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-85 relative translate-x-[-20%]">
+      <PopoverContent className="w-80 md:translate-x-0 translate-x-[-24%]">
         <div className="grid gap-4">
           <div className="space-y-2">
             <h4 className="font-medium leading-none">View</h4>
