@@ -36,7 +36,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { Popover, PopoverContent, PopoverAnchor } from '@/components/ui/popover';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useToast } from '@/hooks/use-toast';
-import { suggestDetails } from '@/ai/flows/suggest-details';
+import { suggestTitle } from '@/ai/flows/suggest-title';
+import { suggestTags } from '@/ai/flows/suggest-tags';
+import { suggestColors } from '@/ai/flows/suggest-colors';
+import { suggestNotes } from '@/ai/flows/suggest-notes';
 import { basicColorMap, cn } from '@/lib/utils';
 
 
@@ -58,11 +61,20 @@ interface ImageDetailDialogProps {
   onUpdate: (image: ImageItem) => void;
 }
 
+type AIGenerationState = {
+    title?: boolean;
+    tags?: boolean;
+    colors?: boolean;
+    notes?: boolean;
+}
+
+
 export default function ImageDetailDialog({ image, allTags, isOpen, onOpenChange, onDelete, onUpdate }: ImageDetailDialogProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [tagInput, setTagInput] = useState('');
   const [isSuggestionsOpen, setSuggestionsOpen] = useState(false);
-  const [isGenerating, setIsGenerating] = useState(false);
+  const [isGenerating, setIsGenerating] = useState<AIGenerationState>({});
+  const [dataUri, setDataUri] = useState<string | null>(null);
   const { toast } = useToast();
 
   const form = useForm<ImageEditFormValues>({
@@ -86,12 +98,49 @@ export default function ImageDetailDialog({ image, allTags, isOpen, onOpenChange
     }
   }, [image, form]);
   
+  const isGif = image.url.toLowerCase().endsWith('.gif');
+
   useEffect(() => {
     if (!isOpen) {
         setSuggestionsOpen(false);
         setIsEditing(false);
+        setDataUri(null);
+    } else {
+        if (isGif) return;
+
+        let isCancelled = false;
+
+        const generateDataUri = async () => {
+            try {
+                const proxyResponse = await fetch('/api/proxy-image', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ imageUrl: image.url }),
+                });
+        
+                if (!proxyResponse.ok) {
+                  throw new Error('Failed to fetch image from URL.');
+                }
+        
+                const { dataUri } = await proxyResponse.json();
+                if (!isCancelled) {
+                  setDataUri(dataUri);
+                }
+            } catch (error) {
+                console.error("Data URI generation failed:", error);
+                if (!isCancelled) {
+                  setDataUri(null);
+                }
+            }
+        }
+    
+        generateDataUri();
+
+        return () => {
+            isCancelled = true;
+        }
     }
-  }, [isOpen]);
+  }, [isOpen, image.url, isGif]);
 
   const suggestedTags = useMemo(() => {
     if (!tagInput) return [];
@@ -162,70 +211,67 @@ export default function ImageDetailDialog({ image, allTags, isOpen, onOpenChange
     }
   };
 
-  const handleAiFill = async () => {
-      if (!image.url) return;
+  const handleAiFill = async (field: keyof AIGenerationState) => {
+    if (!dataUri) return;
 
-      setIsGenerating(true);
-      try {
-        const proxyResponse = await fetch('/api/proxy-image', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ imageUrl: image.url }),
-        });
-
-        if (!proxyResponse.ok) {
-          const errorData = await proxyResponse.json();
-          throw new Error(errorData.error || 'Failed to fetch image from URL.');
+    setIsGenerating(prev => ({ ...prev, [field]: true }));
+    try {
+        let suggestions;
+        if (field === 'title') {
+            suggestions = await suggestTitle({ photoDataUri: dataUri });
+            if (suggestions.title) form.setValue('title', suggestions.title);
+        } else if (field === 'tags') {
+            suggestions = await suggestTags({ photoDataUri: dataUri });
+            if (suggestions.tags) form.setValue('tags', suggestions.tags);
+        } else if (field === 'colors') {
+            suggestions = await suggestColors({ photoDataUri: dataUri });
+            if (suggestions.colors) form.setValue('colors', suggestions.colors);
+        } else if (field === 'notes') {
+            suggestions = await suggestNotes({ photoDataUri: dataUri });
+            if (suggestions.notes) form.setValue('notes', suggestions.notes);
         }
-
-        const { dataUri } = await proxyResponse.json();
-
-        const suggestions = await suggestDetails({
-          photoDataUri: dataUri,
-        });
-
-        if (suggestions.title) form.setValue('title', suggestions.title);
-        if (suggestions.notes) form.setValue('notes', suggestions.notes);
-        if (suggestions.tags) form.setValue('tags', suggestions.tags);
-        if (suggestions.colors) form.setValue('colors', suggestions.colors);
-
-        toast({
-            title: "Suggestions applied!",
-            description: "AI has filled in the details for you.",
-        });
-
-      } catch (error: any) {
+    } catch (error: any) {
         console.error("AI suggestion failed:", error);
         toast({
-          title: "AI Suggestion Failed",
-          description: error.message || "Could not generate suggestions for this image.",
-          variant: 'destructive',
+            title: `AI ${field} suggestion failed`,
+            description: error.message || `Could not generate suggestion for ${field}.`,
+            variant: 'destructive',
         });
-      } finally {
-        setIsGenerating(false);
-      }
-    };
+    } finally {
+        setIsGenerating(prev => ({ ...prev, [field]: false }));
+    }
+  };
+
 
   if (!image) return null;
 
-  const isGif = image.url.toLowerCase().endsWith('.gif');
   const selectedColors = form.watch('colors') || [];
-
-  const aiButton = (
-    <Button
-      type="button"
-      variant="outline"
-      onClick={handleAiFill}
-      disabled={isGenerating || isGif}
-      className="w-full"
-    >
-      {isGenerating ? (
-        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-      ) : (
-        <Sparkles className="mr-2 h-5 w-5" />
-      )}
-      Auto-fill with AI
-    </Button>
+  
+  const AiButton = ({ field }: { field: keyof AIGenerationState }) => (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={() => handleAiFill(field)}
+            disabled={!dataUri || isGenerating[field]}
+            className="absolute top-1/2 right-1.5 -translate-y-1/2 h-7 w-7 text-muted-foreground"
+          >
+            {isGenerating[field] ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Sparkles className="h-4 w-4" />
+            )}
+            <span className="sr-only">Auto-fill {field} with AI</span>
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>Auto-fill {field} with AI</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 
   return (
@@ -247,27 +293,16 @@ export default function ImageDetailDialog({ image, allTags, isOpen, onOpenChange
           {isEditing ? (
              <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                 {isGif ? (
-                    <TooltipProvider>
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <span className="w-full inline-block">{aiButton}</span>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                            <p>AI suggestions are not available for GIFs.</p>
-                        </TooltipContent>
-                    </Tooltip>
-                    </TooltipProvider>
-                  ) : (
-                    aiButton
-                  )}
                 <FormField
                   control={form.control}
                   name="title"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Title</FormLabel>
-                      <FormControl><Input {...field} /></FormControl>
+                      <div className="relative">
+                        <FormControl><Input {...field} className="pr-10"/></FormControl>
+                        <AiButton field="title" />
+                      </div>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -278,9 +313,10 @@ export default function ImageDetailDialog({ image, allTags, isOpen, onOpenChange
                   render={({ field }) => (
                      <FormItem>
                       <FormLabel>Tags</FormLabel>
+                       <div className="relative">
                         <Popover open={isSuggestionsOpen && suggestedTags.length > 0} onOpenChange={setSuggestionsOpen}>
                           <FormControl>
-                            <div className="flex flex-wrap gap-2 items-center rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
+                            <div className="flex flex-wrap gap-2 items-center rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 pr-10 min-h-10">
                               {field.value?.map((tag: string) => (
                                 <Badge key={tag} variant="secondary">
                                   {tag}
@@ -328,6 +364,8 @@ export default function ImageDetailDialog({ image, allTags, isOpen, onOpenChange
                               </div>
                            </PopoverContent>
                         </Popover>
+                        <AiButton field="tags" />
+                      </div>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -338,7 +376,27 @@ export default function ImageDetailDialog({ image, allTags, isOpen, onOpenChange
                   name="colors"
                   render={() => (
                     <FormItem>
-                      <FormLabel>Colors</FormLabel>
+                        <div className="flex items-center gap-2">
+                            <FormLabel>Colors</FormLabel>
+                             <TooltipProvider>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="icon"
+                                            onClick={() => handleAiFill('colors')}
+                                            disabled={!dataUri || isGenerating['colors']}
+                                            className="h-6 w-6 text-muted-foreground"
+                                        >
+                                            {isGenerating['colors'] ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+                                            <span className="sr-only">Auto-fill colors with AI</span>
+                                        </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent><p>Auto-fill colors with AI</p></TooltipContent>
+                                </Tooltip>
+                             </TooltipProvider>
+                        </div>
                       <FormControl>
                         <div className="grid grid-cols-12 gap-2">
                             {Object.entries(basicColorMap).map(([name, hex]) => (
@@ -376,7 +434,10 @@ export default function ImageDetailDialog({ image, allTags, isOpen, onOpenChange
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Notes</FormLabel>
-                      <FormControl><Textarea {...field} /></FormControl>
+                      <div className="relative">
+                        <FormControl><Textarea {...field} className="pr-10"/></FormControl>
+                        <AiButton field="notes" />
+                      </div>
                       <FormMessage />
                     </FormItem>
                   )}

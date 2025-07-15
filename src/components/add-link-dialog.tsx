@@ -33,7 +33,10 @@ import type { ImageItem } from '@/lib/types';
 import { Badge } from './ui/badge';
 import { Popover, PopoverContent, PopoverAnchor } from '@/components/ui/popover';
 import { useToast } from '@/hooks/use-toast';
-import { suggestDetails } from '@/ai/flows/suggest-details';
+import { suggestTitle } from '@/ai/flows/suggest-title';
+import { suggestTags } from '@/ai/flows/suggest-tags';
+import { suggestColors } from '@/ai/flows/suggest-colors';
+import { suggestNotes } from '@/ai/flows/suggest-notes';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 import { cn, basicColorMap } from '@/lib/utils';
 
@@ -57,11 +60,20 @@ interface AddLinkDialogProps {
   initialUrl?: string;
 }
 
+type AIGenerationState = {
+    title?: boolean;
+    tags?: boolean;
+    colors?: boolean;
+    notes?: boolean;
+}
+
 export default function AddLinkDialog({ onAddImage, allTags, isOpen, onOpenChange, children, initialUrl }: AddLinkDialogProps) {
   const [tagInput, setTagInput] = useState('');
   const [isSuggestionsOpen, setSuggestionsOpen] = useState(false);
   const [isPreviewLarge, setIsPreviewLarge] = useState(false);
-  const [isGenerating, setIsGenerating] = useState(false);
+  const [isGenerating, setIsGenerating] = useState<AIGenerationState>({});
+  const [dataUri, setDataUri] = useState<string | null>(null);
+
   const { toast } = useToast();
   
   const form = useForm<ImageFormValues>({
@@ -85,11 +97,56 @@ export default function AddLinkDialog({ onAddImage, allTags, isOpen, onOpenChang
         colors: [],
       });
       setTagInput('');
-      setIsGenerating(false);
+      setIsGenerating({});
+      setDataUri(null);
     } else {
       setSuggestionsOpen(false);
     }
   }, [isOpen, form, initialUrl]);
+
+  const imageUrl = form.watch('url');
+  const isUrlValid = z.string().url().safeParse(imageUrl).success;
+  const isGif = isUrlValid && imageUrl.toLowerCase().endsWith('.gif');
+
+  useEffect(() => {
+    setDataUri(null);
+    if (!isUrlValid || isGif) {
+      return;
+    }
+    
+    let isCancelled = false;
+
+    const generateDataUri = async () => {
+        try {
+            const proxyResponse = await fetch('/api/proxy-image', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ imageUrl }),
+            });
+    
+            if (!proxyResponse.ok) {
+              throw new Error('Failed to fetch image from URL.');
+            }
+    
+            const { dataUri } = await proxyResponse.json();
+            if (!isCancelled) {
+              setDataUri(dataUri);
+            }
+        } catch (error) {
+            console.error("Data URI generation failed:", error);
+            if (!isCancelled) {
+              setDataUri(null);
+            }
+        }
+    }
+    
+    generateDataUri();
+
+    return () => {
+        isCancelled = true;
+    }
+
+  }, [imageUrl, isUrlValid, isGif]);
 
   const suggestedTags = useMemo(() => {
     if (!tagInput) return [];
@@ -149,73 +206,66 @@ export default function AddLinkDialog({ onAddImage, allTags, isOpen, onOpenChang
       form.setValue('colors', [...currentColors, color]);
     }
   };
+  
+  const handleAiFill = async (field: keyof AIGenerationState) => {
+    if (!dataUri) return;
 
-  const handleAiFill = async () => {
-      const url = form.getValues('url');
-      if (!url) return;
-
-      setIsGenerating(true);
-      try {
-        const proxyResponse = await fetch('/api/proxy-image', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ imageUrl: url }),
-        });
-
-        if (!proxyResponse.ok) {
-          const errorData = await proxyResponse.json();
-          throw new Error(errorData.error || 'Failed to fetch image from URL.');
+    setIsGenerating(prev => ({ ...prev, [field]: true }));
+    try {
+        let suggestions;
+        if (field === 'title') {
+            suggestions = await suggestTitle({ photoDataUri: dataUri });
+            if (suggestions.title) form.setValue('title', suggestions.title);
+        } else if (field === 'tags') {
+            suggestions = await suggestTags({ photoDataUri: dataUri });
+            if (suggestions.tags) form.setValue('tags', suggestions.tags);
+        } else if (field === 'colors') {
+            suggestions = await suggestColors({ photoDataUri: dataUri });
+            if (suggestions.colors) form.setValue('colors', suggestions.colors);
+        } else if (field === 'notes') {
+            suggestions = await suggestNotes({ photoDataUri: dataUri });
+            if (suggestions.notes) form.setValue('notes', suggestions.notes);
         }
-
-        const { dataUri } = await proxyResponse.json();
-
-        const suggestions = await suggestDetails({
-          photoDataUri: dataUri,
-        });
-
-        if (suggestions.title) form.setValue('title', suggestions.title);
-        if (suggestions.notes) form.setValue('notes', suggestions.notes);
-        if (suggestions.tags) form.setValue('tags', suggestions.tags);
-        if (suggestions.colors) form.setValue('colors', suggestions.colors);
-
-        toast({
-            title: "Suggestions applied!",
-            description: "AI has filled in the details for you.",
-        });
-
-      } catch (error: any) {
+    } catch (error: any) {
         console.error("AI suggestion failed:", error);
         toast({
-          title: "AI Suggestion Failed",
-          description: error.message || "Could not generate suggestions for this image.",
-          variant: 'destructive',
+            title: `AI ${field} suggestion failed`,
+            description: error.message || `Could not generate suggestion for ${field}.`,
+            variant: 'destructive',
         });
-      } finally {
-        setIsGenerating(false);
-      }
-    };
-
-  const imageUrl = form.watch('url');
-  const isUrlValid = z.string().url().safeParse(imageUrl).success;
-  const isGif = isUrlValid && imageUrl.toLowerCase().endsWith('.gif');
-  const selectedColors = form.watch('colors') || [];
-
-  const aiButton = (
-    <Button
-        type="button"
-        variant="outline"
-        onClick={handleAiFill}
-        disabled={!isUrlValid || isGenerating || isGif}
-        className="w-full"
-    >
-        {isGenerating ? (
-        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-        ) : (
-        <Sparkles className="mr-2 h-5 w-5" />
-        )}
-        Auto-fill with AI
-    </Button>
+    } finally {
+        setIsGenerating(prev => ({ ...prev, [field]: false }));
+    }
+  };
+  
+  const AiButton = ({ field }: { field: keyof AIGenerationState }) => (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={() => handleAiFill(field)}
+            disabled={!dataUri || isGenerating[field]}
+            className="absolute top-1/2 right-1.5 -translate-y-1/2 h-7 w-7 text-muted-foreground"
+          >
+            {isGenerating[field] ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Sparkles className="h-4 w-4" />
+            )}
+            <span className="sr-only">Auto-fill {field} with AI</span>
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>Auto-fill {field} with AI</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
+
+  const selectedColors = form.watch('colors') || [];
 
   return (
     <>
@@ -265,20 +315,6 @@ export default function AddLinkDialog({ onAddImage, allTags, isOpen, onOpenChang
                         unoptimized={isGif}
                       />
                     </div>
-                     {isGif ? (
-                       <TooltipProvider>
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <span className="w-full inline-block">{aiButton}</span>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                                <p>AI suggestions are not available for GIFs.</p>
-                            </TooltipContent>
-                        </Tooltip>
-                       </TooltipProvider>
-                    ) : (
-                       aiButton
-                    )}
                   </div>
                 )}
 
@@ -288,9 +324,12 @@ export default function AddLinkDialog({ onAddImage, allTags, isOpen, onOpenChang
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Title</FormLabel>
-                      <FormControl>
-                        <Input placeholder="e.g., Abstract Architecture" {...field} />
-                      </FormControl>
+                      <div className="relative">
+                        <FormControl>
+                          <Input placeholder="e.g., Abstract Architecture" {...field} className="pr-10" />
+                        </FormControl>
+                        <AiButton field="title"/>
+                      </div>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -302,56 +341,59 @@ export default function AddLinkDialog({ onAddImage, allTags, isOpen, onOpenChang
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Tags</FormLabel>
-                      <Popover open={isSuggestionsOpen && suggestedTags.length > 0} onOpenChange={setSuggestionsOpen}>
-                        <FormControl>
-                          <div className="flex flex-wrap gap-2 items-center rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
-                            {field.value?.map((tag: string) => (
-                              <Badge key={tag} variant="secondary">
-                                {tag}
-                                <button
-                                  type="button"
-                                  className="ml-1 rounded-full outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                                  onClick={() => removeTag(tag, field)}
-                                >
-                                  <X className="h-3 w-3" />
-                                </button>
-                              </Badge>
-                            ))}
-                            <PopoverAnchor asChild>
-                              <Input
-                                placeholder="Add a tag..."
-                                value={tagInput}
-                                onChange={(e) => {
-                                  setTagInput(e.target.value);
-                                  if (!isSuggestionsOpen) setSuggestionsOpen(true);
-                                }}
-                                onKeyDown={(e) => handleTagKeyDown(e, field)}
-                                onFocus={() => setSuggestionsOpen(true)}
-                                className="h-auto flex-1 bg-transparent p-0 border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 min-w-[120px]"
-                              />
-                            </PopoverAnchor>
-                          </div>
-                        </FormControl>
-                        <PopoverContent
-                            onOpenAutoFocus={(e) => e.preventDefault()}
-                            className="w-[var(--radix-popover-anchor-width)] p-1">
-                            <div className="max-h-40 overflow-y-auto">
-                              {suggestedTags.map((tag) => (
-                                <button
-                                  type="button"
-                                  key={tag}
-                                  className="w-full text-left text-sm p-2 rounded-sm hover:bg-accent"
-                                  onMouseDown={(e) => {
-                                      e.preventDefault();
-                                      handleAddTag(tag, field);
-                                  }}
-                                >
+                       <div className="relative">
+                        <Popover open={isSuggestionsOpen && suggestedTags.length > 0} onOpenChange={setSuggestionsOpen}>
+                          <FormControl>
+                            <div className="flex flex-wrap gap-2 items-center rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 pr-10 min-h-10">
+                              {field.value?.map((tag: string) => (
+                                <Badge key={tag} variant="secondary">
                                   {tag}
-                                </button>
+                                  <button
+                                    type="button"
+                                    className="ml-1 rounded-full outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                                    onClick={() => removeTag(tag, field)}
+                                  >
+                                    <X className="h-3 w-3" />
+                                  </button>
+                                </Badge>
                               ))}
+                              <PopoverAnchor asChild>
+                                <Input
+                                  placeholder="Add a tag..."
+                                  value={tagInput}
+                                  onChange={(e) => {
+                                    setTagInput(e.target.value);
+                                    if (!isSuggestionsOpen) setSuggestionsOpen(true);
+                                  }}
+                                  onKeyDown={(e) => handleTagKeyDown(e, field)}
+                                  onFocus={() => setSuggestionsOpen(true)}
+                                  className="h-auto flex-1 bg-transparent p-0 border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 min-w-[120px]"
+                                />
+                              </PopoverAnchor>
                             </div>
-                        </PopoverContent>
-                      </Popover>
+                          </FormControl>
+                          <PopoverContent
+                              onOpenAutoFocus={(e) => e.preventDefault()}
+                              className="w-[var(--radix-popover-anchor-width)] p-1">
+                              <div className="max-h-40 overflow-y-auto">
+                                {suggestedTags.map((tag) => (
+                                  <button
+                                    type="button"
+                                    key={tag}
+                                    className="w-full text-left text-sm p-2 rounded-sm hover:bg-accent"
+                                    onMouseDown={(e) => {
+                                        e.preventDefault();
+                                        handleAddTag(tag, field);
+                                    }}
+                                  >
+                                    {tag}
+                                  </button>
+                                ))}
+                              </div>
+                          </PopoverContent>
+                        </Popover>
+                         <AiButton field="tags"/>
+                      </div>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -362,7 +404,27 @@ export default function AddLinkDialog({ onAddImage, allTags, isOpen, onOpenChang
                   name="colors"
                   render={() => (
                     <FormItem>
-                      <FormLabel>Colors</FormLabel>
+                       <div className="flex items-center gap-2">
+                        <FormLabel>Colors</FormLabel>
+                         <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={() => handleAiFill('colors')}
+                                        disabled={!dataUri || isGenerating['colors']}
+                                        className="h-6 w-6 text-muted-foreground"
+                                    >
+                                        {isGenerating['colors'] ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+                                        <span className="sr-only">Auto-fill colors with AI</span>
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent><p>Auto-fill colors with AI</p></TooltipContent>
+                            </Tooltip>
+                         </TooltipProvider>
+                      </div>
                       <FormControl>
                         <div className="grid grid-cols-12 gap-2">
                             {Object.entries(basicColorMap).map(([name, hex]) => (
@@ -401,9 +463,12 @@ export default function AddLinkDialog({ onAddImage, allTags, isOpen, onOpenChang
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Notes</FormLabel>
-                      <FormControl>
-                        <Textarea placeholder="Add any notes about this image..." {...field} />
-                      </FormControl>
+                      <div className="relative">
+                        <FormControl>
+                          <Textarea placeholder="Add any notes about this image..." {...field} className="pr-10" />
+                        </FormControl>
+                        <AiButton field="notes"/>
+                      </div>
                       <FormMessage />
                     </FormItem>
                   )}
