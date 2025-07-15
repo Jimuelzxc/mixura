@@ -7,7 +7,7 @@ import ImageGrid from '@/components/image-grid';
 import ImageDetailDialog from '@/components/image-detail-dialog';
 import FilterToolbar from '@/components/filter-toolbar';
 import { useToast } from '@/hooks/use-toast';
-import { ImagePlus, AlertTriangle, Edit, Check, X, LayoutGrid, Pencil, UploadCloud } from 'lucide-react';
+import { ImagePlus, AlertTriangle, Edit, Check, X, LayoutGrid, Pencil, UploadCloud, Settings } from 'lucide-react';
 import AddLinkDialog from '@/components/add-link-dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
@@ -16,8 +16,10 @@ import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import BoardTabs from '@/components/board-tabs';
 import { initialData } from '@/lib/data';
+import ApiSettingsDialog from '@/components/api-settings-dialog';
 
 const LOCALSTORAGE_KEY = 'mixura-data';
+const API_KEY_LOCALSTORAGE_KEY = 'mixura-api-key';
 
 const defaultViewSettings: ViewSettings = {
   viewMode: 'moodboard',
@@ -48,6 +50,7 @@ export default function Home() {
 
   const [deletingBoardId, setDeletingBoardId] = useState<string | null>(null);
   const [isCanvasFullscreen, setIsCanvasFullscreen] = useState(false);
+  const [isApiSettingsOpen, setIsApiSettingsOpen] = useState(false);
   
   const { toast } = useToast();
   
@@ -508,6 +511,12 @@ export default function Home() {
     setAddLinkDialogOpen(true);
   }
 
+  const handleSaveApiKey = (key: string) => {
+    localStorage.setItem(API_KEY_LOCALSTORAGE_KEY, key);
+    toast({ title: 'API Key Saved!', description: 'Your Gemini API key has been securely saved in your browser.' });
+    setIsApiSettingsOpen(false);
+  }
+
   return (
     <div 
       className={cn(
@@ -537,6 +546,7 @@ export default function Home() {
         onImportClick={handleImportClick}
         onExportClick={handleExport}
         onDeleteAllClick={() => setDeleteAllAlertOpen(true)}
+        onApiSettingsClick={() => setIsApiSettingsOpen(true)}
         isAddDisabled={isAllBoardsView}
       />
 
@@ -720,8 +730,11 @@ export default function Home() {
         </AlertDialogContent>
       </AlertDialog>
 
+      <ApiSettingsDialog
+        isOpen={isApiSettingsOpen}
+        onOpenChange={setIsApiSettingsOpen}
+        onSave={handleSaveApiKey}
+      />
     </div>
   );
 }
-
-    

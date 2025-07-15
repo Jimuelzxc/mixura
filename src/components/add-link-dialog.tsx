@@ -41,6 +41,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/t
 import { cn, basicColorMap } from '@/lib/utils';
 import { Separator } from './ui/separator';
 
+const API_KEY_LOCALSTORAGE_KEY = 'mixura-api-key';
 
 const imageSchema = z.object({
   url: z.string().url({ message: "Please enter a valid image URL." }),
@@ -75,6 +76,8 @@ export default function AddLinkDialog({ onAddImage, allTags, isOpen, onOpenChang
   const [isPreviewLarge, setIsPreviewLarge] = useState(false);
   const [isGenerating, setIsGenerating] = useState<AIGenerationState>({});
   const [dataUri, setDataUri] = useState<string | null>(null);
+  const [apiKey, setApiKey] = useState<string | null>(null);
+  const [lastTokenUsage, setLastTokenUsage] = useState<number | null>(null);
 
   const { toast } = useToast();
   
@@ -91,6 +94,8 @@ export default function AddLinkDialog({ onAddImage, allTags, isOpen, onOpenChang
   
   useEffect(() => {
     if (isOpen) {
+      const storedKey = localStorage.getItem(API_KEY_LOCALSTORAGE_KEY);
+      setApiKey(storedKey);
       form.reset({
         url: initialUrl || '',
         title: '',
@@ -101,6 +106,7 @@ export default function AddLinkDialog({ onAddImage, allTags, isOpen, onOpenChang
       setTagInput('');
       setIsGenerating({});
       setDataUri(null);
+      setLastTokenUsage(null);
     } else {
       setSuggestionsOpen(false);
     }
@@ -208,25 +214,35 @@ export default function AddLinkDialog({ onAddImage, allTags, isOpen, onOpenChang
       form.setValue('colors', [...currentColors, color]);
     }
   };
+
+  const getAiHeaders = () => {
+    if (!apiKey) return undefined;
+    return { 'x-goog-api-key': apiKey };
+  };
   
   const handleAiFill = async (field: keyof AIGenerationState) => {
     if (!dataUri) return;
 
     setIsGenerating(prev => ({ ...prev, [field]: true }));
+    setLastTokenUsage(null);
+
     try {
         let suggestions;
         if (field === 'title') {
-            suggestions = await suggestTitle({ photoDataUri: dataUri });
+            suggestions = await suggestTitle({ photoDataUri: dataUri }, { headers: getAiHeaders() });
             if (suggestions.title) form.setValue('title', suggestions.title);
         } else if (field === 'tags') {
-            suggestions = await suggestTags({ photoDataUri: dataUri });
+            suggestions = await suggestTags({ photoDataUri: dataUri }, { headers: getAiHeaders() });
             if (suggestions.tags) form.setValue('tags', suggestions.tags);
         } else if (field === 'colors') {
-            suggestions = await suggestColors({ photoDataUri: dataUri });
+            suggestions = await suggestColors({ photoDataUri: dataUri }, { headers: getAiHeaders() });
             if (suggestions.colors) form.setValue('colors', suggestions.colors);
         } else if (field === 'notes') {
-            suggestions = await suggestNotes({ photoDataUri: dataUri });
+            suggestions = await suggestNotes({ photoDataUri: dataUri }, { headers: getAiHeaders() });
             if (suggestions.notes) form.setValue('notes', suggestions.notes);
+        }
+        if (suggestions?.usage) {
+          setLastTokenUsage(suggestions.usage.totalTokens);
         }
     } catch (error: any) {
         console.error("AI suggestion failed:", error);
@@ -243,37 +259,40 @@ export default function AddLinkDialog({ onAddImage, allTags, isOpen, onOpenChang
   const handleAiFillAll = async () => {
     if (!dataUri) return;
     setIsGenerating(prev => ({...prev, all: true}));
+    setLastTokenUsage(null);
+    let totalTokens = 0;
 
     const fields: (keyof AIGenerationState)[] = ['title', 'notes', 'tags', 'colors'];
     
     try {
-        await Promise.all(fields.map(async (field) => {
-            try {
-                let suggestions;
-                 if (field === 'title') {
-                    suggestions = await suggestTitle({ photoDataUri: dataUri });
-                    if (suggestions.title) form.setValue('title', suggestions.title);
-                } else if (field === 'tags') {
-                    suggestions = await suggestTags({ photoDataUri: dataUri });
-                    if (suggestions.tags) form.setValue('tags', suggestions.tags);
-                } else if (field === 'colors') {
-                    suggestions = await suggestColors({ photoDataUri: dataUri });
-                    if (suggestions.colors) form.setValue('colors', suggestions.colors);
-                } else if (field === 'notes') {
-                    suggestions = await suggestNotes({ photoDataUri: dataUri });
-                    if (suggestions.notes) form.setValue('notes', suggestions.notes);
-                }
-            } catch (innerError: any) {
-                console.error(`AI suggestion for ${field} failed:`, innerError);
-                toast({
-                    title: `AI ${field} suggestion failed`,
-                    description: innerError.message || `Could not generate suggestion for ${field}.`,
-                    variant: 'destructive',
-                });
-            }
-        }));
-    } catch (error) {
+        const results = await Promise.all([
+          suggestTitle({ photoDataUri: dataUri }, { headers: getAiHeaders() }),
+          suggestNotes({ photoDataUri: dataUri }, { headers: getAiHeaders() }),
+          suggestTags({ photoDataUri: dataUri }, { headers: getAiHeaders() }),
+          suggestColors({ photoDataUri: dataUri }, { headers: getAiHeaders() })
+        ]);
+        
+        const [titleRes, notesRes, tagsRes, colorsRes] = results;
+
+        if (titleRes.title) form.setValue('title', titleRes.title);
+        if (notesRes.notes) form.setValue('notes', notesRes.notes);
+        if (tagsRes.tags) form.setValue('tags', tagsRes.tags);
+        if (colorsRes.colors) form.setValue('colors', colorsRes.colors);
+
+        totalTokens += titleRes.usage?.totalTokens || 0;
+        totalTokens += notesRes.usage?.totalTokens || 0;
+        totalTokens += tagsRes.usage?.totalTokens || 0;
+        totalTokens += colorsRes.usage?.totalTokens || 0;
+
+        setLastTokenUsage(totalTokens);
+
+    } catch (error: any) {
         console.error("AI fill all failed:", error);
+        toast({
+            title: `AI suggestion failed`,
+            description: error.message || `Could not generate suggestions.`,
+            variant: 'destructive',
+        });
     } finally {
         setIsGenerating(prev => ({...prev, all: false}));
     }
@@ -290,7 +309,7 @@ export default function AddLinkDialog({ onAddImage, allTags, isOpen, onOpenChang
             variant="ghost"
             size="icon"
             onClick={() => handleAiFill(field)}
-            disabled={!dataUri || isGenerating[field] || isGenerating.all}
+            disabled={!dataUri || isGenerating[field] || isGenerating.all || !apiKey}
             className={cn("h-7 w-7 text-muted-foreground", className)}
           >
             {isGenerating[field] ? (
@@ -302,7 +321,7 @@ export default function AddLinkDialog({ onAddImage, allTags, isOpen, onOpenChang
           </Button>
         </TooltipTrigger>
         <TooltipContent>
-          <p>Auto-fill {field} with AI</p>
+          {apiKey ? <p>Auto-fill {field} with AI</p> : <p>Set your API Key to enable AI features.</p>}
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
@@ -358,21 +377,39 @@ export default function AddLinkDialog({ onAddImage, allTags, isOpen, onOpenChang
                         unoptimized={isGif}
                       />
                     </div>
-                     <Button
-                        type="button"
-                        variant="outline"
-                        className="w-full"
-                        disabled={!dataUri || isGeneratingAny}
-                        onClick={handleAiFillAll}
-                      >
-                        {isGenerating.all ? (
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        ) : (
-                          <Sparkles className="mr-2 h-4 w-4" />
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild className="w-full">
+                          <span>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              className="w-full"
+                              disabled={!dataUri || isGeneratingAny || !apiKey}
+                              onClick={handleAiFillAll}
+                            >
+                              {isGenerating.all ? (
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              ) : (
+                                <Sparkles className="mr-2 h-4 w-4" />
+                              )}
+                              Auto-fill with AI
+                            </Button>
+                          </span>
+                        </TooltipTrigger>
+                         {!apiKey && (
+                          <TooltipContent>
+                            <p>Set your API Key to enable AI features.</p>
+                          </TooltipContent>
                         )}
-                        Auto-fill with AI
-                      </Button>
-                      <Separator />
+                      </Tooltip>
+                    </TooltipProvider>
+                     {lastTokenUsage !== null && (
+                      <div className="text-xs text-muted-foreground text-center">
+                        Total tokens used: {lastTokenUsage}
+                      </div>
+                    )}
+                    <Separator />
                   </div>
                 )}
 

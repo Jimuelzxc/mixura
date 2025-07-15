@@ -19,6 +19,11 @@ type SuggestNotesInput = z.infer<typeof SuggestNotesInputSchema>;
 
 const SuggestNotesOutputSchema = z.object({
   notes: z.string().describe("Brief, insightful notes about the image's style, mood, or potential use. Keep it to 1-2 sentences."),
+  usage: z.object({
+    inputTokens: z.number(),
+    outputTokens: z.number(),
+    totalTokens: z.number(),
+  }).optional(),
 });
 type SuggestNotesOutput = z.infer<typeof SuggestNotesOutputSchema>;
 
@@ -47,7 +52,15 @@ const suggestNotesFlow = ai.defineFlow(
     outputSchema: SuggestNotesOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
-    return output!;
+    try {
+      const {output, usage} = await prompt(input);
+      return {
+        ...output!,
+        usage,
+      };
+    } catch (error: any) {
+      console.error("AI note suggestion failed:", error);
+      throw new Error(`The AI service is temporarily unavailable. Please try again later.`);
+    }
   }
 );

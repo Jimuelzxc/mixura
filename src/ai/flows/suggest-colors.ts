@@ -19,6 +19,11 @@ type SuggestColorsInput = z.infer<typeof SuggestColorsInputSchema>;
 
 const SuggestColorsOutputSchema = z.object({
   colors: z.array(z.string()).describe('An array of 1-3 dominant basic colors from the provided list.'),
+  usage: z.object({
+    inputTokens: z.number(),
+    outputTokens: z.number(),
+    totalTokens: z.number(),
+  }).optional(),
 });
 type SuggestColorsOutput = z.infer<typeof SuggestColorsOutputSchema>;
 
@@ -47,7 +52,15 @@ const suggestColorsFlow = ai.defineFlow(
     outputSchema: SuggestColorsOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
-    return output!;
+    try {
+      const {output, usage} = await prompt(input);
+      return {
+        ...output!,
+        usage,
+      };
+    } catch (error: any) {
+      console.error("AI color suggestion failed:", error);
+      throw new Error(`The AI service is temporarily unavailable. Please try again later.`);
+    }
   }
 );

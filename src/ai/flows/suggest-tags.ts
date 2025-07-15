@@ -19,6 +19,11 @@ type SuggestTagsInput = z.infer<typeof SuggestTagsInputSchema>;
 
 const SuggestTagsOutputSchema = z.object({
   tags: z.array(z.string()).describe('An array of 3-5 relevant lowercase, single-word tags for the image.'),
+  usage: z.object({
+    inputTokens: z.number(),
+    outputTokens: z.number(),
+    totalTokens: z.number(),
+  }).optional(),
 });
 type SuggestTagsOutput = z.infer<typeof SuggestTagsOutputSchema>;
 
@@ -47,7 +52,15 @@ const suggestTagsFlow = ai.defineFlow(
     outputSchema: SuggestTagsOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
-    return output!;
+    try {
+      const {output, usage} = await prompt(input);
+      return {
+        ...output!,
+        usage,
+      };
+    } catch (error: any) {
+      console.error("AI tag suggestion failed:", error);
+      throw new Error(`The AI service is temporarily unavailable. Please try again later.`);
+    }
   }
 );

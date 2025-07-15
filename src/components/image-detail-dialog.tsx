@@ -43,6 +43,8 @@ import { suggestNotes } from '@/ai/flows/suggest-notes';
 import { basicColorMap, cn } from '@/lib/utils';
 
 
+const API_KEY_LOCALSTORAGE_KEY = 'mixura-api-key';
+
 const imageEditSchema = z.object({
   title: z.string().optional(),
   notes: z.string().optional(),
@@ -75,6 +77,9 @@ export default function ImageDetailDialog({ image, allTags, isOpen, onOpenChange
   const [isSuggestionsOpen, setSuggestionsOpen] = useState(false);
   const [isGenerating, setIsGenerating] = useState<AIGenerationState>({});
   const [dataUri, setDataUri] = useState<string | null>(null);
+  const [apiKey, setApiKey] = useState<string | null>(null);
+  const [lastTokenUsage, setLastTokenUsage] = useState<number | null>(null);
+
   const { toast } = useToast();
 
   const form = useForm<ImageEditFormValues>({
@@ -105,7 +110,11 @@ export default function ImageDetailDialog({ image, allTags, isOpen, onOpenChange
         setSuggestionsOpen(false);
         setIsEditing(false);
         setDataUri(null);
+        setLastTokenUsage(null);
     } else {
+        const storedKey = localStorage.getItem(API_KEY_LOCALSTORAGE_KEY);
+        setApiKey(storedKey);
+
         if (isGif) return;
 
         let isCancelled = false;
@@ -163,6 +172,7 @@ export default function ImageDetailDialog({ image, allTags, isOpen, onOpenChange
         colors: image.colors || [],
       });
       setTagInput('');
+      setLastTokenUsage(null);
     }
     setIsEditing(!isEditing);
   }
@@ -211,24 +221,33 @@ export default function ImageDetailDialog({ image, allTags, isOpen, onOpenChange
     }
   };
 
+  const getAiHeaders = () => {
+    if (!apiKey) return undefined;
+    return { 'x-goog-api-key': apiKey };
+  };
+
   const handleAiFill = async (field: keyof AIGenerationState) => {
     if (!dataUri) return;
 
     setIsGenerating(prev => ({ ...prev, [field]: true }));
+    setLastTokenUsage(null);
     try {
         let suggestions;
         if (field === 'title') {
-            suggestions = await suggestTitle({ photoDataUri: dataUri });
+            suggestions = await suggestTitle({ photoDataUri: dataUri }, { headers: getAiHeaders() });
             if (suggestions.title) form.setValue('title', suggestions.title);
         } else if (field === 'tags') {
-            suggestions = await suggestTags({ photoDataUri: dataUri });
+            suggestions = await suggestTags({ photoDataUri: dataUri }, { headers: getAiHeaders() });
             if (suggestions.tags) form.setValue('tags', suggestions.tags);
         } else if (field === 'colors') {
-            suggestions = await suggestColors({ photoDataUri: dataUri });
+            suggestions = await suggestColors({ photoDataUri: dataUri }, { headers: getAiHeaders() });
             if (suggestions.colors) form.setValue('colors', suggestions.colors);
         } else if (field === 'notes') {
-            suggestions = await suggestNotes({ photoDataUri: dataUri });
+            suggestions = await suggestNotes({ photoDataUri: dataUri }, { headers: getAiHeaders() });
             if (suggestions.notes) form.setValue('notes', suggestions.notes);
+        }
+        if (suggestions?.usage) {
+          setLastTokenUsage(suggestions.usage.totalTokens);
         }
     } catch (error: any) {
         console.error("AI suggestion failed:", error);
@@ -256,7 +275,7 @@ export default function ImageDetailDialog({ image, allTags, isOpen, onOpenChange
             variant="ghost"
             size="icon"
             onClick={() => handleAiFill(field)}
-            disabled={!dataUri || isGenerating[field]}
+            disabled={!dataUri || isGenerating[field] || !apiKey}
             className={cn("h-7 w-7 text-muted-foreground", className)}
           >
             {isGenerating[field] ? (
@@ -268,7 +287,7 @@ export default function ImageDetailDialog({ image, allTags, isOpen, onOpenChange
           </Button>
         </TooltipTrigger>
         <TooltipContent>
-          <p>Auto-fill {field} with AI</p>
+           {apiKey ? <p>Auto-fill {field} with AI</p> : <p>Set your API Key to enable AI features.</p>}
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
@@ -293,6 +312,11 @@ export default function ImageDetailDialog({ image, allTags, isOpen, onOpenChange
           {isEditing ? (
              <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                 {lastTokenUsage !== null && (
+                  <div className="text-xs text-muted-foreground text-center pb-2">
+                    Total tokens used: {lastTokenUsage}
+                  </div>
+                )}
                 <FormField
                   control={form.control}
                   name="title"

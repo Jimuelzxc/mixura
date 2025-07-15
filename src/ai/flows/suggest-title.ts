@@ -19,6 +19,11 @@ type SuggestTitleInput = z.infer<typeof SuggestTitleInputSchema>;
 
 const SuggestTitleOutputSchema = z.object({
   title: z.string().describe('A concise and descriptive title for the image, no more than 10 words.'),
+  usage: z.object({
+    inputTokens: z.number(),
+    outputTokens: z.number(),
+    totalTokens: z.number(),
+  }).optional(),
 });
 type SuggestTitleOutput = z.infer<typeof SuggestTitleOutputSchema>;
 
@@ -47,7 +52,15 @@ const suggestTitleFlow = ai.defineFlow(
     outputSchema: SuggestTitleOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
-    return output!;
+    try {
+      const {output, usage} = await prompt(input);
+      return {
+        ...output!,
+        usage,
+      };
+    } catch (error: any) {
+        console.error("AI title suggestion failed:", error);
+        throw new Error(`The AI service is temporarily unavailable. Please try again later.`);
+    }
   }
 );

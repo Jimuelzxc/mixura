@@ -3,7 +3,7 @@
 
 import type { Board } from '@/lib/types';
 import { Button } from './ui/button';
-import { LayoutGrid, Plus, Trash, X, Menu, Upload, Download, Trash2, Sun, Moon } from 'lucide-react';
+import { LayoutGrid, Plus, Trash, X, Menu, Upload, Download, Trash2, Sun, Moon, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 import { ScrollArea, ScrollBar } from './ui/scroll-area';
@@ -35,6 +35,7 @@ interface BoardTabsProps {
   onImportClick: () => void;
   onExportClick: () => void;
   onDeleteAllClick: () => void;
+  onApiSettingsClick: () => void;
   isAddDisabled: boolean;
 }
 
@@ -50,6 +51,7 @@ export default function BoardTabs({
   onImportClick, 
   onExportClick, 
   onDeleteAllClick,
+  onApiSettingsClick,
   isAddDisabled
 }: BoardTabsProps) {
   const { setTheme } = useTheme();
@@ -155,6 +157,10 @@ export default function BoardTabs({
                 </DropdownMenuItem>
               </DropdownMenuSubContent>
             </DropdownMenuSub>
+            <DropdownMenuItem onClick={onApiSettingsClick}>
+                <Settings className="mr-2 h-4 w-4" />
+                <span>API Settings</span>
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={onDeleteAllClick} className="text-destructive focus:text-destructive focus:bg-destructive/10">
               <Trash2 className="mr-2 h-4 w-4" />
