@@ -24,6 +24,7 @@ const SuggestTitleOutputSchema = z.object({
     outputTokens: z.number(),
     totalTokens: z.number(),
   }).optional(),
+  error: z.string().optional(),
 });
 type SuggestTitleOutput = z.infer<typeof SuggestTitleOutputSchema>;
 
@@ -34,7 +35,7 @@ export async function suggestTitle(input: SuggestTitleInput): Promise<SuggestTit
 const prompt = ai.definePrompt({
   name: 'suggestTitlePrompt',
   input: {schema: SuggestTitleInputSchema},
-  output: {schema: SuggestTitleOutputSchema},
+  output: {schema: SuggestTitleOutputSchema.omit({ error: true })},
   prompt: `You are an expert curator for a visual inspiration board. Your task is to analyze an image and suggest a title for it.
 
 Analyze the provided image based on its content, style, colors, and mood.
@@ -60,7 +61,10 @@ const suggestTitleFlow = ai.defineFlow(
       };
     } catch (error: any) {
         console.error("AI title suggestion failed:", error);
-        throw new Error(`The AI service is temporarily unavailable. Please try again later.`);
+        return { 
+            title: '', 
+            error: `The AI service is temporarily unavailable. Please try again later.`
+        };
     }
   }
 );

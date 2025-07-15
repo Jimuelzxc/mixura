@@ -235,15 +235,19 @@ export default function ImageDetailDialog({ image, allTags, isOpen, onOpenChange
         let suggestions;
         if (field === 'title') {
             suggestions = await suggestTitle({ photoDataUri: dataUri }, { headers: getAiHeaders() });
+            if (suggestions.error) throw new Error(suggestions.error);
             if (suggestions.title) form.setValue('title', suggestions.title);
         } else if (field === 'tags') {
             suggestions = await suggestTags({ photoDataUri: dataUri }, { headers: getAiHeaders() });
+            if (suggestions.error) throw new Error(suggestions.error);
             if (suggestions.tags) form.setValue('tags', suggestions.tags);
         } else if (field === 'colors') {
             suggestions = await suggestColors({ photoDataUri: dataUri }, { headers: getAiHeaders() });
+            if (suggestions.error) throw new Error(suggestions.error);
             if (suggestions.colors) form.setValue('colors', suggestions.colors);
         } else if (field === 'notes') {
             suggestions = await suggestNotes({ photoDataUri: dataUri }, { headers: getAiHeaders() });
+            if (suggestions.error) throw new Error(suggestions.error);
             if (suggestions.notes) form.setValue('notes', suggestions.notes);
         }
         if (suggestions?.usage) {

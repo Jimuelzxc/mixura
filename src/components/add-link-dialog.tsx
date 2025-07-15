@@ -230,15 +230,19 @@ export default function AddLinkDialog({ onAddImage, allTags, isOpen, onOpenChang
         let suggestions;
         if (field === 'title') {
             suggestions = await suggestTitle({ photoDataUri: dataUri }, { headers: getAiHeaders() });
+            if (suggestions.error) throw new Error(suggestions.error);
             if (suggestions.title) form.setValue('title', suggestions.title);
         } else if (field === 'tags') {
             suggestions = await suggestTags({ photoDataUri: dataUri }, { headers: getAiHeaders() });
+            if (suggestions.error) throw new Error(suggestions.error);
             if (suggestions.tags) form.setValue('tags', suggestions.tags);
         } else if (field === 'colors') {
             suggestions = await suggestColors({ photoDataUri: dataUri }, { headers: getAiHeaders() });
+            if (suggestions.error) throw new Error(suggestions.error);
             if (suggestions.colors) form.setValue('colors', suggestions.colors);
         } else if (field === 'notes') {
             suggestions = await suggestNotes({ photoDataUri: dataUri }, { headers: getAiHeaders() });
+            if (suggestions.error) throw new Error(suggestions.error);
             if (suggestions.notes) form.setValue('notes', suggestions.notes);
         }
         if (suggestions?.usage) {
@@ -262,8 +266,6 @@ export default function AddLinkDialog({ onAddImage, allTags, isOpen, onOpenChang
     setLastTokenUsage(null);
     let totalTokens = 0;
 
-    const fields: (keyof AIGenerationState)[] = ['title', 'notes', 'tags', 'colors'];
-    
     try {
         const results = await Promise.all([
           suggestTitle({ photoDataUri: dataUri }, { headers: getAiHeaders() }),
@@ -271,6 +273,12 @@ export default function AddLinkDialog({ onAddImage, allTags, isOpen, onOpenChang
           suggestTags({ photoDataUri: dataUri }, { headers: getAiHeaders() }),
           suggestColors({ photoDataUri: dataUri }, { headers: getAiHeaders() })
         ]);
+        
+        for (const res of results) {
+            if (res.error) {
+                throw new Error(res.error);
+            }
+        }
         
         const [titleRes, notesRes, tagsRes, colorsRes] = results;
 

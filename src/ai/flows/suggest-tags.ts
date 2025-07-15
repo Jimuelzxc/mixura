@@ -24,6 +24,7 @@ const SuggestTagsOutputSchema = z.object({
     outputTokens: z.number(),
     totalTokens: z.number(),
   }).optional(),
+  error: z.string().optional(),
 });
 type SuggestTagsOutput = z.infer<typeof SuggestTagsOutputSchema>;
 
@@ -34,7 +35,7 @@ export async function suggestTags(input: SuggestTagsInput): Promise<SuggestTagsO
 const prompt = ai.definePrompt({
   name: 'suggestTagsPrompt',
   input: {schema: SuggestTagsInputSchema},
-  output: {schema: SuggestTagsOutputSchema},
+  output: {schema: SuggestTagsOutputSchema.omit({ error: true })},
   prompt: `You are an expert curator for a visual inspiration board. Your task is to analyze an image and suggest tags for it.
 
 Analyze the provided image based on its content, style, colors, and mood.
@@ -60,7 +61,10 @@ const suggestTagsFlow = ai.defineFlow(
       };
     } catch (error: any) {
       console.error("AI tag suggestion failed:", error);
-      throw new Error(`The AI service is temporarily unavailable. Please try again later.`);
+      return {
+        tags: [],
+        error: `The AI service is temporarily unavailable. Please try again later.`
+      };
     }
   }
 );

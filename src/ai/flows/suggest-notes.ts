@@ -24,6 +24,7 @@ const SuggestNotesOutputSchema = z.object({
     outputTokens: z.number(),
     totalTokens: z.number(),
   }).optional(),
+  error: z.string().optional(),
 });
 type SuggestNotesOutput = z.infer<typeof SuggestNotesOutputSchema>;
 
@@ -34,7 +35,7 @@ export async function suggestNotes(input: SuggestNotesInput): Promise<SuggestNot
 const prompt = ai.definePrompt({
   name: 'suggestNotesPrompt',
   input: {schema: SuggestNotesInputSchema},
-  output: {schema: SuggestNotesOutputSchema},
+  output: {schema: SuggestNotesOutputSchema.omit({ error: true })},
   prompt: `You are an expert curator for a visual inspiration board. Your task is to analyze an image and suggest notes for it.
 
 Analyze the provided image based on its content, style, colors, and mood.
@@ -60,7 +61,10 @@ const suggestNotesFlow = ai.defineFlow(
       };
     } catch (error: any) {
       console.error("AI note suggestion failed:", error);
-      throw new Error(`The AI service is temporarily unavailable. Please try again later.`);
+      return {
+        notes: '',
+        error: `The AI service is temporarily unavailable. Please try again later.`
+      };
     }
   }
 );

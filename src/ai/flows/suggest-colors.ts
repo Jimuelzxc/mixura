@@ -24,6 +24,7 @@ const SuggestColorsOutputSchema = z.object({
     outputTokens: z.number(),
     totalTokens: z.number(),
   }).optional(),
+  error: z.string().optional(),
 });
 type SuggestColorsOutput = z.infer<typeof SuggestColorsOutputSchema>;
 
@@ -34,7 +35,7 @@ export async function suggestColors(input: SuggestColorsInput): Promise<SuggestC
 const prompt = ai.definePrompt({
   name: 'suggestColorsPrompt',
   input: {schema: SuggestColorsInputSchema},
-  output: {schema: SuggestColorsOutputSchema},
+  output: {schema: SuggestColorsOutputSchema.omit({ error: true })},
   prompt: `You are an expert curator for a visual inspiration board. Your task is to analyze an image and suggest colors for it.
 
 Analyze the provided image based on its content, style, colors, and mood.
@@ -60,7 +61,10 @@ const suggestColorsFlow = ai.defineFlow(
       };
     } catch (error: any) {
       console.error("AI color suggestion failed:", error);
-      throw new Error(`The AI service is temporarily unavailable. Please try again later.`);
+      return { 
+        colors: [], 
+        error: `The AI service is temporarily unavailable. Please try again later.`
+      };
     }
   }
 );
