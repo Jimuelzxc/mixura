@@ -247,7 +247,7 @@ export default function ImageDetailDialog({ image, allTags, isOpen, onOpenChange
 
   const selectedColors = form.watch('colors') || [];
   
-  const AiButton = ({ field }: { field: keyof AIGenerationState }) => (
+  const AiButton = ({ field, className }: { field: keyof AIGenerationState, className?: string }) => (
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
@@ -257,7 +257,7 @@ export default function ImageDetailDialog({ image, allTags, isOpen, onOpenChange
             size="icon"
             onClick={() => handleAiFill(field)}
             disabled={!dataUri || isGenerating[field]}
-            className="absolute top-1/2 right-1.5 -translate-y-1/2 h-7 w-7 text-muted-foreground"
+            className={cn("h-7 w-7 text-muted-foreground", className)}
           >
             {isGenerating[field] ? (
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -301,7 +301,7 @@ export default function ImageDetailDialog({ image, allTags, isOpen, onOpenChange
                       <FormLabel>Title</FormLabel>
                       <div className="relative">
                         <FormControl><Input {...field} className="pr-10"/></FormControl>
-                        <AiButton field="title" />
+                        <AiButton field="title" className="absolute top-1/2 right-1.5 -translate-y-1/2"/>
                       </div>
                       <FormMessage />
                     </FormItem>
@@ -364,7 +364,7 @@ export default function ImageDetailDialog({ image, allTags, isOpen, onOpenChange
                               </div>
                            </PopoverContent>
                         </Popover>
-                        <AiButton field="tags" />
+                        <AiButton field="tags" className="absolute top-1/2 right-1.5 -translate-y-1/2"/>
                       </div>
                       <FormMessage />
                     </FormItem>
@@ -378,24 +378,7 @@ export default function ImageDetailDialog({ image, allTags, isOpen, onOpenChange
                     <FormItem>
                         <div className="flex items-center gap-2">
                             <FormLabel>Colors</FormLabel>
-                             <TooltipProvider>
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <Button
-                                            type="button"
-                                            variant="ghost"
-                                            size="icon"
-                                            onClick={() => handleAiFill('colors')}
-                                            disabled={!dataUri || isGenerating['colors']}
-                                            className="h-6 w-6 text-muted-foreground"
-                                        >
-                                            {isGenerating['colors'] ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-                                            <span className="sr-only">Auto-fill colors with AI</span>
-                                        </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent><p>Auto-fill colors with AI</p></TooltipContent>
-                                </Tooltip>
-                             </TooltipProvider>
+                            <AiButton field="colors" />
                         </div>
                       <FormControl>
                         <div className="grid grid-cols-12 gap-2">
@@ -436,7 +419,7 @@ export default function ImageDetailDialog({ image, allTags, isOpen, onOpenChange
                       <FormLabel>Notes</FormLabel>
                       <div className="relative">
                         <FormControl><Textarea {...field} className="pr-10"/></FormControl>
-                        <AiButton field="notes" />
+                        <AiButton field="notes" className="absolute top-2.5 right-1.5" />
                       </div>
                       <FormMessage />
                     </FormItem>

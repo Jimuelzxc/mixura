@@ -39,6 +39,7 @@ import { suggestColors } from '@/ai/flows/suggest-colors';
 import { suggestNotes } from '@/ai/flows/suggest-notes';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 import { cn, basicColorMap } from '@/lib/utils';
+import { Separator } from './ui/separator';
 
 
 const imageSchema = z.object({
@@ -61,6 +62,7 @@ interface AddLinkDialogProps {
 }
 
 type AIGenerationState = {
+    all?: boolean;
     title?: boolean;
     tags?: boolean;
     colors?: boolean;
@@ -237,8 +239,49 @@ export default function AddLinkDialog({ onAddImage, allTags, isOpen, onOpenChang
         setIsGenerating(prev => ({ ...prev, [field]: false }));
     }
   };
+
+  const handleAiFillAll = async () => {
+    if (!dataUri) return;
+    setIsGenerating(prev => ({...prev, all: true}));
+
+    const fields: (keyof AIGenerationState)[] = ['title', 'notes', 'tags', 'colors'];
+    
+    try {
+        await Promise.all(fields.map(async (field) => {
+            try {
+                let suggestions;
+                 if (field === 'title') {
+                    suggestions = await suggestTitle({ photoDataUri: dataUri });
+                    if (suggestions.title) form.setValue('title', suggestions.title);
+                } else if (field === 'tags') {
+                    suggestions = await suggestTags({ photoDataUri: dataUri });
+                    if (suggestions.tags) form.setValue('tags', suggestions.tags);
+                } else if (field === 'colors') {
+                    suggestions = await suggestColors({ photoDataUri: dataUri });
+                    if (suggestions.colors) form.setValue('colors', suggestions.colors);
+                } else if (field === 'notes') {
+                    suggestions = await suggestNotes({ photoDataUri: dataUri });
+                    if (suggestions.notes) form.setValue('notes', suggestions.notes);
+                }
+            } catch (innerError: any) {
+                console.error(`AI suggestion for ${field} failed:`, innerError);
+                toast({
+                    title: `AI ${field} suggestion failed`,
+                    description: innerError.message || `Could not generate suggestion for ${field}.`,
+                    variant: 'destructive',
+                });
+            }
+        }));
+    } catch (error) {
+        console.error("AI fill all failed:", error);
+    } finally {
+        setIsGenerating(prev => ({...prev, all: false}));
+    }
+  };
+
+  const isGeneratingAny = Object.values(isGenerating).some(Boolean);
   
-  const AiButton = ({ field }: { field: keyof AIGenerationState }) => (
+  const AiButton = ({ field, className }: { field: keyof AIGenerationState, className?: string }) => (
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
@@ -247,8 +290,8 @@ export default function AddLinkDialog({ onAddImage, allTags, isOpen, onOpenChang
             variant="ghost"
             size="icon"
             onClick={() => handleAiFill(field)}
-            disabled={!dataUri || isGenerating[field]}
-            className="absolute top-1/2 right-1.5 -translate-y-1/2 h-7 w-7 text-muted-foreground"
+            disabled={!dataUri || isGenerating[field] || isGenerating.all}
+            className={cn("h-7 w-7 text-muted-foreground", className)}
           >
             {isGenerating[field] ? (
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -315,6 +358,21 @@ export default function AddLinkDialog({ onAddImage, allTags, isOpen, onOpenChang
                         unoptimized={isGif}
                       />
                     </div>
+                     <Button
+                        type="button"
+                        variant="outline"
+                        className="w-full"
+                        disabled={!dataUri || isGeneratingAny}
+                        onClick={handleAiFillAll}
+                      >
+                        {isGenerating.all ? (
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        ) : (
+                          <Sparkles className="mr-2 h-4 w-4" />
+                        )}
+                        Auto-fill with AI
+                      </Button>
+                      <Separator />
                   </div>
                 )}
 
@@ -328,7 +386,7 @@ export default function AddLinkDialog({ onAddImage, allTags, isOpen, onOpenChang
                         <FormControl>
                           <Input placeholder="e.g., Abstract Architecture" {...field} className="pr-10" />
                         </FormControl>
-                        <AiButton field="title"/>
+                        <AiButton field="title" className="absolute top-1/2 right-1.5 -translate-y-1/2"/>
                       </div>
                       <FormMessage />
                     </FormItem>
@@ -392,7 +450,7 @@ export default function AddLinkDialog({ onAddImage, allTags, isOpen, onOpenChang
                               </div>
                           </PopoverContent>
                         </Popover>
-                         <AiButton field="tags"/>
+                         <AiButton field="tags" className="absolute top-1/2 right-1.5 -translate-y-1/2"/>
                       </div>
                       <FormMessage />
                     </FormItem>
@@ -406,24 +464,7 @@ export default function AddLinkDialog({ onAddImage, allTags, isOpen, onOpenChang
                     <FormItem>
                        <div className="flex items-center gap-2">
                         <FormLabel>Colors</FormLabel>
-                         <TooltipProvider>
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Button
-                                        type="button"
-                                        variant="ghost"
-                                        size="icon"
-                                        onClick={() => handleAiFill('colors')}
-                                        disabled={!dataUri || isGenerating['colors']}
-                                        className="h-6 w-6 text-muted-foreground"
-                                    >
-                                        {isGenerating['colors'] ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-                                        <span className="sr-only">Auto-fill colors with AI</span>
-                                    </Button>
-                                </TooltipTrigger>
-                                <TooltipContent><p>Auto-fill colors with AI</p></TooltipContent>
-                            </Tooltip>
-                         </TooltipProvider>
+                        <AiButton field="colors" />
                       </div>
                       <FormControl>
                         <div className="grid grid-cols-12 gap-2">
@@ -467,7 +508,7 @@ export default function AddLinkDialog({ onAddImage, allTags, isOpen, onOpenChang
                         <FormControl>
                           <Textarea placeholder="Add any notes about this image..." {...field} className="pr-10" />
                         </FormControl>
-                        <AiButton field="notes"/>
+                        <AiButton field="notes" className="absolute top-2.5 right-1.5"/>
                       </div>
                       <FormMessage />
                     </FormItem>
