@@ -14,80 +14,90 @@ const defaultViewSettings: ViewSettings = {
 export const initialData: { boards: Board[], activeBoardId: string } = {
   boards: [
     {
-      id: "board-1752155521738",
-      name: "Graphic Design",
+      id: "board-1752595471219",
+      name: "Cutout Style",
       images: [
         {
-          url: "https://i.pinimg.com/736x/66/49/f7/6649f7187201f052af354f9a01110a35.jpg",
-          title: "Chromakopia: Tyler, the Creator Album Art",
-          notes: "The image is a stylized album cover with a collage-like aesthetic, combining vibrant colors and geometric shapes to create a bold and energetic mood.  It features a unique, mask-like portrait, hinting at a concept album with themes of identity and transformation.",
-          tags: ["album", "collage", "music", "vibrant", "geometric"],
-          colors: ["Green", "Yellow", "Brown"],
-          id: "img-1752156821238",
-          x: -105.62088224317893,
-          y: 48.92580104998672,
-          width: 351.62056263576517,
-          height: 438.092467305702
+          url: "https://i.pinimg.com/736x/2e/df/ba/2edfbaf81aefa29cab45d93c63ee4bd6.jpg",
+          title: "Raiders Style: Collared Coat and Beanie",
+          notes: "",
+          tags: ["cutout", "character"],
+          colors: ["Purple"],
+          id: "img-1752595690012",
+          x: -555.0900683145687,
+          y: -193.24640389460086,
+          width: 977.1005231350971,
+          height: 1214.7377427562687
         },
         {
-          url: "https://i.pinimg.com/736x/b4/c4/93/b4c4930530e7accb0188d5392250b415.jpg",
-          title: "Lost Again: A Minimalist Graphic",
-          notes: "A minimalist graphic design with a strong, emotional message.  The yellow figure against a pale blue sky evokes feelings of isolation and loss.",
-          tags: ["lost", "alone", "sad", "minimal", "yellow"],
-          colors: ["Yellow", "Blue"],
-          id: "img-1752156815690",
-          x: 319.29299296950245,
-          y: 244.15109211377393,
-          width: 313.01317122305454,
-          height: 313.01317122305454
+          url: "https://i.pinimg.com/736x/8e/ab/55/8eab55855d01049f71ba63eb55ed2747.jpg",
+          title: "",
+          notes: "",
+          tags: [],
+          colors: [],
+          id: "img-1752595629383",
+          x: 472.33946894256167,
+          y: -753.4428986025529,
+          width: 689.7101368332051,
+          height: 689.7101368332051
         },
         {
-          url: "https://i.pinimg.com/736x/f2/1f/43/f21f435dec2df347f507a1fd6131ca4f.jpg",
-          title: "The Answer: Allen Iverson, stylized portrait",
-          notes: "A stylized image of Allen Iverson, known as \"The Answer\", in a basketball pose. The color palette and geometric style create a vintage feel.",
-          tags: ["basketball", "allen iverson", "nba", "vintage", "retro"],
-          colors: ["Brown", "Red", "Black"],
-          id: "img-1752156793550",
-          x: 234.9207264525083,
-          y: 596.99137737661,
-          width: 413.29875793276335,
-          height: 516.6234474159542
+          url: "https://i.pinimg.com/736x/61/bf/86/61bf86d90d2b097fc9e84e9ae8ccbf39.jpg",
+          title: "",
+          notes: "",
+          tags: [],
+          colors: [],
+          id: "img-1752595618461",
+          x: 1320.7251218277947,
+          y: 449.87610508101477,
+          width: 457.6106483145196,
+          height: 323.1291516669873
         },
         {
-          url: "https://i.pinimg.com/736x/e1/f4/42/e1f4423a2b810cc370d95f80b29cc0df.jpg",
-          title: "Digital Melancholy: A Nostalgic Collage",
-          notes: "A surreal, digital collage featuring a dark-skinned man with blue hands, surrounded by nostalgic computer icons, evoking a blend of melancholy and technological reminiscence.",
-          tags: ["collage", "surreal", "digital", "nostalgia", "technology"],
-          colors: ["Blue", "Red", "Black"],
-          id: "img-1752156786968",
-          x: 292.04477087213587,
-          y: -239.41613650351292,
-          width: 335.49353572882814,
-          height: 447.1727697689951
+          url: "https://i.pinimg.com/736x/e7/32/b4/e732b4f3c149fa25bd16fb7cb4c93dc4.jpg",
+          title: "",
+          notes: "",
+          tags: [],
+          colors: [],
+          id: "img-1752595554977",
+          x: 461.8987985042745,
+          y: 304.7676839807509,
+          width: 811.1484621716021,
+          height: 811.1484621716021
         },
         {
-          url: "https://i.pinimg.com/736x/bd/ed/68/bded68ed912202ddc1694c57fa3e80a3.jpg",
-          title: "Sensory Overload: A Red and Black Collage",
-          notes: "The image is a bold, graphic design featuring a collage of human senses and symbols, creating a striking contrast between the red background and black and white elements. It evokes a vintage feel with its halftone style and strong imagery.",
-          tags: ["collage", "graphic", "red", "vintage", "bold"],
-          colors: ["Red", "Black", "White"],
-          id: "img-1752155603533",
-          x: 706.9594592820434,
-          y: 396.2979676620739,
-          width: 496.2814321103895,
-          height: 490.20451661516023
+          url: "https://i.pinimg.com/736x/0d/57/12/0d57125b2d4647b5fdc1db93f4bde8ce.jpg",
+          title: "",
+          notes: "",
+          tags: [],
+          colors: [],
+          id: "img-1752595524701",
+          x: 401.1022841437423,
+          y: -93.50921768688511,
+          width: 409.8119981649608,
+          height: 405.9143297041528
         },
         {
-          url: "https://i.pinimg.com/736x/0e/b8/9a/0eb89a37d3f4b0248fe16bbd96aea0b0.jpg",
-          title: "Fragmented Portrait with Gold Teeth",
-          notes: "The image is a bold and striking collage featuring a fragmented portrait of a man with exaggerated gold teeth, creating a vibrant and slightly unsettling mood. It's a dynamic piece that blends portraiture with graphic design elements.",
-          tags: ["collage", "portrait", "bold", "graphic", "gold"],
-          colors: ["Brown", "Red", "Gold"],
-          id: "img-1752155575388",
-          x: 667.4315563787206,
-          y: -14.382989522136143,
-          width: 368,
-          height: 368
+          url: "https://i.pinimg.com/736x/3b/07/f6/3b07f6c3f0ec87e113a7910ecc1bde9f.jpg",
+          title: "",
+          notes: "",
+          tags: [],
+          colors: [],
+          id: "img-1752595500388",
+          x: 1426.0679459757623,
+          y: 78.34458126290164
+        },
+        {
+          url: "https://i.pinimg.com/1200x/39/a3/03/39a30387bf634804de0c8dbf0b05a125.jpg",
+          title: "",
+          notes: "",
+          tags: ["cutout"],
+          colors: ["Green", "Red"],
+          id: "img-1752595479354",
+          x: 902.4078831739363,
+          y: -332.38555107123165,
+          width: 455.41810303391446,
+          height: 569.272628792393
         }
       ],
       viewSettings: {
@@ -100,9 +110,75 @@ export const initialData: { boards: Board[], activeBoardId: string } = {
         listCoverPosition: "left",
         backgroundPattern: "none"
       }
+    },
+    {
+      id: "board-1752595943587",
+      name: "Graphic Design",
+      images: [
+        {
+          url: "https://i.pinimg.com/736x/2f/2c/18/2f2c18b99d8c0ec8c0b227cdc90d22e6.jpg",
+          title: "",
+          notes: "",
+          tags: [],
+          colors: [],
+          id: "img-1752596991181",
+          x: 100,
+          y: 100
+        }
+      ],
+      viewSettings: {
+        viewMode: "moodboard",
+        gridColumns: 4,
+        listShowCover: true,
+        listShowTitle: true,
+        listShowNotes: true,
+        listShowTags: true,
+        listCoverPosition: "left",
+        backgroundPattern: "none"
+      }
+    },
+    {
+      id: "board-1752598810595",
+      name: "Typography",
+      images: [
+        {
+          url: "https://i.pinimg.com/1200x/b8/cd/db/b8cddbb8d54ca2fc5e010d22ccb0db1e.jpg",
+          title: "",
+          notes: "",
+          tags: [],
+          colors: [],
+          id: "img-1752599012523",
+          x: 100,
+          y: 100
+        }
+      ],
+      viewSettings: {
+        viewMode: "moodboard",
+        gridColumns: 3,
+        listShowCover: true,
+        listShowTitle: true,
+        listShowNotes: true,
+        listShowTags: true,
+        listCoverPosition: "left",
+        backgroundPattern: "none"
+      }
+    },
+    {
+      id: "board-1752638780517",
+      name: "Board 4",
+      images: [],
+      viewSettings: {
+        viewMode: "moodboard",
+        gridColumns: 3,
+        listShowCover: true,
+        listShowTitle: true,
+        listShowNotes: true,
+        listShowTags: true,
+        listCoverPosition: "left",
+        backgroundPattern: "none"
+      }
     }
   ],
-  activeBoardId: "all"
+  activeBoardId: "board-1752595471219"
 };
 
-    
