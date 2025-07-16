@@ -7,7 +7,7 @@
 
 <div align="center">
   <h1>
-   Mixura - Your Idea Organizer
+   Mixura - Your Idea Organizer (It's Free!)
   </h1>
     <p>
    Mixura is a simple, personal space to save and organize images.<br>
