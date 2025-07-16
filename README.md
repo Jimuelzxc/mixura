@@ -7,13 +7,13 @@
 
 <div align="center">
   <h1>
-   Mixura - Your Idea Organizer (It's Free!)
+   Mixura - Your Idea Organizer
   </h1>
     <p>
    Mixura is a simple, personal space to save and organize images.<br>
   It's like your own private Pinterest for creative inspiration, now with AI help to make organizing even easier.
   <p />
-     <a href="https://mixura-saves.vercel.app/">mixura-saves.vercel.app/</a>
+     <a href="https://mixura-saves.vercel.app/">mixura-saves.vercel.app/</a> (It's Free!)
 </div>
 
 
