@@ -1,8 +1,6 @@
 <div style="text-decoration: none; color: inherit; display: flex; align-items: center;">
 
-  <a href="https://mixura-saves.vercel.app">
-    <img src="./mixura-assets/" alt="Mixura Icon" style="width:50px; height:50px; vertical-align: middle; margin-right: 5px;">
-  </a>
+  [![Mixura Icon](./mixura-assets/icon.png)](https://mixura-saves.vercel.app)
 
   <span style="font-size:50px; font-weight: bold; color:black;">
     Mixura - Your Idea Organizer
