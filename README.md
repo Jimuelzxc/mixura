@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://mixura-saves.vercel.app">
-    <img src="./mixura-assets/icon.png" alt="Mixura Icon" width="60" height="80">
+    <img src="./mixura-assets/icon.png" alt="Mixura Icon">
   </a>
 </p>
 
@@ -8,7 +8,6 @@
 <div align="center">
   <h2>
    Mixura - Your Idea Organizer
-  <br />
   </h2>
 </div>
 
