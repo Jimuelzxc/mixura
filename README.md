@@ -1,19 +1,17 @@
-<div style="text-align: center; margin-top: 20px;">
-
+<p align="center">
   <a href="https://mixura-saves.vercel.app">
-    <img src="./mixura-assets/icon.png" alt="Mixura Icon" style="width: 60px; height: 60px; margin-bottom: 10px;">
+    <img src="./mixura-assets/icon.png" alt="Mixura Icon" width="60" height="60">
   </a>
+</p>
 
-  <h1 style="font-size: 28px; font-weight: bold; margin: 10px 0; color: black;">
-    Mixura – Your Idea Organizer
-  </h1>
+<center>
+  # Mixura – Your Idea Organizer
+</center>
 
-  <p style="max-width: 600px; margin: 0 auto; font-size: 16px; line-height: 1.6; color: #444;">
-    Mixura is a simple, personal space to save and organize images.<br>
-    It's like your own private Pinterest for creative inspiration, now with AI help to make organizing even easier.
-  </p>
-
-</div>
+<center>
+  Mixura is a simple, personal space to save and organize images.<br>
+  It's like your own private Pinterest for creative inspiration, now with AI help to make organizing even easier.
+</center>
 
 
 </br>
