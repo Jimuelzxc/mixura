@@ -9,6 +9,7 @@
   </span>
 </div>
 Mixura is a simple, personal space to save and organize images. It's like your own private Pinterest for creative inspiration, now with AI help to make organizing even easier.
+</br>
 
 
 
