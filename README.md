@@ -13,7 +13,7 @@
    Mixura is a simple, personal space to save and organize images.<br>
   It's like your own private Pinterest for creative inspiration, now with AI help to make organizing even easier.
   <p />
-     <a href="https://mixura-saves.vercel.app/">Try Mixura — 100% Free & Open Source </a>
+     <a href="https://mixura-saves.vercel.app/">Try Mixura
 </div>
 
 
