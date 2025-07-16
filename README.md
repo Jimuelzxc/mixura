@@ -1,12 +1,16 @@
 <p align="center">
   <a href="https://mixura-saves.vercel.app">
-    <img src="./mixura-assets/icon.png" alt="Mixura Icon" width="60" height="60">
+    <img src="./mixura-assets/icon.png" alt="Mixura Icon" width="60" height="80">
   </a>
 </p>
 
-<center>
-  # Mixura – Your Idea Organizer
-</center>
+
+<div align="center">
+  <h2>
+   Mixura - Your Idea Organizer
+  <br />
+  </h2>
+</div>
 
 <center>
   Mixura is a simple, personal space to save and organize images.<br>
