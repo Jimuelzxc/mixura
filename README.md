@@ -6,9 +6,9 @@
 
 
 <div align="center">
-  <h2>
+  <h1>
    Mixura - Your Idea Organizer
-  </h2>
+  </h1>
     <p>
    Mixura is a simple, personal space to save and organize images.<br>
   It's like your own private Pinterest for creative inspiration, now with AI help to make organizing even easier.
